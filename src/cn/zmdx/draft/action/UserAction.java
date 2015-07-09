@@ -4,14 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.struts2.ServletActionContext;
-
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Encrypter;
@@ -84,6 +79,9 @@ public class UserAction extends ActionSupport {
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 	/**
@@ -114,6 +112,9 @@ public class UserAction extends ActionSupport {
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 	/**
@@ -181,6 +182,9 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.zmdx.draft.entity.CyclePhoto" table="cycle_photo">
+	  <id name="id" column="id" type="int" >
+			<generator class="native" />
+		</id>
+		<property name="photoId" column="photo_id" />	
+		<property name="cycleId" column="cycle_id"/>
+		<property name="cycleNo" column="cycle_no"/>
+	</class>
+	
+</hibernate-mapping>
+  

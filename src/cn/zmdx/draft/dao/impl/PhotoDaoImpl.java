@@ -12,10 +12,13 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import cn.zmdx.draft.dao.PhotoDao;
+import cn.zmdx.draft.entity.Cycle;
 import cn.zmdx.draft.entity.Photo;
+import cn.zmdx.draft.entity.Themes;
 
 public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	HibernateTemplate template;
+
 	public PhotoDaoImpl(HibernateTemplate template) {
 		this.template = template;
 	}
@@ -57,15 +60,14 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 			}
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastModified"))) {
-					sql.append(" and uploadDate > '"
-							+ dfl.format(lastModified) + "'  ");
-					sql.append(" and uploadDate < '" + dfl.format(date)
+					sql.append(" and uploadDate > '" + dfl.format(lastModified)
 							+ "'  ");
+					sql.append(" and uploadDate < '" + dfl.format(date) + "'  ");
 				}
 			} else if ("1".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastModified"))) {
-					sql.append(" and uploadDate < '"
-							+ dfl.format(lastModified) + "'  ");
+					sql.append(" and uploadDate < '" + dfl.format(lastModified)
+							+ "'  ");
 				}
 			}
 			if ("0".equals(filterMap.get("lastModified"))) {
@@ -91,24 +93,23 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastModified"))) {
-					sql.append(" and uploadDate > '"
-							+ dfl.format(lastModified) + "'  ");
-					sql.append(" and uploadDate < '" + dfl.format(date)
+					sql.append(" and uploadDate > '" + dfl.format(lastModified)
 							+ "'  ");
+					sql.append(" and uploadDate < '" + dfl.format(date) + "'  ");
 				}
 			} else if ("1".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastModified"))) {
-					sql.append(" and uploadDate < '"
-							+ dfl.format(lastModified) + "'  ");
+					sql.append(" and uploadDate < '" + dfl.format(lastModified)
+							+ "'  ");
 				}
 			}
 			if ("0".equals(filterMap.get("lastModified"))) {
 				sql.append(" and uploadDate < '" + dfl.format(date) + "' ");
 			}
-			if("0".equals(filterMap.get("category"))){//新
+			if ("0".equals(filterMap.get("category"))) {// 新
 				sql.append(" order by auditingDate desc limit "
 						+ Integer.parseInt(filterMap.get("limit")) + " ) t  ");
-			}else if("1".equals(filterMap.get("category"))){//热门
+			} else if ("1".equals(filterMap.get("category"))) {// 热门
 				sql.append(" order by praise desc limit "
 						+ Integer.parseInt(filterMap.get("limit")) + " ) t  ");
 			}
@@ -116,6 +117,57 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
 				.setResultTransformer(Transformers.aliasToBean(Photo.class));
+		return query.list();
+	}
+
+	@Override
+	public List queryCycleRanking(String cycleId) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select id,photoUrl,uploadDate,descs,type,flag,praise,tread,auditingDate,userid from (" +
+				"select p.id,p.photoUrl,p.uploadDate,p.descs,p.type,p.flag,p.praise,p.tread,p.auditingDate,p.userid from photo p " +
+				"left join cycle_photo cp on p.id=cp.photo_id  where cp.cycle_id=? and p.type=1 and p.flag=1 order by praise desc ) t");
+
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Photo.class));
+		query.setString(0, cycleId);
+		return query.list();
+	}
+
+	@Override
+	public List queryThemes(Map<String, Object> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select id,name,descs from (select id,name,descs from themes order by id desc ) t");
+
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Themes.class));
+		return query.list();
+	}
+
+	@Override
+	public List queryCycleByThemesId(Map<String, Object> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select id,cycle_no,starttime,signup_endtime,endtime,status,theme_id from (select id,cycle_no,starttime,signup_endtime,endtime,status,theme_id from cycle where 1=1 ");
+		if (filterMap != null && !filterMap.isEmpty()) {
+			if (!"".equals(filterMap.get("themeId"))
+					&& filterMap.get("themeId") != null
+					&& !"''".equals(filterMap.get("themeId"))
+					&& !"null".equals(filterMap.get("themeId"))) {
+				sql.append(" and theme_id = " + filterMap.get("themeId") + " ");
+			}
+			if("0".equals(filterMap.get("flag"))){//未开始
+				sql.append(" and status = 0");
+			}else if("1".equals(filterMap.get("flag"))){//进行中
+				sql.append(" and status = 1");
+			}else if("2".equals(filterMap.get("flag"))){//已结束
+				sql.append(" and status = 2");
+			}
+		}
+		sql.append(" order by starttime desc limit 10 ) t  ");
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Cycle.class));
 		return query.list();
 	}
 

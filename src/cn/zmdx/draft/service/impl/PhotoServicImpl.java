@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.zmdx.draft.dao.PhotoDao;
+import cn.zmdx.draft.entity.CyclePhoto;
 import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.service.PhotoService;
 
@@ -27,6 +28,11 @@ public class PhotoServicImpl implements PhotoService {
 	public void uploadPhoto(Map<String, Object> filterMap) {
 		Photo photo =(Photo)filterMap.get("photo");
 		this.photoDao.saveEntity(photo);
+		if(filterMap.get("cyclePhoto")!=null){
+			CyclePhoto cyclePhoto=(CyclePhoto)filterMap.get("cyclePhoto");
+			cyclePhoto.setPhotoId(photo.getId());
+			this.photoDao.saveEntity(cyclePhoto);
+		}
 	}
 
 	@Override
@@ -39,4 +45,19 @@ public class PhotoServicImpl implements PhotoService {
 		return (Photo)this.photoDao.getEntity(Photo.class, id);
 	}
 
+	@Override
+	public List queryCycleRanking(String cycleId) {
+		return this.photoDao.queryCycleRanking(cycleId);
+	}
+
+	@Override
+	public List queryThemes(Map<String, Object> filterMap) {
+		return this.photoDao.queryThemes(filterMap);
+	}
+
+	@Override
+	public List queryCycleByThemesId(Map<String, Object> filterMap) {
+		return this.photoDao.queryCycleByThemesId(filterMap);
+	}
+	
 }

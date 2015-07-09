@@ -1,5 +1,6 @@
 package cn.zmdx.draft.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,4 +45,26 @@ public interface PhotoService {
 	 * @return
 	 */
 	public Photo getPhotoById(String id);
+	/**
+	 * 获取相应周期的排名
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：下午4:34:21
+	 * @param cycleId
+	 */
+	public List queryCycleRanking(String cycleId);
+	/**
+	 * 获取所有主题
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：下午5:29:49
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryThemes(Map<String, Object> filterMap);
+	/**
+	 * 根据主题id获取相关选秀记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：下午5:29:08
+	 * @throws IOException
+	 */
+	public List queryCycleByThemesId(Map<String, Object> filterMap);
 }

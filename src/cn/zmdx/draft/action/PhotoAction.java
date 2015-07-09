@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts2.ServletActionContext;
 
+import cn.zmdx.draft.entity.CyclePhoto;
 import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.util.UploadPhoto;
@@ -89,12 +90,13 @@ public class PhotoAction extends ActionSupport{
 			List<Photo> list = photoService.queryPersonalPhotos(filterMap);
 			
 			out.print("{\"state\":\"success\",\"data\":"+JSON.toJSONString(list, true)+"}");
-			out.flush();
-			out.close();
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 //			logger.error(e);
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 	/**
@@ -133,12 +135,13 @@ public class PhotoAction extends ActionSupport{
 			List<Photo> list = photoService.queryPhotosWall(filterMap);
 			
 			out.print("{\"state\":\"success\",\"data\":"+JSON.toJSONString(list, true)+"}");
-			out.flush();
-			out.close();
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 //			logger.error(e);
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 	/**
@@ -153,12 +156,16 @@ public class PhotoAction extends ActionSupport{
 		HttpServletRequest request= ServletActionContext.getRequest();
 		PrintWriter out = ServletActionContext.getResponse().getWriter();
 		try{
-			String type=request.getParameter("type");//分类，0:个人，1:选秀，2:秀场
+			String type=request.getParameter("type");//分类，0:个人，1:秀场
 			String userid=request.getParameter("userid");
 			FileInputStream fis= new FileInputStream(getImage());
 			String fileName=UploadPhoto.uploadPhoto(fis,imageFileName);
 			String descs=request.getParameter("descs");
-			
+			String cycleId=request.getParameter("cycleId");
+			String cycleNo=request.getParameter("cycleNo");
+
+			Map<String, Object> filterMap = new HashMap();
+			//图片信息
 			Photo photo=new Photo();
 			photo.setPhotoUrl(fileName);
 			photo.setUploadDate(new Date());
@@ -168,15 +175,25 @@ public class PhotoAction extends ActionSupport{
 			photo.setTread(0);
 			photo.setFlag("0");
 			photo.setUserid(Integer.parseInt(userid));
-			
-			Map<String, Object> filterMap = new HashMap();
 			filterMap.put("photo", photo);
 			
+			if("1".equals(type)){
+				//图片选秀信息
+				CyclePhoto cyclePhoto=new CyclePhoto();
+				cyclePhoto.setCycleId(Integer.parseInt(cycleId));
+				cyclePhoto.setCycleNo(cycleNo);
+				filterMap.put("cyclePhoto", cyclePhoto);
+			}
+			
 			photoService.uploadPhoto(filterMap);
+			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 //			logger.error(e);
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 	/**
@@ -198,10 +215,14 @@ public class PhotoAction extends ActionSupport{
 			
 			photoService.updatePhoto(photo);
 			
+			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 //			logger.error(e);
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 	/**
@@ -222,11 +243,96 @@ public class PhotoAction extends ActionSupport{
 			photo.setTread(photo.getTread()-1);
 			
 			photoService.updatePhoto(photo);
-			
+
+			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
 //			logger.error(e);
 			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 根据选秀周期id查看选秀排名
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：上午10:46:21
+	 * @throws IOException
+	 */
+	public void queryCycleRanking()throws IOException{
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		try{
+			String id=request.getParameter("id");
+			
+			List list=photoService.queryCycleRanking(id);
+			
+			out.print("{\"state\":\"success\",\"data\":"+JSON.toJSONString(list, true)+"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+//			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 获取所有主题
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：下午5:29:08
+	 * @throws IOException
+	 */
+	public void queryThemes()throws IOException{
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		try{
+			Map<String, Object> filterMap = new HashMap();
+			List list=photoService.queryThemes(filterMap);
+			
+			out.print("{\"state\":\"success\",\"data\":"+JSON.toJSONString(list, true)+"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+//			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 根据主题id获取相关选秀记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：下午5:29:08
+	 * @throws IOException
+	 */
+	public void queryCycleByThemesId()throws IOException{
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		try{
+			
+			String themeId=request.getParameter("themeId");
+			String flag=request.getParameter("flag");//0:未开始，1:进行中，2:已结束
+			Map<String, Object> filterMap = new HashMap();
+			filterMap.put("themeId", themeId);
+			filterMap.put("flag", flag);
+			List list=photoService.queryCycleByThemesId(filterMap);
+			
+			out.print("{\"state\":\"success\",\"data\":"+JSON.toJSONString(list, true)+"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+//			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
 		}
 	}
 }

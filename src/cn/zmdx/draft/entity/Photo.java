@@ -8,7 +8,7 @@ public class Photo {
 	private String photoUrl;//图片地址
 	private Date uploadDate;//上传时间
 	private String descs;//描述
-	private String type;//分类，0:个人，1:选秀，2:秀场
+	private String type;//分类，0:个人，1:秀场
 	private String flag;//审核状态，0:未审核，1:审核通过，2:审核未通过
 	private int praise;//赞
 	private int tread;//踩

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.zmdx.draft.entity.Cycle" table="cycle">
+	  <id name="id" column="id" type="int" >
+			<generator class="native" />
+		</id>
+		<property name="cycleNo" column="cycle_no"/>
+		<property name="starttime" column="starttime"/>
+		<property name="signupEndtime" column="signup_endtime"/>
+		<property name="endtime" column="endtime" />	
+		<property name="status" column="status" />	
+		<property name="themeId" column="theme_id" />
+	</class>
+	
+</hibernate-mapping>
+  
