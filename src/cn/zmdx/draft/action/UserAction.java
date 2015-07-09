@@ -183,38 +183,4 @@ public class UserAction extends ActionSupport {
 			e.printStackTrace();
 		}
 	}
-	
-	public void queryUserPhoto() throws IOException{
-		ServletActionContext.getResponse().setContentType(
-				"text/json; charset=utf-8");
-		ServletActionContext.getResponse().setHeader("Cache-Control", "max-age=300");
-		PrintWriter out = ServletActionContext.getResponse().getWriter();
-		//lastModified
-		String lastModified = ServletActionContext.getRequest().getParameter("lastModified");
-		//查询数据数量
-		String limit=ServletActionContext.getRequest().getParameter("limit");
-		//标示，0查询lastModified之后的数据，1查询lastModified之前的数据
-		String flag=ServletActionContext.getRequest().getParameter("flag");
-		if (null == lastModified || "".equals(lastModified)
-				|| "null".equals(lastModified)) {
-			lastModified = "0";
-		}
-		if ("".equals(limit)||limit==null|| "0".equals(limit)){
-			limit = "20";
-		}
-		Map<String, String> filterMap = new HashMap();
-		filterMap.put("limit", limit);
-		filterMap.put("lastModified", lastModified);
-		filterMap.put("flag", flag);
-		try {
-//			List<UserPhoto> list = userService.queryUserPhoto(filterMap);
-//			out.print("{\"state\":\"success\",\"data\":"+JSON.toJSONString(list, true)+"}");
-		} catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-//			logger.error(e);
-			e.printStackTrace();
-		}
-		out.flush();
-		out.close();
-	}
 }

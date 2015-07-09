@@ -13,6 +13,7 @@
 		<property name="praise" column="praise" />	
 		<property name="tread" column="tread" />	
 		<property name="auditingDate" column="auditingDate" />	
+		<property name="userid" column="userid" />	
 	</class>
 	
 </hibernate-mapping>

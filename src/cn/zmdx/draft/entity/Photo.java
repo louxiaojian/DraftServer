@@ -10,9 +10,10 @@ public class Photo {
 	private String descs;//描述
 	private String type;//分类，0:个人，1:选秀，2:秀场
 	private String flag;//审核状态，0:未审核，1:审核通过，2:审核未通过
-	private String praise;//赞
-	private String tread;//踩
+	private int praise;//赞
+	private int tread;//踩
 	private Date auditingDate;//审核时间
+	private int userid;
 	
 	public int getId() {
 		return id;
@@ -50,16 +51,16 @@ public class Photo {
 	public void setFlag(String flag) {
 		this.flag = flag;
 	}
-	public String getPraise() {
+	public int getPraise() {
 		return praise;
 	}
-	public void setPraise(String praise) {
+	public void setPraise(int praise) {
 		this.praise = praise;
 	}
-	public String getTread() {
+	public int getTread() {
 		return tread;
 	}
-	public void setTread(String tread) {
+	public void setTread(int tread) {
 		this.tread = tread;
 	}
 	public Date getAuditingDate() {
@@ -67,6 +68,12 @@ public class Photo {
 	}
 	public void setAuditingDate(Date auditingDate) {
 		this.auditingDate = auditingDate;
+	}
+	public int getUserid() {
+		return userid;
+	}
+	public void setUserid(int userid) {
+		this.userid = userid;
 	}
 	
 }

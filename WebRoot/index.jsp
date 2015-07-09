@@ -18,7 +18,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
   </head>
   <body>
-    <form action="user!uploadPhoto.action?id=5" id="pageFrom" name="" method="post" enctype="multipart/form-data">
+    <form action="photo!uploadPhoto.action?userid=5&type=0" id="pageFrom" name="" method="post" enctype="multipart/form-data">
 		<br />
 		<fieldset class="fieldsetStyle">
 			<legend>

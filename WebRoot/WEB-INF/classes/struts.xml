@@ -20,14 +20,11 @@
 			<result name="success">/WEB-INF/register.jsp
 			</result>
 		</action>
-		<action name="login" class="cn.zmdx.locker.actions.LoginAction">
-			<result name="success">/WEB-INF/main.jsp
-			</result>
+		<action name="photo" class="cn.zmdx.draft.action.PhotoAction">
+			<result name="success">index.jsp</result>
 		</action>
 		<action name="user" class="cn.zmdx.draft.action.UserAction">
-			<result name="success">/WEB-INF/main.jsp
-			</result>
-			<result name="viewDataImg">/data/viewDataImg.jsp</result>
+			<result name="success">index.jsp</result>
 		</action>
 		<action name="notify" class="cn.zmdx.locker.actions.NotifyAction">
 			<result name="success">/WEB-INF/main.jsp
