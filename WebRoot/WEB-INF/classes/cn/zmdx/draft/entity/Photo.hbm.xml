@@ -9,11 +9,12 @@
 		<property name="uploadDate" column="uploadDate"/>
 		<property name="descs" column="descs"/>
 		<property name="type" column="type" />	
-		<property name="flag" column="flag" />	
+		<property name="status" column="status" />	
 		<property name="praise" column="praise" />	
 		<property name="tread" column="tread" />	
 		<property name="auditingDate" column="auditingDate" />	
 		<property name="userid" column="userid" />	
+		<property name="report" column="report" />	
 	</class>
 	
 </hibernate-mapping>

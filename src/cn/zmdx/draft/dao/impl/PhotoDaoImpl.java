@@ -50,7 +50,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		Date lastModified = new Date(Long.parseLong(filterMap
 				.get("lastModified")));// 时间戳转换为时间
 		SimpleDateFormat dfl = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		sql.append("select id,photoUrl,uploadDate,descs,type,flag,praise,tread,auditingDate,userid from (select id,photoUrl,uploadDate,descs,type,flag,praise,tread,auditingDate,userid from photo where 1=1 ");
+		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from (select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from photo where 1=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("userid"))
 					&& filterMap.get("userid") != null
@@ -89,7 +89,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		Date lastModified = new Date(Long.parseLong(filterMap
 				.get("lastModified")));// 时间戳转换为时间
 		SimpleDateFormat dfl = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		sql.append("select id,photoUrl,uploadDate,descs,type,flag,praise,tread,auditingDate,userid from (select id,photoUrl,uploadDate,descs,type,flag,praise,tread,auditingDate,userid from photo where flag =1 ");
+		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from (select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from photo where status =1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastModified"))) {
@@ -123,9 +123,9 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryCycleRanking(String cycleId) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,photoUrl,uploadDate,descs,type,flag,praise,tread,auditingDate,userid from (" +
-				"select p.id,p.photoUrl,p.uploadDate,p.descs,p.type,p.flag,p.praise,p.tread,p.auditingDate,p.userid from photo p " +
-				"left join cycle_photo cp on p.id=cp.photo_id  where cp.cycle_id=? and p.type=1 and p.flag=1 order by praise desc ) t");
+		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from (" +
+				"select p.id,p.photoUrl,p.uploadDate,p.descs,p.type,p.status,p.praise,p.tread,p.auditingDate,p.userid,p.report from photo p " +
+				"left join cycle_photo cp on p.id=cp.photo_id  where cp.cycle_id=? and p.type=1 and p.status=1 order by praise desc ) t");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())

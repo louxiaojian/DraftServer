@@ -173,7 +173,8 @@ public class PhotoAction extends ActionSupport{
 			photo.setType(type);
 			photo.setPraise(0);
 			photo.setTread(0);
-			photo.setFlag("0");
+			photo.setReport(0);
+			photo.setStatus("0");
 			photo.setUserid(Integer.parseInt(userid));
 			filterMap.put("photo", photo);
 			
@@ -241,6 +242,35 @@ public class PhotoAction extends ActionSupport{
 			
 			Photo photo=photoService.getPhotoById(id);
 			photo.setTread(photo.getTread()-1);
+			
+			photoService.updatePhoto(photo);
+
+			out.print("{\"state\":\"success\"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+//			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 举报
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：上午10:46:21
+	 * @throws IOException
+	 */
+	public void report()throws IOException{
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		try{
+			String id=request.getParameter("id");
+			
+			Photo photo=photoService.getPhotoById(id);
+			photo.setReport(photo.getReport()+1);
 			
 			photoService.updatePhoto(photo);
 
