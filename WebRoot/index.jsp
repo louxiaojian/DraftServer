@@ -33,6 +33,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<td align="left"><input type="file" id="image"
 							name="image" value="${image}" onchange="uploadImg()" />
 						</td>
+						<td align="left"><input type="file" id="image"
+							name="image" value="${image}" onchange="uploadImg()" />
+						</td>
+						<td align="left"><input type="file" id="image"
+							name="image" value="${image}" onchange="uploadImg()" />
+						</td>
 					</tr>
 					<tr>
 						<td colspan="4" align="center"><input type="submit"

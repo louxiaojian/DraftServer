@@ -10,7 +10,7 @@ public class Cycle {
 	private Date signupEndtime;//报名结束时间
 	private Date endtime;//选秀结束时间
 	private String status;//选秀状态，0:未开始，1:进行中，2:结束
-	private String themeId;//选秀主题id
+	private int themeId;//选秀主题id
 	
 	public int getId() {
 		return id;
@@ -48,10 +48,10 @@ public class Cycle {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getThemeId() {
+	public int getThemeId() {
 		return themeId;
 	}
-	public void setThemeId(String themeId) {
+	public void setThemeId(int themeId) {
 		this.themeId = themeId;
 	}
 }

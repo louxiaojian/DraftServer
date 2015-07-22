@@ -15,6 +15,7 @@
 		<property name="auditingDate" column="auditingDate" />	
 		<property name="userid" column="userid" />	
 		<property name="report" column="report" />	
+		<property name="view" column="view" />	
 	</class>
 	
 </hibernate-mapping>

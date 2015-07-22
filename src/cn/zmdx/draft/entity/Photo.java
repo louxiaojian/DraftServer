@@ -15,6 +15,7 @@ public class Photo {
 	private Date auditingDate;//审核时间
 	private int userid;
 	private int report;
+	private int view;
 	
 	public int getId() {
 		return id;
@@ -81,6 +82,12 @@ public class Photo {
 	}
 	public void setReport(int report) {
 		this.report = report;
+	}
+	public int getView() {
+		return view;
+	}
+	public void setView(int view) {
+		this.view = view;
 	}
 	
 }

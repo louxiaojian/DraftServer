@@ -50,7 +50,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		Date lastModified = new Date(Long.parseLong(filterMap
 				.get("lastModified")));// 时间戳转换为时间
 		SimpleDateFormat dfl = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from (select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from photo where 1=1 ");
+		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view from (select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view from photo where 1=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("userid"))
 					&& filterMap.get("userid") != null
@@ -89,7 +89,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		Date lastModified = new Date(Long.parseLong(filterMap
 				.get("lastModified")));// 时间戳转换为时间
 		SimpleDateFormat dfl = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from (select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from photo where status =1 ");
+		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view from (select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view from photo where status =1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastModified"))) {
@@ -123,14 +123,14 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryCycleRanking(String cycleId) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report from (" +
-				"select p.id,p.photoUrl,p.uploadDate,p.descs,p.type,p.status,p.praise,p.tread,p.auditingDate,p.userid,p.report from photo p " +
+		sql.append("select id,photoUrl,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,p.view from (" +
+				"select p.id,p.photoUrl,p.uploadDate,p.descs,p.type,p.status,p.praise,p.tread,p.auditingDate,p.userid,p.report,p.view from photo p " +
 				"left join cycle_photo cp on p.id=cp.photo_id  where cp.cycle_id=? and p.type=1 and p.status=1 order by praise desc ) t");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
 				.setResultTransformer(Transformers.aliasToBean(Photo.class));
-		query.setString(0, cycleId);
+		query.setInteger(0, Integer.parseInt(cycleId));
 		return query.list();
 	}
 
@@ -148,7 +148,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryCycleByThemesId(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,cycle_no,starttime,signup_endtime,endtime,status,theme_id from (select id,cycle_no,starttime,signup_endtime,endtime,status,theme_id from cycle where 1=1 ");
+		sql.append("select id,cycle_no as cycleNo,starttime,signup_endtime as signupEndtime,endtime,status,theme_id as themeId from (select id,cycle_no,starttime,signup_endtime,endtime,status,theme_id from cycle where 1=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("themeId"))
 					&& filterMap.get("themeId") != null
@@ -168,6 +168,19 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
 				.setResultTransformer(Transformers.aliasToBean(Cycle.class));
+		return query.list();
+	}
+
+	@Override
+	public List validateIsAttend(Map<String, Object> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select p.id from photo p left join cycle_photo cp on p.id=cp.photo_id  where cp.cycle_id=? and p.userid=? order by praise desc");
+
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Photo.class));
+		query.setInteger(0, Integer.parseInt(filterMap.get("cycleId").toString()));
+		query.setInteger(1, Integer.parseInt(filterMap.get("userId").toString()));
 		return query.list();
 	}
 

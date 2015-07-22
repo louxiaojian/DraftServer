@@ -26,12 +26,14 @@ public class PhotoServicImpl implements PhotoService {
 
 	@Override
 	public void uploadPhoto(Map<String, Object> filterMap) {
-		Photo photo =(Photo)filterMap.get("photo");
-		this.photoDao.saveEntity(photo);
-		if(filterMap.get("cyclePhoto")!=null){
-			CyclePhoto cyclePhoto=(CyclePhoto)filterMap.get("cyclePhoto");
-			cyclePhoto.setPhotoId(photo.getId());
-			this.photoDao.saveEntity(cyclePhoto);
+		for(int i=0;i<(Integer)filterMap.get("count");i++){
+			Photo photo =(Photo)filterMap.get("photo"+i);
+//			this.photoDao.saveEntity(photo);
+			if(filterMap.get("cyclePhoto")!=null){
+				CyclePhoto cyclePhoto=(CyclePhoto)filterMap.get("cyclePhoto");
+				cyclePhoto.setPhotoId(photo.getId());
+//				this.photoDao.saveEntity(cyclePhoto);
+			}
 		}
 	}
 
@@ -58,6 +60,11 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public List queryCycleByThemesId(Map<String, Object> filterMap) {
 		return this.photoDao.queryCycleByThemesId(filterMap);
+	}
+
+	@Override
+	public List validateIsAttend(Map<String, Object> filterMap) {
+		return this.photoDao.validateIsAttend(filterMap);
 	}
 	
 }

@@ -6,16 +6,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Encrypter;
 import cn.zmdx.draft.util.UploadPhoto;
-
 import com.opensymphony.xwork2.ActionSupport;
 
 public class UserAction extends ActionSupport {
-
+	private Logger logger=Logger.getLogger(UserAction.class);
 	private UserServiceImpl userService;
 	// 上传文件域
 	private File image;
@@ -54,11 +55,12 @@ public class UserAction extends ActionSupport {
 	 * @date： 日期：2015-7-7 时间：下午12:37:15
 	 * @throws IOException
 	 */
-	public void register() throws IOException{
+	public void register(){
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		PrintWriter out =null;
 		try{
+			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("pwd");
@@ -74,10 +76,15 @@ public class UserAction extends ActionSupport {
 				user.setAge(0);
 //				this.userService.saveUser(user);
 			}else{
-				out.print("{\"state\":\"loginname already exist\"}");
+				out.print("{\"state\":\"failed\",\"errorMsg\":\"loginname already exist\"}");
 			}
+		} catch (IOException ie) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
+			logger.error(e);
 			e.printStackTrace();
 		}finally{
 			out.flush();
@@ -90,11 +97,12 @@ public class UserAction extends ActionSupport {
 	 * @date： 日期：2015-7-6 时间：下午5:24:15
 	 * @throws IOException
 	 */
-	public void login() throws IOException{
+	public void login(){
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		PrintWriter out =null;
 		try{
+			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("pwd");
@@ -106,11 +114,16 @@ public class UserAction extends ActionSupport {
 				if(user.getPassword().equals(Encrypter.md5(pwd))){
 					out.print("{\"state\":\"success\"}");
 				}else{
-					out.print("{\"state\":\"password error\"}");
+					out.print("{\"state\":\"failed\",\"errorMsg\":\"password error\"}");
 				}
 			}
+		} catch (IOException ie) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\"}");
+			logger.error(e);
 			e.printStackTrace();
 		}finally{
 			out.flush();
@@ -138,9 +151,13 @@ public class UserAction extends ActionSupport {
 				this.userService.updateUser(user);
 			}
 			out.print("{\"state\":\"success\"}");
-		} catch (Exception e) {
+		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
-//			logger.error(e);
+			logger.error(ie);
+			ie.printStackTrace();
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(e);
 			e.printStackTrace();
 		}finally{
 			out.flush();
@@ -153,11 +170,12 @@ public class UserAction extends ActionSupport {
 	 * @date： 日期：2015-7-7 时间：下午12:53:03
 	 * @throws IOException
 	 */
-	public void perfectInformation() throws IOException{
+	public void perfectInformation(){
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out = ServletActionContext.getResponse().getWriter();
-		try {
+		PrintWriter out =null;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request=ServletActionContext.getRequest();
 			int id=Integer.parseInt(request.getParameter("id"));
 			String username=request.getParameter("username");//昵称
@@ -179,8 +197,53 @@ public class UserAction extends ActionSupport {
 			user.setIntroduction(introduction);
 			this.userService.updateUser(user);
 			out.print("{\"state\":\"success\"}");
-		} catch (Exception e) {
+		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 修改密码
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-21 时间：上午11:41:41
+	 */
+	public void updatePassword(){
+		HttpServletRequest request=ServletActionContext.getRequest();
+		HttpServletResponse response =ServletActionContext.getResponse();
+		PrintWriter out= null;
+		try {
+			out= response.getWriter();
+			String oldPassowrd =request.getParameter("oldPassword");
+			String newPassowrd =request.getParameter("newPassword");
+			String userName=request.getParameter("userName");
+			List<?> list=userService.login(userName);
+			if(list.size()>0&&!list.isEmpty()){
+				User user=(User)list.get(0);
+				if(Encrypter.md5(oldPassowrd).equals(user.getPassword())){
+					user.setPassword(Encrypter.md5(newPassowrd));
+					this.userService.updateUser(user);
+					out.print("{\"state\":\"success\"}");
+				}else{
+					out.print("{\"state\":\"failed\",\"errorMsg\":\"original password error\"}");
+				}
+			}else{
+				out.print("{\"state\":\"failed\",\"errorMsg\":\"username does not exist\"}");
+			}
+		} catch (IOException ie) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(e);
 			e.printStackTrace();
 		}finally{
 			out.flush();

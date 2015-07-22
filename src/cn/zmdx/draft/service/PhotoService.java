@@ -67,4 +67,12 @@ public interface PhotoService {
 	 * @throws IOException
 	 */
 	public List queryCycleByThemesId(Map<String, Object> filterMap);
+	/**
+	 * 验证用户是否参与此次选秀
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-20 时间：下午12:26:33
+	 * @param filterMap
+	 * @return
+	 */
+	public List validateIsAttend(Map<String, Object> filterMap);
 }
