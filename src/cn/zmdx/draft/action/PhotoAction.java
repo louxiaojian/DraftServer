@@ -8,9 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.http.HTTPException;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+
+import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.CyclePhoto;
 import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.service.PhotoService;
@@ -89,9 +92,9 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -134,9 +137,9 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -206,9 +209,9 @@ public class PhotoAction extends ActionSupport{
 			photoService.uploadPhoto(filterMap);
 			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -235,9 +238,9 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -264,9 +267,9 @@ public class PhotoAction extends ActionSupport{
 
 			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -293,9 +296,9 @@ public class PhotoAction extends ActionSupport{
 
 			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -322,9 +325,9 @@ public class PhotoAction extends ActionSupport{
 
 			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -348,9 +351,9 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -373,9 +376,9 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -403,9 +406,9 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
-			logger.error(e);
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
+			logger.error(e);
 		}finally{
 			out.flush();
 			out.close();
@@ -437,17 +440,71 @@ public class PhotoAction extends ActionSupport{
 			}else{//未参与
 				out.print("{\"state\":\"success\",\"result\":\"no\"}");
 			}
-		}catch(HTTPException he){
-			out.print("{\"state\":\"error\",\""+he.hashCode()+"\":\""+he.fillInStackTrace()+"\"}");
-			he.printStackTrace();
-			logger.error(he);
-		}catch (RuntimeException re) {
-			out.print("{\"state\":\"error\",\""+re.hashCode()+"\":\""+re.fillInStackTrace()+"\"}");
-			re.printStackTrace();
-			logger.error(re);
-			System.out.println(re.getMessage());
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\""+e.hashCode()+"\":\""+e.fillInStackTrace()+"\"}");
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			e.printStackTrace();
+			logger.error(e);
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 发表评论
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-22 时间：上午11:49:09
+	 */
+	public void comment(){
+		HttpServletRequest request= ServletActionContext.getRequest();
+		HttpServletResponse response= ServletActionContext.getResponse();
+		PrintWriter out=null;
+		try {
+			response.setContentType("text/json; charset=utf-8");
+			out=response.getWriter();
+			String photoId=request.getParameter("photoId");
+			String content=request.getParameter("content");
+			String parentId=request.getParameter("parentId");
+			String userId=request.getParameter("userId");
+			Comment comment=new Comment();
+			comment.setContent(content);
+			comment.setParentId(Integer.parseInt(parentId));
+			comment.setPhotoId(Integer.parseInt(photoId));
+			comment.setUserId(Integer.parseInt(userId));
+			comment.setDatetime(new Date());
+			this.photoService.saveEntity(comment);
+			out.print("{\"state\":\"success\"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getLocalizedMessage()+"\"}");
+			e.printStackTrace();
+			logger.error(e);
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 加载评论
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-22 时间：下午12:50:14
+	 */
+	public void loadComment(){
+		HttpServletRequest request= ServletActionContext.getRequest();
+		HttpServletResponse response= ServletActionContext.getResponse();
+		PrintWriter out=null;
+		try {
+			response.setContentType("text/json; charset=utf-8");
+			out=response.getWriter();
+			String photoId=request.getParameter("photoId");
+			String lastId=request.getParameter("lastId");
+			String flag=request.getParameter("flag");
+			Map<String, Object> filterMap = new HashMap();
+			filterMap.put("photoId", photoId);
+			filterMap.put("lastId", lastId);
+			filterMap.put("flag", flag);
+			List list=this.photoService.queryComment(filterMap);
+			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getLocalizedMessage()+"\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{

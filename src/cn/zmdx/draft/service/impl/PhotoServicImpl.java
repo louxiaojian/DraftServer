@@ -66,5 +66,15 @@ public class PhotoServicImpl implements PhotoService {
 	public List validateIsAttend(Map<String, Object> filterMap) {
 		return this.photoDao.validateIsAttend(filterMap);
 	}
+
+	@Override
+	public void saveEntity(Object obj) {
+		this.photoDao.saveEntity(obj);
+	}
+
+	@Override
+	public List queryComment(Map<String, Object> filterMap) {
+		return this.photoDao.queryComment(filterMap);
+	}
 	
 }

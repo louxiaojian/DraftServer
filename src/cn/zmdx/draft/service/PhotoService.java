@@ -75,4 +75,20 @@ public interface PhotoService {
 	 * @return
 	 */
 	public List validateIsAttend(Map<String, Object> filterMap);
+	/**
+	 * 保存对象
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-7 时间：上午11:31:29
+	 * @param obj
+	 * @return
+	 */
+	public void saveEntity(Object obj);
+	/**
+	 * 查询相应的评论信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-22 时间：下午12:27:59
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryComment(Map<String, Object> filterMap);
 }

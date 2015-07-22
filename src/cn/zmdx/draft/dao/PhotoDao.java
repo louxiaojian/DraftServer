@@ -51,5 +51,13 @@ public interface PhotoDao extends BaseDao {
 	 * @return
 	 */
 	public List validateIsAttend(Map<String, Object> filterMap);
+	/**
+	 * 查询相应的评论信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-22 时间：下午12:27:59
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryComment(Map<String, Object> filterMap);
 
 }

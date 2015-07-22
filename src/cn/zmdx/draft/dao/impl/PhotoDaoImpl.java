@@ -12,6 +12,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import cn.zmdx.draft.dao.PhotoDao;
+import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.Cycle;
 import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.entity.Themes;
@@ -181,6 +182,34 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				.setResultTransformer(Transformers.aliasToBean(Photo.class));
 		query.setInteger(0, Integer.parseInt(filterMap.get("cycleId").toString()));
 		query.setInteger(1, Integer.parseInt(filterMap.get("userId").toString()));
+		return query.list();
+	}
+
+	@Override
+	public List queryComment(Map<String, Object> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select id,content,datetime,parent_id as parentId ,photo_id as photoId,user_id as userId,loginname as username from (SELECT c.id,content,datetime,parent_id,photo_id,user_id,u.loginname FROM comment c left join users u on c.user_id=u.id where 1=1 ");
+		if (filterMap != null && !filterMap.isEmpty()) {
+			if (!"".equals(filterMap.get("photoId"))
+					&& filterMap.get("photoId") != null
+					&& !"''".equals(filterMap.get("photoId"))
+					&& !"null".equals(filterMap.get("photoId"))) {
+				sql.append(" and photo_id = " + filterMap.get("photoId") + " ");
+			}
+			if("0".equals(filterMap.get("flag"))){
+				if(!"".equals(filterMap.get("lastId"))&&filterMap.get("lastId")!=null){
+					sql.append(" and c.id >"+filterMap.get("lastId"));
+				}
+			}else if("1".equals(filterMap.get("flag"))){
+				if(!"".equals(filterMap.get("lastId"))&&filterMap.get("lastId")!=null){
+					sql.append(" and c.id <"+filterMap.get("lastId"));
+				}
+			}
+		}
+		sql.append(" order by datetime desc ) t  ");
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Comment.class));
 		return query.list();
 	}
 
