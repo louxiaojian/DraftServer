@@ -12,10 +12,11 @@ public class Comment {
 	private int id;
 	private Date datetime;//发表评论时间
 	private String content;//评论内容
-	private int parentId;//上级评论id，默认为0
-	private int photoId;//评论所属图片id
+	private Integer parentUserId;//上级评论人id，默认为0
+	private int pictureSetId;//评论所属照片集id
 	private int userId;//评论人id
 	private String username;//评论人昵称
+	private String parentusername;//评论回复人昵称
 	
 	public int getId() {
 		return id;
@@ -35,18 +36,6 @@ public class Comment {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public int getParentId() {
-		return parentId;
-	}
-	public void setParentId(int parentId) {
-		this.parentId = parentId;
-	}
-	public int getPhotoId() {
-		return photoId;
-	}
-	public void setPhotoId(int photoId) {
-		this.photoId = photoId;
-	}
 	public int getUserId() {
 		return userId;
 	}
@@ -58,6 +47,24 @@ public class Comment {
 	}
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	public Integer getParentUserId() {
+		return parentUserId;
+	}
+	public void setParentUserId(Integer parentUserId) {
+		this.parentUserId = parentUserId;
+	}
+	public String getParentusername() {
+		return parentusername;
+	}
+	public void setParentusername(String parentusername) {
+		this.parentusername = parentusername;
+	}
+	public int getPictureSetId() {
+		return pictureSetId;
+	}
+	public void setPictureSetId(int pictureSetId) {
+		this.pictureSetId = pictureSetId;
 	}
 
 }

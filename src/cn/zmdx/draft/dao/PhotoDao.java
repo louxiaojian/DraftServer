@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import cn.zmdx.draft.entity.Photo;
+
 public interface PhotoDao extends BaseDao {
 	/**
 	 * 查看个人照片
@@ -59,5 +61,40 @@ public interface PhotoDao extends BaseDao {
 	 * @return
 	 */
 	public List queryComment(Map<String, Object> filterMap);
+	/**
+	 * 查看选秀照片墙
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：上午11:22:56
+	 * @param filterMap
+	 * @return
+	 */
+	public List<Photo> queryDraftPhotosWall(Map<String, String> filterMap);
+	/**
+	 * 查看热门照片墙
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：下午12:03:02
+	 * @param filterMap
+	 * @return
+	 */
+	public List<Photo> queryHotPhotosWall(Map<String, String> filterMap);
+	/**
+	 * 获取相应图片集的图片信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：下午2:47:52
+	 * @param id
+	 * @return
+	 */
+	public List queryPhotoByPictureSetId(int id);
+	/**
+	 * 根据userid、pictureSetId、operationType查询操作记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：下午3:44:51
+	 * @param userid
+	 * @param pictureSetId
+	 * @param operationType
+	 * @return
+	 */
+	public List queryPhotoByPictureSetId(String userid, String pictureSetId,
+			int operationType);
 
 }

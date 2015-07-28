@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -18,8 +19,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
   </head>
   <body>
-    <form action="photo!uploadPhoto.action?userid=5&type=0" id="pageFrom" name="" method="post" enctype="multipart/form-data">
-		<br />
+    <form action="photo!uploadPhoto.action?userid=5&type=1&cycleId=1&cycleNo=201507001&descs=asdfyhh" id="pageFrom" name="" method="post" enctype="multipart/form-data">
+		<br /><s:debug></s:debug>
 		<fieldset class="fieldsetStyle">
 			<legend>
 				<font size="3">基本信息</font>
@@ -53,6 +54,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<table>
 			<tr><td>用户名：<input name="loginname" type="text" /></td></tr>
 			<tr><td>密码：<input name="pwd" type="password" /></td></tr>
+			<tr><td><input type="submit" value="登录"/></td></tr>
+		</table>
+	</form>
+	<form action="photo!comment.action?userId=5&pictureSetId=1" method="post">
+		<table>
+			<tr><td>评论：
+			<textarea rows="6" cols="30" name="content"></textarea>
+			</td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
 	</form>

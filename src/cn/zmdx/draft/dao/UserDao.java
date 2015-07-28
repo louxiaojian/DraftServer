@@ -1,6 +1,6 @@
 package cn.zmdx.draft.dao;
 
-import java.util.List;
+import cn.zmdx.draft.entity.User;
 
 public interface UserDao extends BaseDao{
 
@@ -11,5 +11,5 @@ public interface UserDao extends BaseDao{
 	 * @param loginname
 	 * @return
 	 */
-	public List<?> login(String loginname);
+	public User findByName(String loginname);
 }

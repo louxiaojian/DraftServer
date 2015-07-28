@@ -4,15 +4,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
-import cn.zmdx.draft.util.Encrypter;
+import cn.zmdx.draft.util.Sha1;
 import cn.zmdx.draft.util.UploadPhoto;
+import cn.zmdx.draft.util.UserCookieUtil;
+
+import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
 
 public class UserAction extends ActionSupport {
@@ -64,17 +73,19 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("pwd");
-			pwd=Encrypter.md5(pwd);
-			List<?> list=userService.login(loginname);
-			if(list.size()==0){
-//				out.print("{\"state\":\"success\"}");
-				User user =new User();
-				user.setLoginname(loginname);
-				user.setPassword(pwd);
-				user.setFlag("1");
-				user.setIsvalidate("0");
-				user.setAge(0);
-//				this.userService.saveUser(user);
+			Sha1 sha1=new Sha1();
+			pwd=sha1.Digest(pwd);
+			User user=userService.findByName(loginname);
+			if(user==null){
+				User newUser =new User();
+				newUser.setLoginname(loginname);
+				newUser.setPassword(pwd);
+				newUser.setFlag("1");
+				newUser.setIsvalidate("0");
+				newUser.setAge(0);
+				newUser.setRegistrationDate(new Date());
+				this.userService.saveUser(newUser);
+				out.print("{\"state\":\"success\"}");
 			}else{
 				out.print("{\"state\":\"failed\",\"errorMsg\":\"loginname already exist\"}");
 			}
@@ -106,17 +117,57 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("pwd");
-			List<?> list=userService.login(loginname);
-			if(list.size()==0){
+			User user=userService.findByName(loginname);
+			if(user==null){
 				out.print("{\"state\":\"loginname does not exist\"}");
 			}else{
-				User user=(User)list.get(0);
-				if(user.getPassword().equals(Encrypter.md5(pwd))){
-					out.print("{\"state\":\"success\"}");
+				Sha1 sha1=new Sha1();
+				pwd=sha1.Digest(pwd);
+				if(user.getPassword().equals(pwd)){
+					UserCookieUtil.saveCookie(user, ServletActionContext.getResponse());
+					User u=new User();
+					u.setId(user.getId());
+					u.setAge(user.getAge());
+					u.setAddress(user.getAddress());
+					u.setIntroduction(user.getIntroduction());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					u.setTelephone(user.getTelephone());
+					u.setLoginname(user.getLoginname());
+					u.setGender(user.getGender());
+					out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(u)+"}");
 				}else{
 					out.print("{\"state\":\"failed\",\"errorMsg\":\"password error\"}");
 				}
 			}
+		} catch (IOException ie) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 注销登录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-24 时间：下午12:05:37
+	 */
+	public void logout(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		PrintWriter out =null;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			HttpServletRequest request=ServletActionContext.getRequest();
+//			String loginname=request.getParameter("loginname");
+			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
+			out.print("{\"state\":\"success\"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
 			logger.error(ie);
@@ -224,11 +275,12 @@ public class UserAction extends ActionSupport {
 			String oldPassowrd =request.getParameter("oldPassword");
 			String newPassowrd =request.getParameter("newPassword");
 			String userName=request.getParameter("userName");
-			List<?> list=userService.login(userName);
-			if(list.size()>0&&!list.isEmpty()){
-				User user=(User)list.get(0);
-				if(Encrypter.md5(oldPassowrd).equals(user.getPassword())){
-					user.setPassword(Encrypter.md5(newPassowrd));
+			User user=userService.findByName(userName);
+			if(user!=null){
+				Sha1 sha1=new Sha1();
+				oldPassowrd=sha1.Digest(oldPassowrd);
+				if(oldPassowrd.equals(user.getPassword())){
+					user.setPassword(sha1.Digest(newPassowrd));
 					this.userService.updateUser(user);
 					out.print("{\"state\":\"success\"}");
 				}else{
@@ -237,6 +289,41 @@ public class UserAction extends ActionSupport {
 			}else{
 				out.print("{\"state\":\"failed\",\"errorMsg\":\"username does not exist\"}");
 			}
+		} catch (IOException ie) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 查看用户信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：下午4:51:02
+	 */
+	public void viewUserInfo(){
+		HttpServletRequest request=ServletActionContext.getRequest();
+		HttpServletResponse response =ServletActionContext.getResponse();
+		PrintWriter out= null;
+		try {
+			out= response.getWriter();
+			String userId=request.getParameter("userId");
+			User user=userService.getById(Integer.parseInt(userId));
+			User u=new User();
+			u.setId(user.getId());
+			u.setAge(user.getAge());
+			u.setAddress(user.getAddress());
+			u.setIntroduction(user.getIntroduction());
+			u.setHeadPortrait(user.getHeadPortrait());
+			u.setUsername(user.getUsername());
+			u.setTelephone(user.getTelephone());
+			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(u)+"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
 			logger.error(ie);

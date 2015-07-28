@@ -1,5 +1,7 @@
 package cn.zmdx.draft.entity;
 
+import java.util.Date;
+
 public class User {
 	private int id;
 	private String username;//昵称
@@ -12,7 +14,9 @@ public class User {
 	private String isvalidate;//真人验证，0:未验证，1:验证失败，2:验证成功
 	private String headPortrait;//头像
 	private int age;//年龄
+	private int gender;//性别：0未知，1男，2女
 	private String introduction;//个人介绍
+	private Date registrationDate;//注册时间
 	
 	public int getId() {
 		return id;
@@ -85,6 +89,18 @@ public class User {
 	}
 	public void setIntroduction(String introduction) {
 		this.introduction = introduction;
+	}
+	public Date getRegistrationDate() {
+		return registrationDate;
+	}
+	public void setRegistrationDate(Date registrationDate) {
+		this.registrationDate = registrationDate;
+	}
+	public int getGender() {
+		return gender;
+	}
+	public void setGender(int gender) {
+		this.gender = gender;
 	}
 	
 }

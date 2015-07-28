@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="cn.zmdx.draft.entity.Comment" table="comment">
+	<class name="cn.zmdx.draft.entity.Comment" table="comment" dynamic-insert="true">
 	  <id name="id" column="id" type="int" >
 			<generator class="native" />
 		</id>
 		<property name="datetime" column="datetime"/>
 		<property name="content" column="content"/>
-		<property name="parentId" column="parent_id"/>
-		<property name="photoId" column="photo_id" />	
+		<property name="parentUserId" column="parent_user_id"/>
+		<property name="pictureSetId" column="picture_set_id" />	
 		<property name="userId" column="user_id" />	
 	</class>
 	
