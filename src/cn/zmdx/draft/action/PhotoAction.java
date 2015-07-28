@@ -8,13 +8,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
-
 import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.CyclePhotoSet;
 import cn.zmdx.draft.entity.Photo;
@@ -23,7 +20,6 @@ import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.util.SensitivewordFilter;
 import cn.zmdx.draft.util.UploadPhoto;
-
 import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
 
