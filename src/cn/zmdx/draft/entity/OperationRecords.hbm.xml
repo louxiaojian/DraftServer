@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="cn.zmdx.draft.entity.CyclePhotoSet" table="cycle_photo_set" dynamic-insert="true">
+	<class name="cn.zmdx.draft.entity.OperationRecords" table="operation_records" dynamic-insert="true">
 	  <id name="id" column="id" type="int" >
 			<generator class="native" />
 		</id>
-		<property name="photoSetId" column="photo_set_id" />	
-		<property name="cycleId" column="cycle_id"/>
-		<property name="cycleNo" column="cycle_no"/>
+		<property name="userid" column="userid"/>
+		<property name="operationType" column="operation_type"/>
+		<property name="pictureSetId" column="picture_set_id"/>
 	</class>
 	
 </hibernate-mapping>

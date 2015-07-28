@@ -13,7 +13,7 @@ public interface UserService {
 	 * @param loginname
 	 * @return
 	 */
-	public List<?> login(String loginname);
+	public User findByName(String loginname);
 
 	/**
 	 * 用户注册

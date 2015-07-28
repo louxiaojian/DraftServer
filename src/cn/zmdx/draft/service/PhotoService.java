@@ -31,20 +31,20 @@ public interface PhotoService {
 	 */
 	public void uploadPhoto(Map<String, Object> filterMap);
 	/**
-	 * 修改Photo
+	 * 修改object
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：上午10:47:39
 	 * @param photo
 	 */
-	public void updatePhoto(Photo photo);
+	public void updateObject(Object object);
 	/**
-	 * 根据id获取Photo对象
+	 * 根据id获取Object对象
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：上午10:48:32
 	 * @param id
 	 * @return
 	 */
-	public Photo getPhotoById(String id);
+	public Object getObjectById(Class clazz,String id);
 	/**
 	 * 获取相应周期的排名
 	 * @author louxiaojian
@@ -91,4 +91,38 @@ public interface PhotoService {
 	 * @return
 	 */
 	public List queryComment(Map<String, Object> filterMap);
+	/**
+	 * 查看选秀照片墙
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：上午11:21:56
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryDraftPhotosWall(Map<String, String> filterMap);
+	/**
+	 * 查看热门照片墙
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：下午12:02:18
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryHotPhotosWall(Map<String, String> filterMap);
+	/**
+	 * 获取相应图片集的图片信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：下午2:45:46
+	 * @param id
+	 */
+	public List queryPhotoByPictureSetId(int id);
+	/**
+	 * 根据userid、pictureSetId、operationType查询操作记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-27 时间：下午3:43:15
+	 * @param userid
+	 * @param pictureSetId
+	 * @param operationType
+	 * @return
+	 */
+	public String OperationPictureSet(String userid, String pictureSetId,
+			int operationType);
 }

@@ -1,8 +1,8 @@
 package cn.zmdx.draft.entity;
 
-public class CyclePhoto {
+public class CyclePhotoSet {
 	private int id;
-	private int photoId;
+	private int photoSetId;
 	private int cycleId;
 	private String cycleNo;
 	
@@ -11,12 +11,6 @@ public class CyclePhoto {
 	}
 	public void setId(int id) {
 		this.id = id;
-	}
-	public int getPhotoId() {
-		return photoId;
-	}
-	public void setPhotoId(int photoId) {
-		this.photoId = photoId;
 	}
 	public int getCycleId() {
 		return cycleId;
@@ -29,5 +23,11 @@ public class CyclePhoto {
 	}
 	public void setCycleNo(String cycleNo) {
 		this.cycleNo = cycleNo;
+	}
+	public int getPhotoSetId() {
+		return photoSetId;
+	}
+	public void setPhotoSetId(int photoSetId) {
+		this.photoSetId = photoSetId;
 	}
 }

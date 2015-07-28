@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.zmdx.draft.entity.PictureSet" table="picture_set" dynamic-insert="true">
+	  <id name="id" column="id" type="int" >
+			<generator class="native" />
+		</id>
+		<property name="uploadDate" column="uploadDate"/>
+		<property name="descs" column="descs"/>
+		<property name="type" column="type" />	
+		<property name="status" column="status" />	
+		<property name="praise" column="praise" />	
+		<property name="tread" column="tread" />	
+		<property name="auditingDate" column="auditingDate" />	
+		<property name="userid" column="userid" />	
+		<property name="report" column="report" />	
+		<property name="view" column="view" />	
+		<property name="votes" column="votes" />	
+	</class>
+	
+</hibernate-mapping>
+  
