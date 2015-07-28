@@ -28,7 +28,7 @@ public class PhotoAction extends ActionSupport{
 	private File [] image;
 	// 上传文件类型
 	private String [] imageContentType;
-	// 封装上传文件名
+	// 封装上传文件名 
 	private String [] imageFileName;
 	
 	public PhotoService getPhotoService() {
