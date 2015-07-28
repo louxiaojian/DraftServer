@@ -25,7 +25,7 @@ public class UserCookieUtil {
 	 */
 	public static void saveCookie(User user, HttpServletResponse response) {
 		// cookie的有效期至（到哪一天）
-		long validTime = System.currentTimeMillis() + (cookieMaxAge);
+		long validTime = System.currentTimeMillis() + (cookieMaxAge*1000);
 		// MD5加密用户详细信息
 		Sha1 sha1=new Sha1();
 		String sha1CookieValue = sha1.Digest("qwer1234"+user.getLoginname() + ":"

@@ -74,6 +74,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 					// 如果cookieValue为空 说明用户上次没有选择“记住下次登录”执行其他
 					if (cookieValue == null) {
 						//httpResponse.sendRedirect(reqContextPath + "/");// 跳转至登录页面
+						httpResponse.getWriter().print("{\"state\":\"failed\",\"errorMsg\":\"please log in\"}");
 					} else {
 						// 先得到的CookieValue进行Base64解码
 						String cookieValueAfterDecode = new String(
@@ -83,6 +84,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 								.split(":");
 						if (cookieValues.length != 3) {
 							//httpResponse.sendRedirect(reqContextPath + "/");// 跳转至登录页面
+							httpResponse.getWriter().print("{\"state\":\"failed\",\"errorMsg\":\"please log in\"}");
 						}
 						// 判断是否在有效期内,过期就删除Cookie
 						long validTimeInCookie = new Long(cookieValues[1]);
@@ -90,6 +92,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 							// 删除Cookie
 							UserCookieUtil.clearCookie(httpResponse);
 							//httpResponse.sendRedirect(reqContextPath + "/");// 跳转至登录页面
+							httpResponse.getWriter().print("{\"state\":\"failed\",\"errorMsg\":\"please log in\"}");
 						}
 						// 取出cookie中的用户名,并到数据库中检查这个用户名,
 						String loginname = cookieValues[0];
@@ -118,11 +121,13 @@ public class LoginFilter extends HttpServlet implements Filter {
 								chain.doFilter(request, response);
 							}else{
 								//httpResponse.sendRedirect(reqContextPath + "/");// 跳转至登录页面
+								httpResponse.getWriter().print("{\"state\":\"failed\",\"errorMsg\":\"please log in\"}");
 							}
 						}
 					}
 				} else {
 					//httpResponse.sendRedirect(reqContextPath + "/");// 跳转至登录页面
+					httpResponse.getWriter().print("{\"state\":\"failed\",\"errorMsg\":\"please log in\"}");
 				}
 			}
 		}
