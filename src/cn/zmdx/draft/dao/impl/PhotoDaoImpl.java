@@ -209,7 +209,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					sql.append(" and id < "+filterMap.get("lastid"));
 				}
 			}
-			sql.append(" order by votes desc limit "
+			sql.append(" order by praise desc limit "
 					+ Integer.parseInt(filterMap.get("limit")) );
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类

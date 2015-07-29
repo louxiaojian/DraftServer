@@ -4,17 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
+import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Sha1;
@@ -73,21 +71,68 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("pwd");
-			Sha1 sha1=new Sha1();
-			pwd=sha1.Digest(pwd);
-			User user=userService.findByName(loginname);
-			if(user==null){
-				User newUser =new User();
-				newUser.setLoginname(loginname);
-				newUser.setPassword(pwd);
-				newUser.setFlag("1");
-				newUser.setIsvalidate("0");
-				newUser.setAge(0);
-				newUser.setRegistrationDate(new Date());
-				this.userService.saveUser(newUser);
-				out.print("{\"state\":\"success\"}");
+			String code=request.getParameter("captcha");
+			//获取当前可用的验证码
+			Captcha captcha=this.userService.queryUsableCaptcha(loginname);
+			if(captcha!=null){
+				if(code.equals(captcha.getCode())){
+					Sha1 sha1=new Sha1();
+					pwd=sha1.Digest(pwd);
+					User user=userService.findByName(loginname);
+					if(user==null){
+						User newUser =new User();
+						newUser.setLoginname(loginname);
+						newUser.setPassword(pwd);
+						newUser.setFlag("1");
+						newUser.setIsvalidate("0");
+						newUser.setAge(0);
+						newUser.setRegistrationDate(new Date());
+						this.userService.saveUser(newUser);
+						out.print("{\"state\":\"success\"}");
+					}else{//用户名已存在
+						out.print("{\"state\":\"failed\",\"errorMsg\":\"loginname already exist\"}");
+					}
+				}else{//验证码错误
+					out.print("{\"state\":\"failed\",\"errorMsg\":\"verification code error\"}");
+				}
+			}else{//没有验证码
+				out.print("{\"state\":\"failed\",\"errorMsg\":\"no available code\"}");
+			}
+		} catch (IOException ie) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\"}");
+			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 生成验证码
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-29 时间：上午10:58:56
+	 */
+	public void createCaptcha(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		PrintWriter out =null;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			HttpServletRequest request=ServletActionContext.getRequest();
+			String telephone=request.getParameter("loginname");
+			//验证该手机号今日是否能获取
+			int count=this.userService.qualificationByTelephone(telephone);
+			if(count>3){
+				out.print("{\"state\":\"failed\",\"errorMsg\":\"can't get today\"}");
 			}else{
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"loginname already exist\"}");
+				String code="524745";
+				Captcha captcha=this.userService.createCaptcha(telephone,code);
+				out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(captcha)+"}");
 			}
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");

@@ -1,7 +1,6 @@
 package cn.zmdx.draft.service;
 
-import java.util.List;
-
+import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.User;
 
 public interface UserService {
@@ -39,4 +38,27 @@ public interface UserService {
 	 * @return
 	 */
 	public void updateUser(User user);
+	/**
+	 * 生成验证码
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-29 时间：上午10:58:56
+	 */
+	public Captcha createCaptcha(String loginname, String code);
+
+	/**
+	 * 验证该手机号今日是否能获取
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-29 时间：上午11:36:58
+	 * @param telephone
+	 */
+	public int qualificationByTelephone(String telephone);
+
+	/**
+	 * 获取当前可用的验证码
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-29 时间：上午11:55:27
+	 * @param loginname
+	 * @return
+	 */
+	public Captcha queryUsableCaptcha(String loginname);
 }
