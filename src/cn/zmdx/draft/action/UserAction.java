@@ -87,6 +87,7 @@ public class UserAction extends ActionSupport {
 						newUser.setIsvalidate("0");
 						newUser.setAge(0);
 						newUser.setRegistrationDate(new Date());
+						newUser.setOrgId(0);
 						this.userService.saveUser(newUser);
 						out.print("{\"state\":\"success\"}");
 					}else{//用户名已存在
@@ -180,6 +181,7 @@ public class UserAction extends ActionSupport {
 					u.setTelephone(user.getTelephone());
 					u.setLoginname(user.getLoginname());
 					u.setGender(user.getGender());
+					u.setValidateDate(user.getValidateDate());
 					out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(u)+"}");
 				}else{
 					out.print("{\"state\":\"failed\",\"errorMsg\":\"password error\"}");
@@ -368,6 +370,7 @@ public class UserAction extends ActionSupport {
 			u.setHeadPortrait(user.getHeadPortrait());
 			u.setUsername(user.getUsername());
 			u.setTelephone(user.getTelephone());
+			u.setValidateDate(user.getValidateDate());
 			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(u)+"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");

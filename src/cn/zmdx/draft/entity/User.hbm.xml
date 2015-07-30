@@ -17,6 +17,9 @@
 		<property name="age" column="age"/>
 		<property name="introduction" column="introduction"/>
 		<property name="registrationDate" column="registration_date"/>
+		<property name="orgId" column="org_id"/>
+		<property name="gender" column="gender"/>
+		<property name="validateDate" column="validateDate"/>
 	</class>
 	
 </hibernate-mapping>

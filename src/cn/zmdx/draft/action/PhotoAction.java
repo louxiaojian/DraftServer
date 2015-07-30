@@ -265,6 +265,41 @@ public class PhotoAction extends ActionSupport{
 			out.close();
 		}
 	}
+	
+	/**
+	 * 真人验证
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-30 时间：下午2:16:43
+	 */
+	public void realityVerification(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = null ;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			String userid=request.getParameter("userid");
+			File [] files=getImage();
+			for (int i = 0; i < files.length; i++) {
+				FileInputStream fis= new FileInputStream(files[i]);
+				String fileName=UploadPhoto.uploadPhoto(fis, imageFileName[i]);
+				Photo photo=new Photo();
+				photo.setPhotoUrl(fileName);
+				photo.setUploadDate(new Date());
+				photo.setUserid(Integer.parseInt(userid));
+				photo.setPictureSetId(0);
+				this.photoService.saveEntity(photo);
+			}
+			out.print("{\"state\":\"success\"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			e.printStackTrace();
+			logger.error(e);
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
 	/**
 	 * 点赞
 	 * @author louxiaojian

@@ -69,8 +69,8 @@ public class UploadPhoto {
 			inParams.put("compressFilePath", "/test/" + fileName);
 			Map<String, CosFile> files = new HashMap<String, CosFile>();
 			files.put("compressFile", new CosFile());
-//			cos.uploadFileContentWithCompress(inParams,
-//					os.toByteArray(), files, msg);
+			cos.uploadFileContentWithCompress(inParams,
+					os.toByteArray(), files, msg);
 			System.out.println(files);
 			System.out.println(msg);
 	//    		//生成 xh 分辨率 缩略图
