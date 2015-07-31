@@ -125,4 +125,20 @@ public interface PhotoService {
 	 */
 	public String OperationPictureSet(String userid, String pictureSetId,
 			int operationType);
+	/**
+	 * 真人验证申请
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-31 时间：上午11:20:43
+	 * @param photo
+	 * @param userId
+	 */
+	public void realityVerification(Photo photo, String userId);
+	/**
+	 * 加载审批记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-31 时间：下午2:21:50
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryReviewRecords(Map<String, String> filterMap);
 }

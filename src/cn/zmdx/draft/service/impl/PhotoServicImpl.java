@@ -8,6 +8,7 @@ import cn.zmdx.draft.entity.CyclePhotoSet;
 import cn.zmdx.draft.entity.OperationRecords;
 import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.entity.PictureSet;
+import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.PhotoService;
 
 public class PhotoServicImpl implements PhotoService {
@@ -124,6 +125,19 @@ public class PhotoServicImpl implements PhotoService {
 			this.photoDao.saveEntity(or);
 			return "success";
 		}
+	}
+
+	@Override
+	public void realityVerification(Photo photo, String userId) {
+		User user=(User)this.photoDao.getEntity(User.class, Integer.parseInt(userId));
+		user.setIsvalidate("3");//待审核
+		this.photoDao.updateEntity(user);
+		this.photoDao.saveEntity(photo);
+	}
+
+	@Override
+	public List queryReviewRecords(Map<String, String> filterMap) {
+		return this.photoDao.queryReviewRecords(filterMap);
 	}
 	
 }

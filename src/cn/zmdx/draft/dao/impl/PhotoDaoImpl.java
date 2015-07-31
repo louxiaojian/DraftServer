@@ -254,4 +254,29 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		return query.list();
 	}
 
+	@Override
+	public List queryReviewRecords(Map<String, String> filterMap) {
+		StringBuffer sql=new StringBuffer("select id,status,photo_set_id as photoSetId,descs,datetime,operator_id as operatorId,operator_name as operatorName,user_id as userId,type from (SELECT rr.id,rr.status,photo_set_id,rr.descs,rr.datetime,rr.operator_id,u.loginname as operator_name,rr.user_id,rr.type FROM review_records rr left join users u on u.id=rr.operator_id where 1=1 ");
+		if(filterMap!=null&&!filterMap.isEmpty()){
+			if("0".equals(filterMap.get("type"))){
+				if(!"".equals(filterMap.get("pictureSetId"))&&filterMap.get("pictureSetId")!=null){
+					sql.append(" and photo_set_id =?");
+				}
+			}else if("1".equals(filterMap.get("type"))){
+				if(!"".equals(filterMap.get("userId"))&&filterMap.get("userId")!=null){
+					sql.append(" and user_id =?");
+				}
+			}
+		}
+		sql.append(" order by datetime desc");
+		sql.append(") t");
+		Query query = getSession().createSQLQuery(sql.toString()).setResultTransformer(Transformers.aliasToBean(ReviewRecords.class));
+		if("0".equals(filterMap.get("type"))){
+			query.setInteger(0, Integer.parseInt(filterMap.get("pictureSetId")));
+		}else if("1".equals(filterMap.get("type"))){
+			query.setInteger(0, Integer.parseInt(filterMap.get("userId")));
+		}
+		return query.list();
+	}
+
 }

@@ -11,7 +11,7 @@ public class User {
 	private String name;//真实姓名
 	private String loginname;//登录名
 	private String flag;//用户状态，0:未激活，1:正常，2:冻结
-	private String isvalidate;//真人验证，0:未验证，1:验证失败，2:验证成功
+	private String isvalidate;//真人验证，0:未验证，1:验证失败，2:验证成功,3:待审核
 	private String headPortrait;//头像
 	private int age;//年龄
 	private int gender;//性别：0未知，1男，2女

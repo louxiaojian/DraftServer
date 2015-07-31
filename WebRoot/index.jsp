@@ -19,7 +19,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
   </head>
   <body>
-    <form action="photo!realityVerification.action?userid=1&type=1&cycleId=1&cycleNo=201507001&descs=asdfyhh" id="pageFrom" name="" method="post" enctype="multipart/form-data">
+    <form action="photo!realityVerification.action?userId=7&type=1&cycleId=1&cycleNo=201507001&descs=asdfyhh" id="pageFrom" name="" method="post" enctype="multipart/form-data">
 		<br /><s:debug></s:debug>
 		<fieldset class="fieldsetStyle">
 			<legend>

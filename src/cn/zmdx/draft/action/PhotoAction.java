@@ -2,6 +2,7 @@ package cn.zmdx.draft.action;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -267,7 +268,7 @@ public class PhotoAction extends ActionSupport{
 	}
 	
 	/**
-	 * 真人验证
+	 * 上传真人验证照片
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-30 时间：下午2:16:43
 	 */
@@ -278,7 +279,7 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = null ;
 		try{
 			out = ServletActionContext.getResponse().getWriter();
-			String userid=request.getParameter("userid");
+			String userId=request.getParameter("userId");
 			File [] files=getImage();
 			for (int i = 0; i < files.length; i++) {
 				FileInputStream fis= new FileInputStream(files[i]);
@@ -286,9 +287,9 @@ public class PhotoAction extends ActionSupport{
 				Photo photo=new Photo();
 				photo.setPhotoUrl(fileName);
 				photo.setUploadDate(new Date());
-				photo.setUserid(Integer.parseInt(userid));
+				photo.setUserid(Integer.parseInt(userId));
 				photo.setPictureSetId(0);
-				this.photoService.saveEntity(photo);
+				this.photoService.realityVerification(photo,userId);
 			}
 			out.print("{\"state\":\"success\"}");
 		}catch (Exception e) {
@@ -636,6 +637,41 @@ public class PhotoAction extends ActionSupport{
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 加载审批记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-31 时间：下午12:33:42
+	 * @throws IOException
+	 */
+	public void queryReviewRecords() throws IOException {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter out = response.getWriter();
+		try {
+			response.setContentType("text/json; charset=utf-8");
+			String type = request.getParameter("type");
+			String userId = request.getParameter("userId");
+			String pictureSetId = request.getParameter("pictureSetId");
+			Map<String, String> filterMap = new HashMap();
+			if (type != null && !"".equals(type)) {
+				filterMap.put("type", type);
+			}
+			if (userId != null && !"".equals(userId)) {
+				filterMap.put("userId", userId);
+			}
+			if (pictureSetId != null && !"".equals(pictureSetId)) {
+				filterMap.put("pictureSetId", pictureSetId);
+			}
+			List list=photoService.queryReviewRecords(filterMap);
+			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+		} catch (Exception e) {
+			e.printStackTrace();
+			out.print("error");
+		} finally {
 			out.flush();
 			out.close();
 		}

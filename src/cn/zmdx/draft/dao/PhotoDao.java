@@ -96,5 +96,13 @@ public interface PhotoDao extends BaseDao {
 	 */
 	public List queryPhotoByPictureSetId(String userid, String pictureSetId,
 			int operationType);
+	/**
+	 * 加载审批记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-31 时间：下午2:22:47
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryReviewRecords(Map<String, String> filterMap);
 
 }

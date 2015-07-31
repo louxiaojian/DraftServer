@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.zmdx.draft.entity.ReviewRecords" table="review_records">
+	  <id name="id" column="id" type="int" >
+			<generator class="native" />
+		</id>
+		<property name="photoSetId" column="photo_set_id" />	
+		<property name="descs" column="descs"/>
+		<property name="status" column="status"/>
+		<property name="datetime" column="datetime"/>
+		<property name="operatorId" column="operator_id"/>
+		<property name="userId" column="user_id"/>
+		<property name="type" column="type"/>
+	</class>
+	
+</hibernate-mapping>
+  
