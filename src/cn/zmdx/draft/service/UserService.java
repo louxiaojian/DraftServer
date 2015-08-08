@@ -1,7 +1,11 @@
 package cn.zmdx.draft.service;
 
+import java.util.List;
+import java.util.Map;
+
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.User;
+import cn.zmdx.draft.entity.UserAttentionFans;
 
 public interface UserService {
 
@@ -61,4 +65,49 @@ public interface UserService {
 	 * @return
 	 */
 	public Captcha queryUsableCaptcha(String loginname);
+
+	/**
+	 * 添加对象
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午12:50:33
+	 * @param obj
+	 */
+	public void saveObject(Object obj);
+	
+	/**
+	 * 验证是否已关注
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午1:59:24
+	 * @param fansUserId
+	 * @param attentionUserId
+	 * @return
+	 */
+	public UserAttentionFans isAttention(String fansUserId, String attentionUserId);
+
+	/**
+	 * 取消关注
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午2:26:38
+	 * @param fansUserId
+	 * @param attentionUserId
+	 */
+	public void cancelAttention(String fansUserId, String attentionUserId);
+
+	/**
+	 * 查看我关注的人
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午2:37:06
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryAttentions(Map<String, String> filterMap);
+
+	/**
+	 * 查看我的粉丝
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午2:37:06
+	 * @param filterMap
+	 * @return
+	 */
+	List queryFans(Map<String, String> filterMap);
 }

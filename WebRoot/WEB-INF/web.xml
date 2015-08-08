@@ -25,10 +25,10 @@
       <param-value>/,/login.jsp,/user!login.action,/user!register.action,/user_login.action,/user_register.action,/user!logout.action,/user_logout.action,/user_createCaptcha.action,/user!createCaptcha.action</param-value>
     </init-param>
   </filter>
-	<filter-mapping>
+	<!-- <filter-mapping>
 		<filter-name>Login</filter-name>
 	    <url-pattern>*.action</url-pattern>
-  </filter-mapping>
+  </filter-mapping> -->
   <filter-mapping>
     <filter-name>Login</filter-name>
     <url-pattern>*.jsp</url-pattern>

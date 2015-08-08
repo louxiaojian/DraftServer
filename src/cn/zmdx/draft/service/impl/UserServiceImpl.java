@@ -1,10 +1,13 @@
 package cn.zmdx.draft.service.impl;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import cn.zmdx.draft.dao.UserDao;
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.User;
+import cn.zmdx.draft.entity.UserAttentionFans;
 import cn.zmdx.draft.service.UserService;
 
 public class UserServiceImpl implements UserService {
@@ -23,7 +26,10 @@ public class UserServiceImpl implements UserService {
 	public void saveUser(User user) {
 		this.userDao.saveEntity(user);
 	}
-
+	@Override
+	public void saveObject(Object obj) {
+		this.userDao.saveEntity(obj);
+	}
 	@Override
 	public void updateUser(User user) {
 		this.userDao.updateEntity(user);
@@ -58,5 +64,26 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Captcha queryUsableCaptcha(String loginname) {
 		return this.userDao.queryUsableCaptcha(loginname);
+	}
+
+	@Override
+	public UserAttentionFans isAttention(String fansUserId,
+			String attentionUserId) {
+		return this.userDao.isAttention(fansUserId,attentionUserId);
+	}
+	
+	@Override
+	public void cancelAttention(String fansUserId, String attentionUserId) {
+		this.userDao.cancelAttention(fansUserId,attentionUserId);
+	}
+
+	@Override
+	public List queryAttentions(Map<String, String> filterMap) {
+		return this.userDao.queryAttentions(filterMap);
+	}
+
+	@Override
+	public List queryFans(Map<String, String> filterMap) {
+		return this.userDao.queryFans(filterMap);
 	}
 }

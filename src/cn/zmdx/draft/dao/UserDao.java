@@ -1,7 +1,11 @@
 package cn.zmdx.draft.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.User;
+import cn.zmdx.draft.entity.UserAttentionFans;
 
 public interface UserDao extends BaseDao{
 
@@ -35,4 +39,38 @@ public interface UserDao extends BaseDao{
 	 * @return
 	 */
 	public Captcha queryUsableCaptcha(String loginname);
+	/**
+	 * 验证是否已关注
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午2:00:11
+	 * @param fansUserId
+	 * @param attentionUserId
+	 * @return
+	 */
+	public UserAttentionFans isAttention(String fansUserId,
+			String attentionUserId);
+	/**
+	 * 取消关注
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午2:26:51
+	 * @param fansUserId
+	 * @param attentionUserId
+	 */
+	public void cancelAttention(String fansUserId, String attentionUserId);
+	/**
+	 * 查看我关注的人
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午2:38:55
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryAttentions(Map<String, String> filterMap);
+	/**
+	 * 查看我的粉丝
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-6 时间：下午2:38:55
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryFans(Map<String, String> filterMap);
 }
