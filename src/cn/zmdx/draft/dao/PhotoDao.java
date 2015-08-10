@@ -27,9 +27,9 @@ public interface PhotoDao extends BaseDao {
 	 * 获取相应周期的排名
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：下午4:34:21
-	 * @param cycleId
+	 * @param filterMap
 	 */
-	public List queryCycleRanking(String cycleId);
+	public List queryCycleRanking(Map<String, String> filterMap);
 	/**
 	 * 获取所有主题
 	 * @author louxiaojian

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import cn.zmdx.draft.entity.Captcha;
+import cn.zmdx.draft.entity.Photo;
+import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.entity.UserAttentionFans;
+import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Sha1;
 import cn.zmdx.draft.util.UploadPhoto;
@@ -27,6 +31,7 @@ import com.opensymphony.xwork2.ActionSupport;
 public class UserAction extends ActionSupport {
 	private Logger logger=Logger.getLogger(UserAction.class);
 	private UserServiceImpl userService;
+	private PhotoService photoService;
 	// 上传文件域
 	private File image;
 	// 上传文件类型
@@ -49,6 +54,12 @@ public class UserAction extends ActionSupport {
 	}
 	public void setUserService(UserServiceImpl userService) {
 		this.userService = userService;
+	}
+	public PhotoService getPhotoService() {
+		return photoService;
+	}
+	public void setPhotoService(PhotoService photoService) {
+		this.photoService = photoService;
 	}
 	public File getImage() {
 		return image;
@@ -87,8 +98,6 @@ public class UserAction extends ActionSupport {
 			//获取当前可用的验证码
 			Captcha captcha=this.userService.queryUsableCaptcha(loginname);
 			if(captcha!=null){
-				System.out.println(captcha.getDeadline().getTime()>new Date().getTime());
-				
 				if(code.equals(captcha.getCode())){
 					if(captcha.getDeadline().getTime()>new Date().getTime()){
 						Sha1 sha1=new Sha1();
@@ -104,18 +113,19 @@ public class UserAction extends ActionSupport {
 							newUser.setRegistrationDate(new Date());
 							newUser.setOrgId(0);
 							this.userService.saveUser(newUser);
-							out.print("{\"state\":\"success\"}");
+							out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(newUser))+"}");
 						}else{//用户名已存在
-							out.print("{\"state\":\"failed\",\"errorMsg\":\"loginname already exist\"}");
+							out.print("{\"state\":1,\"errorMsg\":\"loginname already exist\"}");
 						}
-					}else{
-						out.print("{\"state\":\"failed\",\"errorMsg\":\"verification code has expired\"}");
+					}else{//验证码失效
+						out.print("{\"state\":1,\"errorMsg\":\"verification code has expired\"}");
 					}
 				}else{//验证码错误
-					out.print("{\"state\":\"failed\",\"errorMsg\":\"verification code error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
 				}
-			}else{//没有验证码
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"no available code\"}");
+			}else{//未获取验证码
+//				out.print("{\"state\":1,\"errorMsg\":\"no available code\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
 			}
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
@@ -147,7 +157,7 @@ public class UserAction extends ActionSupport {
 			//验证该手机号今日是否能获取
 			int count=this.userService.qualificationByTelephone(telephone);
 			if(count>3){
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"can't get today\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"can't get today\"}");
 			}else{
 				String code=String.valueOf((int)((Math.random()*9+1)*100000));
 				String returnString = HttpSender.batchSend(uri, account, pswd, telephone, contentLeft+code+contentRight, needstatus, product, extno);
@@ -155,11 +165,11 @@ public class UserAction extends ActionSupport {
 				System.out.println(returnCode);
 				if("0".equals(returnCode)){
 					Captcha captcha=this.userService.createCaptcha(telephone,code);
-					out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(captcha)+"}");
+					out.print("{\"state\":0,\"result\":"+JSON.toJSONString(captcha)+"}");
 				}else if("107".equals(returnCode)){
-					out.print("{\"state\":\"failed\",\"errorMsg\":\"telephone error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"telephone error\"}");
 				}else {
-					out.print("{\"state\":\"failed\",\"errorMsg\":\"system error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"system error\"}");
 				}
 			}
 		} catch (IOException ie) {
@@ -192,26 +202,15 @@ public class UserAction extends ActionSupport {
 			String pwd=request.getParameter("pwd");
 			User user=userService.findByName(loginname);
 			if(user==null){
-				out.print("{\"state\":\"loginname does not exist\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"loginname does not exist\"}");
 			}else{
 				Sha1 sha1=new Sha1();
 				pwd=sha1.Digest(pwd);
 				if(user.getPassword().equals(pwd)){
 					UserCookieUtil.saveCookie(user, ServletActionContext.getResponse());
-					User u=new User();
-					u.setId(user.getId());
-					u.setAge(user.getAge());
-					u.setAddress(user.getAddress());
-					u.setIntroduction(user.getIntroduction());
-					u.setHeadPortrait(user.getHeadPortrait());
-					u.setUsername(user.getUsername());
-					u.setTelephone(user.getTelephone());
-					u.setLoginname(user.getLoginname());
-					u.setGender(user.getGender());
-					u.setValidateDate(user.getValidateDate());
-					out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(u)+"}");
+					out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(user))+"}");
 				}else{
-					out.print("{\"state\":\"failed\",\"errorMsg\":\"password error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"password error\"}");
 				}
 			}
 		} catch (IOException ie) {
@@ -241,7 +240,7 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request=ServletActionContext.getRequest();
 //			String loginname=request.getParameter("loginname");
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
 			logger.error(ie);
@@ -267,7 +266,7 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = ServletActionContext.getResponse().getWriter();
 		try {
 			HttpServletRequest request=ServletActionContext.getRequest();
-			int id = Integer.parseInt(request.getParameter("id"));
+			int id = Integer.parseInt(request.getParameter("userId"));
 			User user=this.userService.getById(id);
 			FileInputStream fis= new FileInputStream(getImage());
 			String fileName=UploadPhoto.uploadPhoto(fis,imageFileName);
@@ -275,7 +274,7 @@ public class UserAction extends ActionSupport {
 				user.setHeadPortrait(fileName);
 				this.userService.updateUser(user);
 			}
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0,\"imgUrl\":\""+fileName+"\"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
 			logger.error(ie);
@@ -302,12 +301,13 @@ public class UserAction extends ActionSupport {
 		try{
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request=ServletActionContext.getRequest();
-			int id=Integer.parseInt(request.getParameter("id"));
+			int id=Integer.parseInt(request.getParameter("userId"));
 			String username=request.getParameter("username");//昵称
 			String address=request.getParameter("address");//地址
 			String telephone=request.getParameter("telephone");//联系电话
 			String name=request.getParameter("name");//真实姓名
 			String ageStr=request.getParameter("age");//年龄
+			String gender=request.getParameter("gender");//年龄
 			String introduction=request.getParameter("introduction");//个人介绍
 			int age=0;
 			if(!"".equals(ageStr)&&ageStr!=null){
@@ -319,9 +319,10 @@ public class UserAction extends ActionSupport {
 			user.setTelephone(telephone);
 			user.setName(name);
 			user.setAge(age);
+			user.setGender(Integer.parseInt(gender));
 			user.setIntroduction(introduction);
 			this.userService.updateUser(user);
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0,\"userInfo\":"+JSON.toJSON(this.getUser(user))+"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
 			logger.error(ie);
@@ -348,7 +349,7 @@ public class UserAction extends ActionSupport {
 			out= response.getWriter();
 			String oldPassowrd =request.getParameter("oldPassword");
 			String newPassowrd =request.getParameter("newPassword");
-			String userName=request.getParameter("userName");
+			String userName=request.getParameter("loginName");
 			User user=userService.findByName(userName);
 			if(user!=null){
 				Sha1 sha1=new Sha1();
@@ -356,12 +357,12 @@ public class UserAction extends ActionSupport {
 				if(oldPassowrd.equals(user.getPassword())){
 					user.setPassword(sha1.Digest(newPassowrd));
 					this.userService.updateUser(user);
-					out.print("{\"state\":\"success\"}");
-				}else{
-					out.print("{\"state\":\"failed\",\"errorMsg\":\"original password error\"}");
+					out.print("{\"state\":0,\"userInfo\":"+JSON.toJSON(this.getUser(user))+"}");
+				}else{//原密码错误
+					out.print("{\"state\":1,\"errorMsg\":\"original password error\"}");
 				}
 			}else{
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"username does not exist\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"username does not exist\"}");
 			}
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
@@ -387,18 +388,36 @@ public class UserAction extends ActionSupport {
 		PrintWriter out= null;
 		try {
 			out= response.getWriter();
-			String userId=request.getParameter("userId");
+			String userId=request.getParameter("userId");//要查看的用户
+			String currentUserId=request.getParameter("currentUserId");//当前用户
 			User user=userService.getById(Integer.parseInt(userId));
-			User u=new User();
-			u.setId(user.getId());
-			u.setAge(user.getAge());
-			u.setAddress(user.getAddress());
-			u.setIntroduction(user.getIntroduction());
-			u.setHeadPortrait(user.getHeadPortrait());
-			u.setUsername(user.getUsername());
-			u.setTelephone(user.getTelephone());
-			u.setValidateDate(user.getValidateDate());
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(u)+"}");
+			//获取用户图集
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("userid", userId);
+			filterMap.put("currentUserId", currentUserId);
+			filterMap.put("limit", "20");
+			List photoSet=new ArrayList();
+			List<PictureSet> list = photoService.queryPersonalPhotos(filterMap);
+			for (int i = 0; i < list.size(); i++) {
+				PictureSet ps=list.get(i);
+				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+				ps.setPhotoList(pList);
+				photoSet.add(ps);
+			}
+			//获取要查看的用户的关注
+			Map<String, String> filterMap1 = new HashMap();
+			if (userId != null && !"".equals(userId)) {
+				filterMap1.put("fansUserId", userId);
+			}
+			List attentionList=userService.queryAttentions(filterMap1);
+			//获取要查看的用户的粉丝
+			Map<String, String> filterMap2 = new HashMap();
+			if (userId != null && !"".equals(userId)) {
+				filterMap2.put("attentionUserId", userId);
+			}
+			List fansList=userService.queryFans(filterMap2);
+			
+			out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(user))+",\"photoSet\":"+JSON.toJSONString(photoSet, true)+",\"attentionList\":"+JSON.toJSONString(attentionList, true)+",\"fansList\":"+JSON.toJSONString(fansList, true)+"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
 			logger.error(ie);
@@ -428,14 +447,14 @@ public class UserAction extends ActionSupport {
 			//是否关注过
 			UserAttentionFans u=this.userService.isAttention(fansUserId,attentionUserId);
 			if(u!=null){
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"is attentioned\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"is attentioned\"}");
 			}else{
 				UserAttentionFans uaf=new UserAttentionFans();
 				uaf.setAttentionUserId(Integer.parseInt(attentionUserId));
 				uaf.setFansUserId(Integer.parseInt(fansUserId));
 				uaf.setAttentionTime(new Date());
 				this.userService.saveObject(uaf);
-				out.print("{\"state\":\"success\"}");
+				out.print("{\"state\":0}");
 			}
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
@@ -466,10 +485,10 @@ public class UserAction extends ActionSupport {
 			String attentionUserId=request.getParameter("attentionUserId");
 			//是否关注过
 			UserAttentionFans u=this.userService.isAttention(fansUserId,attentionUserId);
-			if(u!=null){
-				out.print("{\"state\":\"success\"}");
-			}else{
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"not attentioned\"}");
+			if(u!=null){//已关注
+				out.print("{\"state\":0}");
+			}else{//未关注
+				out.print("{\"state\":1,\"errorMsg\":\"not attentioned\"}");
 			}
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
@@ -500,7 +519,7 @@ public class UserAction extends ActionSupport {
 			String attentionUserId=request.getParameter("attentionUserId");
 			//是否关注过
 			this.userService.cancelAttention(fansUserId,attentionUserId);
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"error\"}");
 			logger.error(ie);
@@ -533,7 +552,7 @@ public class UserAction extends ActionSupport {
 				filterMap.put("fansUserId", fansUserId);
 			}
 			List list=userService.queryAttentions(filterMap);
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print("error");
@@ -561,7 +580,7 @@ public class UserAction extends ActionSupport {
 				filterMap.put("attentionUserId", attentionUserId);
 			}
 			List list=userService.queryFans(filterMap);
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print("error");
@@ -569,5 +588,26 @@ public class UserAction extends ActionSupport {
 			out.flush();
 			out.close();
 		}
+	}
+	/**
+	 * 转换用户信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-8 时间：下午4:24:26
+	 * @param user
+	 * @return
+	 */
+	public User getUser(User user){
+		User newUser=new User();
+		newUser.setId(user.getId());
+		newUser.setAge(user.getAge());
+		newUser.setAddress(user.getAddress());
+		newUser.setIntroduction(user.getIntroduction());
+		newUser.setHeadPortrait(user.getHeadPortrait());
+		newUser.setUsername(user.getUsername());
+		newUser.setTelephone(user.getTelephone());
+		newUser.setLoginname(user.getLoginname());
+		newUser.setGender(user.getGender());
+		newUser.setValidateDate(user.getValidateDate());
+		return newUser;
 	}
 }

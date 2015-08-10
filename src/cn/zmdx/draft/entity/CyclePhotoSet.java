@@ -3,8 +3,8 @@ package cn.zmdx.draft.entity;
 public class CyclePhotoSet {
 	private int id;
 	private int photoSetId;
-	private int cycleId;
-	private String cycleNo;
+	private int themeCycleId;
+	private String themeTitle;
 	
 	public int getId() {
 		return id;
@@ -12,22 +12,22 @@ public class CyclePhotoSet {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getCycleId() {
-		return cycleId;
-	}
-	public void setCycleId(int cycleId) {
-		this.cycleId = cycleId;
-	}
-	public String getCycleNo() {
-		return cycleNo;
-	}
-	public void setCycleNo(String cycleNo) {
-		this.cycleNo = cycleNo;
-	}
 	public int getPhotoSetId() {
 		return photoSetId;
 	}
 	public void setPhotoSetId(int photoSetId) {
 		this.photoSetId = photoSetId;
+	}
+	public String getThemeTitle() {
+		return themeTitle;
+	}
+	public void setThemeTitle(String themeTitle) {
+		this.themeTitle = themeTitle;
+	}
+	public int getThemeCycleId() {
+		return themeCycleId;
+	}
+	public void setThemeCycleId(int themeCycleId) {
+		this.themeCycleId = themeCycleId;
 	}
 }

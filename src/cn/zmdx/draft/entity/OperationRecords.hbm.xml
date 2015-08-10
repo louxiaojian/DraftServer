@@ -5,9 +5,12 @@
 	  <id name="id" column="id" type="int" >
 			<generator class="native" />
 		</id>
-		<property name="userid" column="userid"/>
+		<property name="informerId" column="informer_id"/>
 		<property name="operationType" column="operation_type"/>
 		<property name="pictureSetId" column="picture_set_id"/>
+		<property name="beingInformerId" column="being_informer_id"/>
+		<property name="type" column="type"/>
+		<property name="datetime" column="datetime"/>
 	</class>
 	
 </hibernate-mapping>

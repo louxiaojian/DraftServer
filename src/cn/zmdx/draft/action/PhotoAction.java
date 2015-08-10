@@ -98,7 +98,7 @@ public class PhotoAction extends ActionSupport{
 				result.add(ps);
 			}
 			
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(result, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -150,7 +150,7 @@ public class PhotoAction extends ActionSupport{
 				ps.setPhotoList(pList);
 				result.add(ps);
 			}
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(result, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -161,7 +161,7 @@ public class PhotoAction extends ActionSupport{
 		}
 	}
 	/**
-	 * 查看选秀照片墙
+	 * 查看选秀照片墙（最新）
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-8 时间：上午10:51:54
 	 */
@@ -179,14 +179,19 @@ public class PhotoAction extends ActionSupport{
 			String limit=request.getParameter("limit");
 			//标示，0查询lastModified之后的数据，1查询lastModified之前的数据
 			String flag=request.getParameter("flag");
+			//选秀主题周期id
+			String themeCycleId=request.getParameter("themeId");
 			if ("".equals(limit)||limit==null|| "0".equals(limit)){
 				limit = "10";
 			}
-			
+			if ("".equals(flag)||flag==null){
+				flag = "0";
+			}
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("limit", limit);
 			filterMap.put("lastid", lastid);
 			filterMap.put("flag", flag);
+			filterMap.put("themeCycleId", themeCycleId);
 			List<PictureSet> list = photoService.queryDraftPhotosWall(filterMap);
 			
 			List result=new ArrayList();
@@ -197,7 +202,7 @@ public class PhotoAction extends ActionSupport{
 				result.add(ps);
 			}
 			
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(result, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -220,10 +225,10 @@ public class PhotoAction extends ActionSupport{
 		try{
 			out = ServletActionContext.getResponse().getWriter();
 			String type=request.getParameter("type");//分类，0:个人，1:秀场
-			String userid=request.getParameter("userid");
+			String userid=request.getParameter("userId");
 			String descs=request.getParameter("descs");
-			String cycleId=request.getParameter("cycleId");
-			String cycleNo=request.getParameter("cycleNo");
+			String themeCycleId=request.getParameter("themeCycleId");//选秀主题周期id
+			String themeTitle=request.getParameter("themeTitle");// 选秀主题标题
 
 			Map<String, Object> filterMap = new HashMap();
 			
@@ -233,30 +238,36 @@ public class PhotoAction extends ActionSupport{
 			ps.setDescs(descs);
 			ps.setUserid(Integer.parseInt(userid));
 			ps.setUploadDate(new Date());
-			ps.setStatus("0");
+			ps.setStatus("1");
+			ps.setThemeCycleId(Integer.parseInt(themeCycleId));
 			filterMap.put("pictureSet", ps);
 			
 			File [] files=getImage();
 			for (int i = 0; i < files.length; i++) {
 				FileInputStream fis= new FileInputStream(files[i]);
 				String fileName=UploadPhoto.uploadPhoto(fis, imageFileName[i]);
-				Photo photo=new Photo();
-				photo.setPhotoUrl(fileName);
-				photo.setUploadDate(new Date());
-				photo.setUserid(Integer.parseInt(userid));
-				filterMap.put("photo"+i, photo);
+				if(fileName==null||"".equals(fileName)){
+					out.print("{\"state\":1,\"errorMsg\":\"upload failed\"}");
+					break;
+				}else{
+					Photo photo=new Photo();
+					photo.setPhotoUrl(fileName);
+					photo.setUploadDate(new Date());
+					photo.setUserid(Integer.parseInt(userid));
+					filterMap.put("photo"+i, photo);
+				}
 			}
 			filterMap.put("count", files.length);
 			if("1".equals(type)){
 				//图片选秀信息
 				CyclePhotoSet cyclePhoto=new CyclePhotoSet();
-				cyclePhoto.setCycleId(Integer.parseInt(cycleId));
-				cyclePhoto.setCycleNo(cycleNo);
+				cyclePhoto.setThemeCycleId(Integer.parseInt(themeCycleId));
+				cyclePhoto.setThemeTitle(themeTitle);
 				filterMap.put("cyclePhoto", cyclePhoto);
 			}
 			
 			photoService.uploadPhoto(filterMap);
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -284,14 +295,18 @@ public class PhotoAction extends ActionSupport{
 			for (int i = 0; i < files.length; i++) {
 				FileInputStream fis= new FileInputStream(files[i]);
 				String fileName=UploadPhoto.uploadPhoto(fis, imageFileName[i]);
-				Photo photo=new Photo();
-				photo.setPhotoUrl(fileName);
-				photo.setUploadDate(new Date());
-				photo.setUserid(Integer.parseInt(userId));
-				photo.setPictureSetId(0);
-				this.photoService.realityVerification(photo,userId);
+				if(fileName==null||"".equals(fileName)){
+					out.print("{\"state\":1,\"errorMsg\":\"upload failed\"}");
+				}else{
+					Photo photo=new Photo();
+					photo.setPhotoUrl(fileName);
+					photo.setUploadDate(new Date());
+					photo.setUserid(Integer.parseInt(userId));
+					photo.setPictureSetId(0);
+					this.photoService.realityVerification(photo,userId);
+				}
 			}
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -313,13 +328,13 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = null ;
 		try{
 			out = ServletActionContext.getResponse().getWriter();
-			String userid=request.getParameter("userid");
+			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,0);
 			if("failed".equals(result)){
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
 			}else{
-				out.print("{\"state\":\"success\"}");
+				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
@@ -342,13 +357,13 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = null ;
 		try{
 			out = ServletActionContext.getResponse().getWriter();
-			String userid=request.getParameter("userid");
+			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,1);
 			if("failed".equals(result)){
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
 			}else{
-				out.print("{\"state\":\"success\"}");
+				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
@@ -360,7 +375,7 @@ public class PhotoAction extends ActionSupport{
 		}
 	}
 	/**
-	 * 举报
+	 * 举报图集
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：上午10:46:21
 	 */
@@ -371,13 +386,13 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = null ;
 		try{
 			out = ServletActionContext.getResponse().getWriter();
-			String userid=request.getParameter("userid");
+			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,2);
 			if("failed".equals(result)){
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
 			}else{
-				out.print("{\"state\":\"success\"}");
+				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
@@ -407,7 +422,7 @@ public class PhotoAction extends ActionSupport{
 			
 			photoService.updateObject(ps);
 
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -429,13 +444,13 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = null ;
 		try{
 			out = ServletActionContext.getResponse().getWriter();
-			String userid=request.getParameter("userid");
+			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,3);
 			if("failed".equals(result)){
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
 			}else{
-				out.print("{\"state\":\"success\"}");
+				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
@@ -447,7 +462,7 @@ public class PhotoAction extends ActionSupport{
 		}
 	}
 	/**
-	 * 根据选秀周期id查看选秀排名
+	 * 根据选秀主题周期id查看选秀排名
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：上午10:46:21
 	 */
@@ -458,9 +473,10 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = null ;
 		try{
 			out = ServletActionContext.getResponse().getWriter();
-			String cycleId=request.getParameter("cycleId");
-			
-			List list=photoService.queryCycleRanking(cycleId);
+			String themeCycleId=request.getParameter("themeCycleId");
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("themeCycleId", themeCycleId);
+			List list=photoService.queryCycleRanking(filterMap);
 			
 			List result=new ArrayList();
 			for (int i = 0; i < list.size(); i++) {
@@ -469,7 +485,7 @@ public class PhotoAction extends ActionSupport{
 				ps.setPhotoList(pList);
 				result.add(ps);
 			}
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(result, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -494,7 +510,7 @@ public class PhotoAction extends ActionSupport{
 			Map<String, Object> filterMap = new HashMap();
 			List list=photoService.queryThemes(filterMap);
 			
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -505,7 +521,7 @@ public class PhotoAction extends ActionSupport{
 		}
 	}
 	/**
-	 * 根据主题id获取相关选秀记录
+	 * 根据主题id获取相关选秀周期
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：下午5:29:08
 	 */
@@ -524,7 +540,7 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("flag", flag);
 			List list=photoService.queryCycleByThemesId(filterMap);
 			
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
@@ -549,20 +565,20 @@ public class PhotoAction extends ActionSupport{
 		try{
 			out = ServletActionContext.getResponse().getWriter();
 //			int i =Integer.parseInt("s");
-			String cycleId=request.getParameter("cycleId");//周期id
+			String themeCycleId=request.getParameter("themeCycleId");//周期id
 			String userId=request.getParameter("userId");//用户id
 			User user=(User)this.photoService.getObjectById(User.class, userId);
-			if(!"2".equals(user.getIsvalidate())){
-				out.print("{\"state\":\"failed\",\"errorMsg\":\"not verified\"}");
+			if(!"1".equals(user.getIsvalidate())){//未通过真人验证
+				out.print("{\"state\":1,\"errorMsg\":\"not verified\"}");
 			}else{
 				Map<String, Object> filterMap = new HashMap<String, Object>();
-				filterMap.put("cycleId", cycleId);
+				filterMap.put("themeCycleId", themeCycleId);
 				filterMap.put("userId", userId);
 				List<?> list=photoService.validateIsAttend(filterMap);
 				if(list!=null&&list.size()>0){//参与过
-					out.print("{\"state\":\"failed\",\"errorMsg\":\"have participated\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"have participated\"}");
 				}else{//未参与
-					out.print("{\"state\":\"success\"}");
+					out.print("{\"state\":0}");
 				}
 			}
 		}catch (Exception e) {
@@ -579,7 +595,7 @@ public class PhotoAction extends ActionSupport{
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-22 时间：上午11:49:09
 	 */
-	public void comment(){
+	public void replyComment(){
 		HttpServletRequest request= ServletActionContext.getRequest();
 		HttpServletResponse response= ServletActionContext.getResponse();
 		PrintWriter out=null;
@@ -601,7 +617,7 @@ public class PhotoAction extends ActionSupport{
 			comment.setUserId(Integer.parseInt(userId));
 			comment.setDatetime(new Date());
 			this.photoService.saveEntity(comment);
-			out.print("{\"state\":\"success\"}");
+			out.print("{\"state\":0}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getLocalizedMessage()+"\"}");
 			e.printStackTrace();
@@ -631,7 +647,7 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("lastId", lastId);
 			filterMap.put("flag", flag);
 			List list=this.photoService.queryComment(filterMap);
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getLocalizedMessage()+"\"}");
 			e.printStackTrace();
@@ -653,7 +669,8 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = response.getWriter();
 		try {
 			response.setContentType("text/json; charset=utf-8");
-			String type = request.getParameter("type");
+//			String type = request.getParameter("type");
+			String type = "1";
 			String userId = request.getParameter("userId");
 			String pictureSetId = request.getParameter("pictureSetId");
 			Map<String, String> filterMap = new HashMap();
@@ -667,11 +684,40 @@ public class PhotoAction extends ActionSupport{
 				filterMap.put("pictureSetId", pictureSetId);
 			}
 			List list=photoService.queryReviewRecords(filterMap);
-			out.print("{\"state\":\"success\",\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
 			e.printStackTrace();
-			out.print("error");
 		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 举报用户
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-10 时间：下午3:09:50
+	 */
+	public void reportUser(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = null ;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			String currentUserId=request.getParameter("currentUserId");//当前用户
+			String beingInformerId=request.getParameter("beingInformerId");//被举报用户id
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("currentUserId", currentUserId);
+			filterMap.put("beingInformerId", beingInformerId);
+			photoService.reportUser(filterMap);
+			out.print("{\"state\":0}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			e.printStackTrace();
+			logger.error(e);
+		}finally{
 			out.flush();
 			out.close();
 		}

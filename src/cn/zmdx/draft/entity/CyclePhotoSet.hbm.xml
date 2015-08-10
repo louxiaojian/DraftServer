@@ -6,8 +6,8 @@
 			<generator class="native" />
 		</id>
 		<property name="photoSetId" column="photo_set_id" />	
-		<property name="cycleId" column="cycle_id"/>
-		<property name="cycleNo" column="cycle_no"/>
+		<property name="themeCycleId" column="theme_cycle_id"/>
+		<property name="themeTitle" column="theme_title"/>
 	</class>
 	
 </hibernate-mapping>

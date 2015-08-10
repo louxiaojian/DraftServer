@@ -17,6 +17,7 @@ public class RankPictureSet {
 	private int report;//举报次数
 	private int view;//浏览量
 	private int votes;//选秀得票数
+	private int themeCycleId;
 	private List<Photo> photoList;
 	
 	public int getId() {
@@ -96,6 +97,12 @@ public class RankPictureSet {
 	}
 	public void setPhotoList(List<Photo> photoList) {
 		this.photoList = photoList;
+	}
+	public int getThemeCycleId() {
+		return themeCycleId;
+	}
+	public void setThemeCycleId(int themeCycleId) {
+		this.themeCycleId = themeCycleId;
 	}
 	
 }

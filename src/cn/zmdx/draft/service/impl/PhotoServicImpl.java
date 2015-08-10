@@ -1,5 +1,6 @@
 package cn.zmdx.draft.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -54,8 +55,8 @@ public class PhotoServicImpl implements PhotoService {
 	}
 
 	@Override
-	public List queryCycleRanking(String cycleId) {
-		return this.photoDao.queryCycleRanking(cycleId);
+	public List queryCycleRanking(Map<String, String> filterMap) {
+		return this.photoDao.queryCycleRanking(filterMap);
 	}
 
 	@Override
@@ -103,28 +104,36 @@ public class PhotoServicImpl implements PhotoService {
 	public String OperationPictureSet(String userid, String pictureSetId,
 			int operationType) {
 		List list=this.photoDao.queryPhotoByPictureSetId(userid,pictureSetId,operationType);
-		if(list.size()>0){
-			return "failed";
-		}else{
-			PictureSet ps=(PictureSet)this.photoDao.getEntity(PictureSet.class,Integer.parseInt(pictureSetId));
-			//操作类型：0：赞，1：踩，2：举报，3：投票
-			if(operationType==0){
-				ps.setPraise(ps.getPraise()+1);
-			}else if(operationType==1){
-				ps.setTread(ps.getTread()+1);
-			}else if(operationType==2){
-				ps.setReport(ps.getReport()+1);
-			}else if(operationType==3){
-				ps.setVotes(ps.getVotes()+1);
+		if(operationType!=2){
+			if(list.size()>0){
+				return "failed";
 			}
-			this.photoDao.updateEntity(ps);
-			OperationRecords or =new OperationRecords();
-			or.setOperationType(operationType);
-			or.setPictureSetId(Integer.parseInt(pictureSetId));
-			or.setUserid(Integer.parseInt(userid));
-			this.photoDao.saveEntity(or);
-			return "success";
 		}
+		PictureSet ps=(PictureSet)this.photoDao.getEntity(PictureSet.class,Integer.parseInt(pictureSetId));
+		//操作类型：0：赞，1：踩，2：举报，3：投票
+		if(operationType==0){
+			ps.setPraise(ps.getPraise()+1);
+		}else if(operationType==1){
+			ps.setTread(ps.getTread()+1);
+		}else if(operationType==2){
+			ps.setReport(ps.getReport()+1);
+		}else if(operationType==3){
+			ps.setVotes(ps.getVotes()+1);
+		}
+		this.photoDao.updateEntity(ps);
+		OperationRecords or =new OperationRecords();
+		if(operationType==2){//举报图集
+			or.setType(0);
+		}else{//其他操作
+			or.setType(2);
+		}
+		or.setDatetime(new Date());
+		or.setOperationType(operationType);
+		or.setPictureSetId(Integer.parseInt(pictureSetId));
+		or.setInformerId(Integer.parseInt(userid));
+		this.photoDao.saveEntity(or);
+		return "success";
+		
 	}
 
 	@Override
@@ -138,6 +147,17 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public List queryReviewRecords(Map<String, String> filterMap) {
 		return this.photoDao.queryReviewRecords(filterMap);
+	}
+
+	@Override
+	public void reportUser(Map<String, String> filterMap) {
+		OperationRecords or =new OperationRecords();
+		or.setOperationType(2);
+		or.setInformerId(Integer.parseInt(filterMap.get("currentUserId")));//举报人id
+		or.setBeingInformerId(Integer.parseInt(filterMap.get("beingInformerId")));//被举报人id
+		or.setType(1);
+		or.setDatetime(new Date());
+		this.photoDao.saveEntity(or);
 	}
 	
 }

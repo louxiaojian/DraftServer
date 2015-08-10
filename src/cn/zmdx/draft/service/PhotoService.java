@@ -49,9 +49,9 @@ public interface PhotoService {
 	 * 获取相应周期的排名
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：下午4:34:21
-	 * @param cycleId
+	 * @param filterMap
 	 */
-	public List queryCycleRanking(String cycleId);
+	public List queryCycleRanking(Map<String, String> filterMap);
 	/**
 	 * 获取所有主题
 	 * @author louxiaojian
@@ -141,4 +141,11 @@ public interface PhotoService {
 	 * @return
 	 */
 	public List queryReviewRecords(Map<String, String> filterMap);
+	/**
+	 * 举报用户
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-10 时间：下午3:33:21
+	 * @param filterMap
+	 */
+	public void reportUser(Map<String, String> filterMap);
 }

@@ -16,6 +16,7 @@
 		<property name="report" column="report" />	
 		<property name="view" column="view" />	
 		<property name="votes" column="votes" />	
+		<property name="themeCycleId" column="theme_cycle_id" />	
 	</class>
 	
 </hibernate-mapping>
