@@ -5,6 +5,7 @@
 	  <id name="id" column="id" type="int" >
 			<generator class="native" />
 		</id>
+		<property name="pictureSetId" column="picture_set_id"/>
 		<property name="uploadDate" column="uploadDate"/>
 		<property name="descs" column="descs"/>
 		<property name="type" column="type" />	

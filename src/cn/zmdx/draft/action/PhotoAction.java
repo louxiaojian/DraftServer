@@ -9,18 +9,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+
 import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.CyclePhotoSet;
 import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.entity.PictureSet;
+import cn.zmdx.draft.entity.RankPictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.util.SensitivewordFilter;
 import cn.zmdx.draft.util.UploadPhoto;
+
 import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -82,6 +87,9 @@ public class PhotoAction extends ActionSupport{
 			if ("".equals(limit)||limit==null|| "0".equals(limit)){
 				limit = "10";
 			}
+			if("".equals(flag)||flag==null){
+				flag="0";
+			}
 			
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("limit", limit);
@@ -122,7 +130,7 @@ public class PhotoAction extends ActionSupport{
 		try{
 			out = ServletActionContext.getResponse().getWriter();
 			//lastid
-			String lastid = request.getParameter("lastid");
+			String lastid = request.getParameter("lastId");
 			//查询数据数量
 			String limit=request.getParameter("limit");
 			//标示，0查询lastModified之后的数据，1查询lastModified之前的数据
@@ -131,24 +139,36 @@ public class PhotoAction extends ActionSupport{
 			if ("".equals(limit)||limit==null|| "0".equals(limit)){
 				limit = "10";
 			}
+			if ("".equals(lastid)||lastid==null){
+				lastid = "0";
+			}
+			if ("".equals(flag)||flag==null){
+				flag = "0";
+			}
 			
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("limit", limit);
 			filterMap.put("lastid", lastid);
 			filterMap.put("flag", flag);
 			filterMap.put("category", category);
-			List<PictureSet> list =null;
+			List list =null;
+			List result=new ArrayList();
 			if("1".equals(category)){//热门
 				list = photoService.queryHotPhotosWall(filterMap);
+				for (int i = 0; i < list.size(); i++) {
+					RankPictureSet ps=(RankPictureSet)list.get(i);
+					List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
+					ps.setPhotoList(pList);
+					result.add(ps);
+				}
 			}else if("0".equals(category)){//新
 				list = photoService.queryPhotosWall(filterMap);
-			}
-			List result=new ArrayList();
-			for (int i = 0; i < list.size(); i++) {
-				PictureSet ps=list.get(i);
-				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
-				ps.setPhotoList(pList);
-				result.add(ps);
+				for (int i = 0; i < list.size(); i++) {
+					PictureSet ps=(PictureSet)list.get(i);
+					List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+					ps.setPhotoList(pList);
+					result.add(ps);
+				}
 			}
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
@@ -174,7 +194,7 @@ public class PhotoAction extends ActionSupport{
 		try{
 			out = ServletActionContext.getResponse().getWriter();
 			//lastid
-			String lastid = request.getParameter("lastid");
+			String lastid = request.getParameter("lastId");
 			//查询数据数量
 			String limit=request.getParameter("limit");
 			//标示，0查询lastModified之后的数据，1查询lastModified之前的数据
@@ -473,15 +493,31 @@ public class PhotoAction extends ActionSupport{
 		PrintWriter out = null ;
 		try{
 			out = ServletActionContext.getResponse().getWriter();
+			//lastid
+			String lastid = request.getParameter("lastId");
+			//查询数据数量
+			String limit=request.getParameter("limit");
+			//标示，0查询lastModified之后的数据，1查询lastModified之前的数据
+			String flag=request.getParameter("flag");
+			//选秀主题周期id
 			String themeCycleId=request.getParameter("themeCycleId");
+			if ("".equals(limit)||limit==null|| "0".equals(limit)){
+				limit = "10";
+			}
+			if ("".equals(flag)||flag==null){
+				flag = "0";
+			}
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("themeCycleId", themeCycleId);
+			filterMap.put("lastid", lastid);
+			filterMap.put("limit", limit);
+			filterMap.put("flag", flag);
 			List list=photoService.queryCycleRanking(filterMap);
 			
 			List result=new ArrayList();
 			for (int i = 0; i < list.size(); i++) {
-				PictureSet ps=(PictureSet)list.get(i);
-				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+				RankPictureSet ps=(RankPictureSet)list.get(i);
+				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 				ps.setPhotoList(pList);
 				result.add(ps);
 			}
@@ -604,6 +640,7 @@ public class PhotoAction extends ActionSupport{
 			out=response.getWriter();
 			String pictureSetId=request.getParameter("pictureSetId");
 			String content=request.getParameter("content");
+			//敏感词过滤
 			SensitivewordFilter sf=new SensitivewordFilter();
 			content=sf.replaceSensitiveWord(content, 1, "*");
 			String parentUserId=request.getParameter("parentUserId");
@@ -642,10 +679,15 @@ public class PhotoAction extends ActionSupport{
 			String pictureSetId=request.getParameter("pictureSetId");
 			String lastId=request.getParameter("lastId");
 			String flag=request.getParameter("flag");
+			String limit=request.getParameter("limit");
+			if("".equals(limit)||limit==null){
+				limit="10";
+			}
 			Map<String, Object> filterMap = new HashMap();
 			filterMap.put("pictureSetId", pictureSetId);
 			filterMap.put("lastId", lastId);
 			filterMap.put("flag", flag);
+			filterMap.put("limit", limit);
 			List list=this.photoService.queryComment(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {

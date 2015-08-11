@@ -6,6 +6,7 @@ import java.util.List;
 public class RankPictureSet {
 	
 	private int id;
+	private int pictureSetId;
 	private Date uploadDate;//上传时间
 	private String descs;//描述
 	private String type;//分类，0:个人，1:秀场
@@ -104,5 +105,10 @@ public class RankPictureSet {
 	public void setThemeCycleId(int themeCycleId) {
 		this.themeCycleId = themeCycleId;
 	}
-	
+	public int getPictureSetId() {
+		return pictureSetId;
+	}
+	public void setPictureSetId(int pictureSetId) {
+		this.pictureSetId = pictureSetId;
+	}
 }

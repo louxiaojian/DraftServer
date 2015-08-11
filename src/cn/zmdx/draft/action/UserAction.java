@@ -40,8 +40,10 @@ public class UserAction extends ActionSupport {
 	private String imageFileName;
 
 	private final static String uri = "http://222.73.117.158/msg/";//应用地址
-	private final static String account = "jiekou-clcs-04";//账号
-	private final static String pswd = "Tch147369";//密码
+	private final static String account = "Zmdx888";//账号
+	private final static String pswd = "Zmdx888888";//密码
+//	private final static String account = "jiekou-clcs-04";//账号
+//	private final static String pswd = "Tch147369";//密码
 //	private final static String mobiles = "15010118286";//手机号码，多个号码使用","分割
 	private final static String contentLeft = "亲爱的用户，您的验证码是";//短信内容
 	private final static String contentRight = "，5分钟内有效。";//短信内容
@@ -156,7 +158,7 @@ public class UserAction extends ActionSupport {
 			String telephone=request.getParameter("loginname");
 			//验证该手机号今日是否能获取
 			int count=this.userService.qualificationByTelephone(telephone);
-			if(count>3){
+			if(count>30){
 				out.print("{\"state\":1,\"errorMsg\":\"can't get today\"}");
 			}else{
 				String code=String.valueOf((int)((Math.random()*9+1)*100000));
@@ -273,8 +275,10 @@ public class UserAction extends ActionSupport {
 			if(fileName!=null&&!"".equals(fileName)){
 				user.setHeadPortrait(fileName);
 				this.userService.updateUser(user);
+				out.print("{\"state\":0,\"imgUrl\":\""+fileName+"\"}");
+			}else{
+				out.print("{\"state\":1,\"errorMsg\":\"upload failed\"}");
 			}
-			out.print("{\"state\":0,\"imgUrl\":\""+fileName+"\"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
