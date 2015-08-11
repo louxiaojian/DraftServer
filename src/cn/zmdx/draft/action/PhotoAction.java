@@ -100,7 +100,7 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -152,7 +152,7 @@ public class PhotoAction extends ActionSupport{
 			}
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -204,7 +204,7 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -269,7 +269,7 @@ public class PhotoAction extends ActionSupport{
 			photoService.uploadPhoto(filterMap);
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -308,7 +308,7 @@ public class PhotoAction extends ActionSupport{
 			}
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -337,7 +337,7 @@ public class PhotoAction extends ActionSupport{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -366,7 +366,7 @@ public class PhotoAction extends ActionSupport{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -395,7 +395,7 @@ public class PhotoAction extends ActionSupport{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -424,7 +424,7 @@ public class PhotoAction extends ActionSupport{
 
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -453,7 +453,7 @@ public class PhotoAction extends ActionSupport{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -487,7 +487,7 @@ public class PhotoAction extends ActionSupport{
 			}
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -512,7 +512,7 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -542,7 +542,7 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -576,13 +576,13 @@ public class PhotoAction extends ActionSupport{
 				filterMap.put("userId", userId);
 				List<?> list=photoService.validateIsAttend(filterMap);
 				if(list!=null&&list.size()>0){//参与过
-					out.print("{\"state\":1,\"errorMsg\":\"have participated\"}");
+					out.print("{\"state\":0,\"errorMsg\":\"have participated\"}");
 				}else{//未参与
 					out.print("{\"state\":0}");
 				}
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -619,7 +619,7 @@ public class PhotoAction extends ActionSupport{
 			this.photoService.saveEntity(comment);
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getLocalizedMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -649,7 +649,7 @@ public class PhotoAction extends ActionSupport{
 			List list=this.photoService.queryComment(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getLocalizedMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -686,7 +686,8 @@ public class PhotoAction extends ActionSupport{
 			List list=photoService.queryReviewRecords(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			logger.error(e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -714,7 +715,7 @@ public class PhotoAction extends ActionSupport{
 			photoService.reportUser(filterMap);
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\",\"errorCode\":\""+e.getClass().getName()+"\",\"errorMsg\":\""+e.getMessage()+"\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{

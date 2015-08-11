@@ -128,11 +128,11 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -173,11 +173,11 @@ public class UserAction extends ActionSupport {
 				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -214,11 +214,11 @@ public class UserAction extends ActionSupport {
 				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -242,11 +242,11 @@ public class UserAction extends ActionSupport {
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
 			out.print("{\"state\":0}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -276,11 +276,11 @@ public class UserAction extends ActionSupport {
 			}
 			out.print("{\"state\":0,\"imgUrl\":\""+fileName+"\"}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -324,11 +324,11 @@ public class UserAction extends ActionSupport {
 			this.userService.updateUser(user);
 			out.print("{\"state\":0,\"userInfo\":"+JSON.toJSON(this.getUser(user))+"}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -365,11 +365,11 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":1,\"errorMsg\":\"username does not exist\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -419,11 +419,11 @@ public class UserAction extends ActionSupport {
 			
 			out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(user))+",\"photoSet\":"+JSON.toJSONString(photoSet, true)+",\"attentionList\":"+JSON.toJSONString(attentionList, true)+",\"fansList\":"+JSON.toJSONString(fansList, true)+"}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -457,11 +457,11 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":0}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -495,7 +495,7 @@ public class UserAction extends ActionSupport {
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -525,7 +525,7 @@ public class UserAction extends ActionSupport {
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -554,8 +554,9 @@ public class UserAction extends ActionSupport {
 			List list=userService.queryAttentions(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			logger.error(e);
 			e.printStackTrace();
-			out.print("error");
 		} finally {
 			out.flush();
 			out.close();
@@ -583,7 +584,8 @@ public class UserAction extends ActionSupport {
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
 			e.printStackTrace();
-			out.print("error");
+			logger.error(e);
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 		} finally {
 			out.flush();
 			out.close();
