@@ -8,7 +8,7 @@
 		<property name="photoUrl" column="photoUrl"/>
 		<property name="uploadDate" column="uploadDate"/>
 <!-- 		<property name="descs" column="descs"/> -->
-<!-- 		<property name="type" column="type" />	 -->
+ 		<property name="type" column="type" />
 <!-- 		<property name="status" column="status" />	 -->
 <!-- 		<property name="praise" column="praise" />	 -->
 <!-- 		<property name="tread" column="tread" />	 -->

@@ -1,7 +1,6 @@
 package cn.zmdx.draft.action;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -22,11 +20,12 @@ import cn.zmdx.draft.entity.UserAttentionFans;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Sha1;
-import cn.zmdx.draft.util.UploadPhoto;
 import cn.zmdx.draft.util.UserCookieUtil;
+import cn.zmdx.draft.util.picCloud.PicCloud;
 import com.alibaba.fastjson.JSON;
 import com.bcloud.msg.http.HttpSender;
 import com.opensymphony.xwork2.ActionSupport;
+import com.qcloud.UploadResult;
 
 public class UserAction extends ActionSupport {
 	private Logger logger=Logger.getLogger(UserAction.class);
@@ -38,7 +37,6 @@ public class UserAction extends ActionSupport {
 	private String imageContentType;
 	// 封装上传文件名
 	private String imageFileName;
-
 	private final static String uri = "http://222.73.117.158/msg/";//应用地址
 	private final static String account = "Zmdx888";//账号
 	private final static String pswd = "Zmdx888888";//密码
@@ -50,6 +48,10 @@ public class UserAction extends ActionSupport {
 	private final static boolean needstatus = true;//是否需要状态报告，需要true，不需要false
 	private final static String product = null;//产品ID
 	private final static String extno = null;//扩展码
+    public static final int APP_ID_V2 = 10002468;
+	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
+	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
+    public static final String BUCKET = "headpic";        //空间名
 	
 	public UserServiceImpl getUserService() {
 		return userService;
@@ -270,19 +272,16 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request=ServletActionContext.getRequest();
 			int id = Integer.parseInt(request.getParameter("userId"));
 			User user=this.userService.getById(id);
-			FileInputStream fis= new FileInputStream(getImage());
-			String fileName=UploadPhoto.uploadPhoto(fis,imageFileName);
-			if(fileName!=null&&!"".equals(fileName)){
-				user.setHeadPortrait(fileName);
-				this.userService.updateUser(user);
-				out.print("{\"state\":0,\"imgUrl\":\""+fileName+"\"}");
+			PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2, BUCKET);
+			UploadResult result = new UploadResult();
+			int ret = pc.Upload(getImage(), result);
+			if(ret!=0){
+				out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
 			}else{
-				out.print("{\"state\":1,\"errorMsg\":\"upload failed\"}");
+				user.setHeadPortrait(result.download_url);
+				this.userService.updateUser(user);
+				out.print("{\"state\":0,\"imgUrl\":\""+result.download_url+"\"}");
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			logger.error(e);

@@ -1,7 +1,6 @@
 package cn.zmdx.draft.action;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -9,13 +8,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
-
 import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.CyclePhotoSet;
 import cn.zmdx.draft.entity.Photo;
@@ -24,10 +20,10 @@ import cn.zmdx.draft.entity.RankPictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.util.SensitivewordFilter;
-import cn.zmdx.draft.util.UploadPhoto;
-
+import cn.zmdx.draft.util.picCloud.PicCloud;
 import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
+import com.qcloud.UploadResult;
 
 public class PhotoAction extends ActionSupport{
 	Logger logger = Logger.getLogger(PhotoAction.class);
@@ -38,7 +34,11 @@ public class PhotoAction extends ActionSupport{
 	private String [] imageContentType;
 	// 封装上传文件名 
 	private String [] imageFileName;
-	
+    public static final int APP_ID_V2 = 10002468;
+	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
+	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
+    public static final String BUCKET = "headpic";        //空间名
+    
 	public PhotoService getPhotoService() {
 		return photoService;
 	}
@@ -264,16 +264,18 @@ public class PhotoAction extends ActionSupport{
 			
 			File [] files=getImage();
 			for (int i = 0; i < files.length; i++) {
-				FileInputStream fis= new FileInputStream(files[i]);
-				String fileName=UploadPhoto.uploadPhoto(fis, imageFileName[i]);
-				if(fileName==null||"".equals(fileName)){
-					out.print("{\"state\":1,\"errorMsg\":\"upload failed\"}");
+				PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2, BUCKET);
+				UploadResult result = new UploadResult();
+				int ret = pc.Upload(files[i], result);
+				if(ret!=0){
+					out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
 					break;
 				}else{
 					Photo photo=new Photo();
-					photo.setPhotoUrl(fileName);
+					photo.setPhotoUrl(result.download_url);
 					photo.setUploadDate(new Date());
 					photo.setUserid(Integer.parseInt(userid));
+					photo.setType(0);//图集
 					filterMap.put("photo"+i, photo);
 				}
 			}
@@ -312,19 +314,21 @@ public class PhotoAction extends ActionSupport{
 			out = ServletActionContext.getResponse().getWriter();
 			String userId=request.getParameter("userId");
 			File [] files=getImage();
-			for (int i = 0; i < files.length; i++) {
-				FileInputStream fis= new FileInputStream(files[i]);
-				String fileName=UploadPhoto.uploadPhoto(fis, imageFileName[i]);
-				if(fileName==null||"".equals(fileName)){
-					out.print("{\"state\":1,\"errorMsg\":\"upload failed\"}");
-				}else{
-					Photo photo=new Photo();
-					photo.setPhotoUrl(fileName);
-					photo.setUploadDate(new Date());
-					photo.setUserid(Integer.parseInt(userId));
-					photo.setPictureSetId(0);
-					this.photoService.realityVerification(photo,userId);
-				}
+			//上传至万象空间
+			PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2, BUCKET);
+			UploadResult result = new UploadResult();
+			int ret = pc.Upload(files[0], result);
+			if(ret!=0){
+				out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
+			}else{
+				//图片链接
+				Photo photo=new Photo();
+				photo.setPhotoUrl(result.download_url);
+				photo.setUploadDate(new Date());
+				photo.setUserid(Integer.parseInt(userId));
+				photo.setPictureSetId(0);
+				photo.setType(1);//图集
+				this.photoService.realityVerification(photo,userId);
 			}
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
@@ -654,7 +658,7 @@ public class PhotoAction extends ActionSupport{
 			comment.setUserId(Integer.parseInt(userId));
 			comment.setDatetime(new Date());
 			this.photoService.saveEntity(comment);
-			out.print("{\"state\":0}");
+			out.print("{\"state\":0,\"result\":"+comment.getId()+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
