@@ -217,8 +217,12 @@ public class PhotoAction extends ActionSupport{
 			List result=new ArrayList();
 			for (int i = 0; i < list.size(); i++) {
 				PictureSet ps=list.get(i);
+				//图集所有照片
 				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
 				ps.setPhotoList(pList);
+				//图集评论数
+				int comments=photoService.queryCommentByPictureSetId(ps.getId());
+				ps.setComments(comments);
 				result.add(ps);
 			}
 			
@@ -263,12 +267,15 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("pictureSet", ps);
 			
 			File [] files=getImage();
+			int errorcount=0;
+			String [] fileids = new String[]{};
+			PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2, BUCKET);
 			for (int i = 0; i < files.length; i++) {
-				PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2, BUCKET);
 				UploadResult result = new UploadResult();
 				int ret = pc.Upload(files[i], result);
+//				int ret=1;
 				if(ret!=0){
-					out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
+					errorcount++;
 					break;
 				}else{
 					Photo photo=new Photo();
@@ -277,19 +284,26 @@ public class PhotoAction extends ActionSupport{
 					photo.setUserid(Integer.parseInt(userid));
 					photo.setType(0);//图集
 					filterMap.put("photo"+i, photo);
+					fileids[fileids.length]=result.fileid;
 				}
 			}
-			filterMap.put("count", files.length);
-			if("1".equals(type)){
-				//图片选秀信息
-				CyclePhotoSet cyclePhoto=new CyclePhotoSet();
-				cyclePhoto.setThemeCycleId(Integer.parseInt(themeCycleId));
-				cyclePhoto.setThemeTitle(themeTitle);
-				filterMap.put("cyclePhoto", cyclePhoto);
+			if(errorcount==0){
+				filterMap.put("count", files.length);
+				if("1".equals(type)){
+					//图片选秀信息
+					CyclePhotoSet cyclePhoto=new CyclePhotoSet();
+					cyclePhoto.setThemeCycleId(Integer.parseInt(themeCycleId));
+					cyclePhoto.setThemeTitle(themeTitle);
+					filterMap.put("cyclePhoto", cyclePhoto);
+				}
+				photoService.uploadPhoto(filterMap);
+				out.print("{\"state\":0}");
+			}else{//失败删除本次所有上传照片
+				for (int i = 0; i < fileids.length; i++) {
+					pc.Delete(fileids[i]);
+				}
+				out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
 			}
-			
-			photoService.uploadPhoto(filterMap);
-			out.print("{\"state\":0}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
@@ -329,8 +343,8 @@ public class PhotoAction extends ActionSupport{
 				photo.setPictureSetId(0);
 				photo.setType(1);//图集
 				this.photoService.realityVerification(photo,userId);
+				out.print("{\"state\":0}");
 			}
-			out.print("{\"state\":0}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
@@ -486,7 +500,7 @@ public class PhotoAction extends ActionSupport{
 		}
 	}
 	/**
-	 * 根据选秀主题周期id查看选秀排名
+	 * 根据选秀主题周期id查看选秀图集排名
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：上午10:46:21
 	 */
@@ -521,8 +535,12 @@ public class PhotoAction extends ActionSupport{
 			List result=new ArrayList();
 			for (int i = 0; i < list.size(); i++) {
 				RankPictureSet ps=(RankPictureSet)list.get(i);
+				//图集所有图片
 				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 				ps.setPhotoList(pList);
+				//图集评论数
+				int comments=photoService.queryCommentByPictureSetId(ps.getId());
+				ps.setComments(comments);
 				result.add(ps);
 			}
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
@@ -535,6 +553,58 @@ public class PhotoAction extends ActionSupport{
 			out.close();
 		}
 	}
+	
+	/**
+	 * 根据选秀主题周期id查看选秀用户排名
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：上午10:46:21
+	 */
+	public void queryUserCycleRanking(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = null ;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			//lastid
+			String lastid = request.getParameter("lastId");
+			//查询数据数量
+			String limit=request.getParameter("limit");
+			//标示，0查询lastModified之后的数据，1查询lastModified之前的数据
+			String flag=request.getParameter("flag");
+			//选秀主题周期id
+			String themeCycleId=request.getParameter("themeCycleId");
+			if ("".equals(limit)||limit==null|| "0".equals(limit)){
+				limit = "10";
+			}
+			if ("".equals(flag)||flag==null){
+				flag = "0";
+			}
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("themeCycleId", themeCycleId);
+			filterMap.put("lastid", lastid);
+			filterMap.put("limit", limit);
+			filterMap.put("flag", flag);
+			List list=photoService.queryUserCycleRanking(filterMap);
+			
+//			List result=new ArrayList();
+//			for (int i = 0; i < list.size(); i++) {
+//				RankPictureSet ps=(RankPictureSet)list.get(i);
+//				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
+//				ps.setPhotoList(pList);
+//				result.add(ps);
+//			}
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			e.printStackTrace();
+			logger.error(e);
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	
 	/**
 	 * 获取所有主题
 	 * @author louxiaojian

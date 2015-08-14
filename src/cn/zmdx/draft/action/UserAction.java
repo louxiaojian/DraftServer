@@ -170,8 +170,10 @@ public class UserAction extends ActionSupport {
 				if("0".equals(returnCode)){
 					Captcha captcha=this.userService.createCaptcha(telephone,code);
 					out.print("{\"state\":0,\"result\":"+JSON.toJSONString(captcha)+"}");
-				}else if("107".equals(returnCode)){
+				}else if("107".equals(returnCode)){//手机号错误
 					out.print("{\"state\":1,\"errorMsg\":\"telephone error\"}");
+				}else if("109".equals(returnCode)){//短信额度不足
+					out.print("{\"state\":1,\"errorMsg\":\"insufficient number of sending\"}");
 				}else {
 					out.print("{\"state\":1,\"errorMsg\":\"system error\"}");
 				}

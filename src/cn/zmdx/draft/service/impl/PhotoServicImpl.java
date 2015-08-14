@@ -159,5 +159,15 @@ public class PhotoServicImpl implements PhotoService {
 		or.setDatetime(new Date());
 		this.photoDao.saveEntity(or);
 	}
+
+	@Override
+	public List queryUserCycleRanking(Map<String, String> filterMap) {
+		return this.photoDao.queryUserCycleRanking(filterMap);
+	}
+
+	@Override
+	public int queryCommentByPictureSetId(int id) {
+		return this.photoDao.queryCommentByPictureSetId(id);
+	}
 	
 }

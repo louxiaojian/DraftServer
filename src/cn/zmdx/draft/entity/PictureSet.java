@@ -19,6 +19,7 @@ public class PictureSet {
 	private int votes;//选秀得票数
 	private int themeCycleId;
 	private List<Photo> photoList;
+	private int comments;
 	
 	public int getId() {
 		return id;
@@ -103,6 +104,12 @@ public class PictureSet {
 	}
 	public void setThemeCycleId(int themeCycleId) {
 		this.themeCycleId = themeCycleId;
+	}
+	public int getComments() {
+		return comments;
+	}
+	public void setComments(int comments) {
+		this.comments = comments;
 	}
 	
 }

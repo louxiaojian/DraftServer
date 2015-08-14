@@ -148,4 +148,20 @@ public interface PhotoService {
 	 * @param filterMap
 	 */
 	public void reportUser(Map<String, String> filterMap);
+	/**
+	 * 根据选秀主题周期id查看选秀用户排名
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-13 时间：下午8:29:25
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryUserCycleRanking(Map<String, String> filterMap);
+	/**
+	 * 获取图集评论数
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-14 时间：上午11:40:38
+	 * @param id
+	 * @return
+	 */
+	public int queryCommentByPictureSetId(int id);
 }

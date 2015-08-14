@@ -19,7 +19,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
   </head>
   <body>
-    <form action="photo!realityVerification.action?userId=8&type=1&themeCycleId=1&themeTitle=201507001&descs=asdfyhh" id="pageFrom" name="" method="post" enctype="multipart/form-data">
+    <form action="photo!uploadPhoto.action?userId=8&type=1&themeCycleId=1&themeTitle=201507001&descs=asdfyhh" id="pageFrom" name="" method="post" enctype="multipart/form-data">
 		<br /><s:debug></s:debug>
 		<fieldset class="fieldsetStyle">
 			<legend>
@@ -65,7 +65,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
 	</form>
-	<form action="user!uploadPhoto.action?userId=1" method="post" enctype="multipart/form-data">
+	<form action="photo!uploadPhoto.action?userId=1" method="post" enctype="multipart/form-data">
 		<table>
 			<tr><td><input type="file" id="image"
 							name="image" value="" onchange="uploadImg()" /></td></tr>

@@ -338,4 +338,41 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		return query.list();
 	}
 
+	@Override
+	public List queryUserCycleRanking(Map<String, String> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,rps.praise from users u left join rank_picture_set rps on rps.userid=u.id where rps.status =1 and rps.type=1 ");
+		if (filterMap != null && !filterMap.isEmpty()) {
+			if ("0".equals(filterMap.get("flag"))) {
+				if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
+					sql.append(" and rps.id > :lastid");
+				}
+			} else if ("1".equals(filterMap.get("flag"))) {
+				if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
+					sql.append(" and rps.id < :lastid");
+				}
+			}
+			if(!"".equals(filterMap.get("themeCycleId"))&&filterMap.get("themeCycleId")!=null){
+				sql.append(" and rps.theme_cycle_id=:themeCycleId");
+			}
+			sql.append(" order by rps.praise desc ");
+		}
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(User.class));
+		if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
+			query.setInteger("lastid", Integer.parseInt(filterMap.get("lastid")));
+		}
+		if(!"".equals(filterMap.get("themeCycleId"))&&filterMap.get("themeCycleId")!=null){
+			query.setInteger("themeCycleId", Integer.parseInt(filterMap.get("themeCycleId")));
+		}
+		return query.list();
+	}
+
+	@Override
+	public int queryCommentByPictureSetId(int id) {
+		List list=this.template.find("from Comment where pictureSetId=?",id);
+		return list.size();
+	}
+
 }

@@ -20,6 +20,7 @@ public class RankPictureSet {
 	private int votes;//选秀得票数
 	private int themeCycleId;
 	private List<Photo> photoList;
+	private int comments;
 	
 	public int getId() {
 		return id;
@@ -110,5 +111,11 @@ public class RankPictureSet {
 	}
 	public void setPictureSetId(int pictureSetId) {
 		this.pictureSetId = pictureSetId;
+	}
+	public int getComments() {
+		return comments;
+	}
+	public void setComments(int comments) {
+		this.comments = comments;
 	}
 }
