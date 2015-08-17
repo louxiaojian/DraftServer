@@ -411,10 +411,10 @@ public class PhotoAction extends ActionSupport{
 			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,0);
-			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"已赞\"}");
+			if("failed".equals(result)){//已操作
+				out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
 			}else{
-				out.print("{\"state\":0}");
+				out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
@@ -440,10 +440,10 @@ public class PhotoAction extends ActionSupport{
 			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,1);
-			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"已踩\"}");
+			if("failed".equals(result)){//已操作过
+				out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
 			}else{
-				out.print("{\"state\":0}");
+				out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
@@ -469,10 +469,10 @@ public class PhotoAction extends ActionSupport{
 			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,2);
-			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"已举报\"}");
+			if("failed".equals(result)){//已操作过
+				out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
 			}else{
-				out.print("{\"state\":0}");
+				out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
@@ -527,10 +527,10 @@ public class PhotoAction extends ActionSupport{
 			String userid=request.getParameter("userId");
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,3);
-			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"已投票\"}");
+			if("failed".equals(result)){//已操作过
+				out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
 			}else{
-				out.print("{\"state\":0}");
+				out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
@@ -747,9 +747,9 @@ public class PhotoAction extends ActionSupport{
 				filterMap.put("userId", userId);
 				List<?> list=photoService.validateIsAttend(filterMap);
 				if(list!=null&&list.size()>0){//参与过
-					out.print("{\"state\":0,\"errorMsg\":\"已参加\"}");
+					out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 				}else{//未参与
-					out.print("{\"state\":0}");
+					out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 				}
 			}
 		}catch (Exception e) {
@@ -956,6 +956,7 @@ public class PhotoAction extends ActionSupport{
 			String id=request.getParameter("id");
 			
 			PictureSet ps=(PictureSet)this.photoService.getObjectById(PictureSet.class,id);
+			
 			List result=new ArrayList();
 			if(ps!=null){
 				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
@@ -966,7 +967,7 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("pictureSetId", id);
 			filterMap.put("limit", 20);
 			List list=this.photoService.queryComment(filterMap);
-			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+",\"comments\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":{\"photoSet\":"+JSON.toJSONString(result, true)+",\"comments\":"+JSON.toJSONString(list, true)+"}}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();

@@ -122,7 +122,7 @@ public class UserAction extends ActionSupport {
 								newUser.setRegistrationDate(new Date());
 								newUser.setOrgId(0);
 								this.userService.register(newUser,captcha);
-								out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(newUser))+"}");
+								out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(newUser))+"}");
 							}else{//用户名已存在
 								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
 							}
@@ -297,7 +297,7 @@ public class UserAction extends ActionSupport {
 				}
 				user.setHeadPortrait(result.download_url);
 				this.userService.updateUser(user);
-				out.print("{\"state\":0,\"imgUrl\":\""+result.download_url+"\"}");
+				out.print("{\"state\":0,\"result\":\""+result.download_url+"\"}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
@@ -342,7 +342,7 @@ public class UserAction extends ActionSupport {
 			user.setGender(Integer.parseInt(gender));
 			user.setIntroduction(introduction);
 			this.userService.updateUser(user);
-			out.print("{\"state\":0,\"userInfo\":"+JSON.toJSON(this.getUser(user))+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSON(this.getUser(user))+"}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
@@ -378,7 +378,7 @@ public class UserAction extends ActionSupport {
 				if(oldPassowrd.equals(user.getPassword())){
 					user.setPassword(sha1.Digest(newPassowrd));
 					this.userService.updateUser(user);
-					out.print("{\"state\":0,\"userInfo\":"+JSON.toJSON(this.getUser(user))+"}");
+					out.print("{\"state\":0,\"result\":"+JSON.toJSON(this.getUser(user))+"}");
 				}else{//原密码错误
 					out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
 				}
@@ -447,7 +447,7 @@ public class UserAction extends ActionSupport {
 			if(user!=null){
 				User newUser=this.getUser(user);
 				newUser.setIsAttention(user.getIsAttention());
-				out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(newUser)+",\"photoSet\":"+JSON.toJSONString(photoSet, true)+",\"attentionList\":"+JSON.toJSONString(attentionList, true)+",\"fansList\":"+JSON.toJSONString(fansList, true)+"}");
+				out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(newUser)+",\"photoSet\":"+JSON.toJSONString(photoSet, true)+",\"attentionList\":"+JSON.toJSONString(attentionList, true)+",\"fansList\":"+JSON.toJSONString(fansList, true)+"}}");
 			}else{
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			}
@@ -481,7 +481,7 @@ public class UserAction extends ActionSupport {
 			//是否关注过
 			UserAttentionFans u=this.userService.isAttention(fansUserId,attentionUserId);
 			if(u!=null){
-				out.print("{\"state\":1,\"errorMsg\":\"is attentioned\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"已关注\"}");
 			}else{
 				UserAttentionFans uaf=new UserAttentionFans();
 				uaf.setAttentionUserId(Integer.parseInt(attentionUserId));
@@ -523,7 +523,7 @@ public class UserAction extends ActionSupport {
 			if(u!=null){//已关注
 				out.print("{\"state\":0}");
 			}else{//未关注
-				out.print("{\"state\":1,\"errorMsg\":\"not attentioned\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"未关注\"}");
 			}
 		} catch (IOException ie) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
@@ -654,7 +654,7 @@ public class UserAction extends ActionSupport {
 						if(user!=null){
 							user.setPassword(pwd);
 							this.userService.resetPassword(user,captcha);
-							out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(user))+"}");
+							out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(user))+"}");
 						}else{//用户名不存在
 							out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 						}
@@ -701,7 +701,6 @@ public class UserAction extends ActionSupport {
 		newUser.setTelephone(user.getTelephone());
 		newUser.setLoginname(user.getLoginname());
 		newUser.setGender(user.getGender());
-		newUser.setValidateDate(user.getValidateDate());
 		return newUser;
 	}
 }
