@@ -21,6 +21,7 @@
 		<property name="gender" column="gender"/>
 		<property name="validateDate" column="validateDate"/>
 		<property name="report" column="report"/>
+		<property name="fileid" column="fileid"/>
 	</class>
 	
 </hibernate-mapping>

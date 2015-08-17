@@ -99,46 +99,51 @@ public class UserAction extends ActionSupport {
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("password");
 			String code=request.getParameter("captcha");
-			//获取当前可用的验证码
-			Captcha captcha=this.userService.queryUsableCaptcha(loginname);
-			if(captcha!=null){
-				if(code.equals(captcha.getCode())){
-					if(captcha.getDeadline().getTime()>new Date().getTime()){
-						Sha1 sha1=new Sha1();
-						pwd=sha1.Digest(pwd);
-						User user=userService.findByName(loginname);
-						if(user==null){
-							User newUser =new User();
-							newUser.setLoginname(loginname);
-							newUser.setPassword(pwd);
-							newUser.setFlag("1");
-							newUser.setIsvalidate("0");
-							newUser.setAge(0);
-							newUser.setRegistrationDate(new Date());
-							newUser.setOrgId(0);
-							this.userService.register(newUser,captcha);
-							out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(newUser))+"}");
-						}else{//用户名已存在
-							out.print("{\"state\":1,\"errorMsg\":\"loginname already exist\"}");
+
+			if("".equals(loginname)||loginname!=null||"".equals(pwd)||pwd!=null){
+				out.print("{\"state\":1,\"errorMsg\":\"用户名、密码不能为空\"}");
+			}else{
+				//获取当前可用的验证码
+				Captcha captcha=this.userService.queryUsableCaptcha(loginname);
+				if(captcha!=null){
+					if(code.equals(captcha.getCode())){
+						if(captcha.getDeadline().getTime()>new Date().getTime()){
+							Sha1 sha1=new Sha1();
+							pwd=sha1.Digest(pwd);
+							User user=userService.findByName(loginname);
+							if(user==null){
+								User newUser =new User();
+								newUser.setLoginname(loginname);
+								newUser.setUsername(loginname);
+								newUser.setPassword(pwd);
+								newUser.setFlag("1");
+								newUser.setIsvalidate("0");
+								newUser.setAge(0);
+								newUser.setRegistrationDate(new Date());
+								newUser.setOrgId(0);
+								this.userService.register(newUser,captcha);
+								out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(newUser))+"}");
+							}else{//用户名已存在
+								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
+							}
+						}else{//验证码失效
+							captcha.setStatus("1");
+							this.userService.updateObject(captcha);
+							out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 						}
-					}else{//验证码失效
-						captcha.setStatus("1");
-						this.userService.updateObject(captcha);
-						out.print("{\"state\":1,\"errorMsg\":\"verification code has expired\"}");
+					}else{//验证码错误
+						out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
 					}
-				}else{//验证码错误
-					out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
+				}else{//未获取验证码
+					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 				}
-			}else{//未获取验证码
-//				out.print("{\"state\":1,\"errorMsg\":\"no available code\"}");
-				out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -173,19 +178,19 @@ public class UserAction extends ActionSupport {
 					Captcha captcha=this.userService.createCaptcha(telephone,code);
 					out.print("{\"state\":0,\"result\":"+JSON.toJSONString(captcha)+"}");
 				}else if("107".equals(returnCode)){//手机号错误
-					out.print("{\"state\":1,\"errorMsg\":\"telephone error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
 				}else if("109".equals(returnCode)){//短信额度不足
-					out.print("{\"state\":1,\"errorMsg\":\"insufficient number of sending\"}");
+					out.print("{\"state\":1,\"errorCode\":\"短信额度不足\",\"errorMsg\":\"系统异常\"}");
 				}else {
-					out.print("{\"state\":1,\"errorMsg\":\"system error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"系统异常\"}");
 				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -208,25 +213,29 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("password");
-			User user=userService.findByName(loginname);
-			if(user==null){
-				out.print("{\"state\":1,\"errorMsg\":\"loginname does not exist\"}");
+			if("".equals(loginname)||loginname!=null||"".equals(pwd)||pwd!=null){
+				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
 			}else{
-				Sha1 sha1=new Sha1();
-				pwd=sha1.Digest(pwd);
-				if(user.getPassword().equals(pwd)){
-					UserCookieUtil.saveCookie(user, ServletActionContext.getResponse());
-					out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(user))+"}");
+				User user=userService.findByName(loginname);
+				if(user==null){
+					out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 				}else{
-					out.print("{\"state\":1,\"errorMsg\":\"password error\"}");
+					Sha1 sha1=new Sha1();
+					pwd=sha1.Digest(pwd);
+					if(user.getPassword().equals(pwd)){
+						UserCookieUtil.saveCookie(user, ServletActionContext.getResponse());
+						out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(user))+"}");
+					}else{
+						out.print("{\"state\":1,\"errorMsg\":\"密码错误\"}");
+					}
 				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -250,11 +259,11 @@ public class UserAction extends ActionSupport {
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
 			out.print("{\"state\":0}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -280,14 +289,18 @@ public class UserAction extends ActionSupport {
 			UploadResult result = new UploadResult();
 			int ret = pc.Upload(getImage(), result);
 			if(ret!=0){
-				out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 			}else{
+				//删除原有头像图片
+				if(!"".equals(user.getFileid())&&user.getFileid()!=null){
+					ret=pc.Delete(user.getFileid());
+				}
 				user.setHeadPortrait(result.download_url);
 				this.userService.updateUser(user);
 				out.print("{\"state\":0,\"imgUrl\":\""+result.download_url+"\"}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -331,11 +344,11 @@ public class UserAction extends ActionSupport {
 			this.userService.updateUser(user);
 			out.print("{\"state\":0,\"userInfo\":"+JSON.toJSON(this.getUser(user))+"}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -353,6 +366,7 @@ public class UserAction extends ActionSupport {
 		HttpServletResponse response =ServletActionContext.getResponse();
 		PrintWriter out= null;
 		try {
+			response.setContentType("text/json; charset=utf-8");
 			out= response.getWriter();
 			String oldPassowrd =request.getParameter("oldPassword");
 			String newPassowrd =request.getParameter("newPassword");
@@ -366,17 +380,17 @@ public class UserAction extends ActionSupport {
 					this.userService.updateUser(user);
 					out.print("{\"state\":0,\"userInfo\":"+JSON.toJSON(this.getUser(user))+"}");
 				}else{//原密码错误
-					out.print("{\"state\":1,\"errorMsg\":\"original password error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
 				}
 			}else{
-				out.print("{\"state\":1,\"errorMsg\":\"username does not exist\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -394,6 +408,7 @@ public class UserAction extends ActionSupport {
 		HttpServletResponse response =ServletActionContext.getResponse();
 		PrintWriter out= null;
 		try {
+			response.setContentType("text/json; charset=utf-8");
 			out= response.getWriter();
 			String userId=request.getParameter("userId");//要查看的用户
 			String currentUserId=request.getParameter("currentUserId");//当前用户
@@ -403,6 +418,12 @@ public class UserAction extends ActionSupport {
 			filterMap.put("userid", userId);
 			filterMap.put("currentUserId", currentUserId);
 			filterMap.put("limit", "20");
+			//验证是否已经关注
+			UserAttentionFans u=this.userService.isAttention(currentUserId,userId);
+			if(u!=null){//已关注
+				user.setIsAttention(0);
+			}else{//未关注
+			}
 			List photoSet=new ArrayList();
 			List<PictureSet> list = photoService.queryPersonalPhotos(filterMap);
 			for (int i = 0; i < list.size(); i++) {
@@ -423,14 +444,19 @@ public class UserAction extends ActionSupport {
 				filterMap2.put("attentionUserId", userId);
 			}
 			List fansList=userService.queryFans(filterMap2);
-			
-			out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(user))+",\"photoSet\":"+JSON.toJSONString(photoSet, true)+",\"attentionList\":"+JSON.toJSONString(attentionList, true)+",\"fansList\":"+JSON.toJSONString(fansList, true)+"}");
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			if(user!=null){
+				User newUser=this.getUser(user);
+				newUser.setIsAttention(user.getIsAttention());
+				out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(newUser)+",\"photoSet\":"+JSON.toJSONString(photoSet, true)+",\"attentionList\":"+JSON.toJSONString(attentionList, true)+",\"fansList\":"+JSON.toJSONString(fansList, true)+"}");
+			}else{
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			}
+			} catch (IOException ie) {
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -448,6 +474,7 @@ public class UserAction extends ActionSupport {
 		HttpServletResponse response =ServletActionContext.getResponse();
 		PrintWriter out= null;
 		try {
+			response.setContentType("text/json; charset=utf-8");
 			out= response.getWriter();
 			String fansUserId=request.getParameter("currentUserId");
 			String attentionUserId=request.getParameter("attentionUserId");
@@ -464,11 +491,11 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":0}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -487,6 +514,7 @@ public class UserAction extends ActionSupport {
 		HttpServletResponse response =ServletActionContext.getResponse();
 		PrintWriter out= null;
 		try {
+			response.setContentType("text/json; charset=utf-8");
 			out= response.getWriter();
 			String fansUserId=request.getParameter("currentUserId");
 			String attentionUserId=request.getParameter("attentionUserId");
@@ -498,11 +526,11 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":1,\"errorMsg\":\"not attentioned\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -521,6 +549,7 @@ public class UserAction extends ActionSupport {
 		HttpServletResponse response =ServletActionContext.getResponse();
 		PrintWriter out= null;
 		try {
+			response.setContentType("text/json; charset=utf-8");
 			out= response.getWriter();
 			String fansUserId=request.getParameter("currentUserId");
 			String attentionUserId=request.getParameter("attentionUserId");
@@ -528,11 +557,11 @@ public class UserAction extends ActionSupport {
 			this.userService.cancelAttention(fansUserId,attentionUserId);
 			out.print("{\"state\":0}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{
@@ -561,7 +590,7 @@ public class UserAction extends ActionSupport {
 			List list=userService.queryAttentions(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		} finally {
@@ -592,7 +621,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e);
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 		} finally {
 			out.flush();
 			out.close();
@@ -627,26 +656,26 @@ public class UserAction extends ActionSupport {
 							this.userService.resetPassword(user,captcha);
 							out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(user))+"}");
 						}else{//用户名不存在
-							out.print("{\"state\":1,\"errorMsg\":\"loginname do not exist\"}");
+							out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 						}
 					}else{//验证码失效
 						captcha.setStatus("1");
 						this.userService.updateObject(captcha);
-						out.print("{\"state\":1,\"errorMsg\":\"verification code has expired\"}");
+						out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 					}
 				}else{//验证码错误
-					out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
 				}
 			}else{//未获取验证码
 //				out.print("{\"state\":1,\"errorMsg\":\"no available code\"}");
-				out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		}finally{

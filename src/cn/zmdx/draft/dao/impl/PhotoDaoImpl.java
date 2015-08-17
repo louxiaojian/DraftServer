@@ -40,7 +40,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryPersonalPhotos(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view,coverUrl from picture_set where 1=1 ");
+		sql.append("select id,uploadDate,descs,type,status,praise,userid,coverUrl from picture_set where 1=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("userid"))
 					&& filterMap.get("userid") != null
@@ -58,7 +58,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				}
 			}
 			if(!filterMap.get("currentUserId").equals(filterMap.get("userid"))){
-				sql.append(" and status =:status ");//非本人只能看审核通过的
+				sql.append(" and status =1 and report<50 ");//非本人只能看审核通过并且举报未限制的
 			}
 			sql.append(" order by uploadDate desc limit :limit");
 		}
@@ -73,9 +73,6 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		}
 		if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
 			query.setInteger("lastid", Integer.parseInt(filterMap.get("lastid")));
-		}
-		if(!filterMap.get("currentUserId").equals(filterMap.get("userid"))){
-			query.setString("status", "1");
 		}
 		query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
 		return query.list();
@@ -95,7 +92,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryPhotosWall(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view,coverUrl from picture_set where status =1 and type=0 ");
+		sql.append("select id,uploadDate,descs,type,praise,userid,coverUrl from picture_set where status =1 and type=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
@@ -123,7 +120,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryCycleRanking(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,picture_set_id as pictureSetId,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view,votes,theme_cycle_id as themeCycleId,coverUrl from rank_picture_set where status =1 and type=1 ");
+		sql.append("select id,picture_set_id as pictureSetId,uploadDate,descs,type,praise,userid,theme_cycle_id as themeCycleId,coverUrl from rank_picture_set where status =1 and type=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
@@ -164,6 +161,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 
 	@Override
 	public List queryCycleByThemesId(Map<String, Object> filterMap) {
+		/**
 		StringBuffer sql = new StringBuffer();
 		sql.append("select id,cycle_no as cycleNo,starttime,signup_endtime as signupEndtime,endtime,status,theme_id as themeId from (select id,cycle_no,starttime,signup_endtime,endtime,status,theme_id from cycle where 1=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
@@ -185,7 +183,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
 				.setResultTransformer(Transformers.aliasToBean(Cycle.class));
-		return query.list();
+		return query.list();*/
+		return null;
 	}
 
 	@Override
@@ -243,7 +242,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List<Photo> queryDraftPhotosWall(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view,votes,theme_cycle_id as themeCycleId,coverUrl from picture_set where status =1 and type=1 ");
+		sql.append("select id,uploadDate,descs,type,praise,userid,theme_cycle_id as themeCycleId,coverUrl from picture_set where status =1 and type=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
@@ -277,7 +276,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List<Photo> queryHotPhotosWall(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,picture_set_id as pictureSetId,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view,votes,coverUrl from rank_picture_set where status =1 and type=0 ");
+		sql.append("select id,picture_set_id as pictureSetId,uploadDate,descs,type,praise,userid,coverUrl from rank_picture_set where status =1 and type=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if ("0".equals(filterMap.get("flag"))) {
 				if (!"0".equals(filterMap.get("lastid"))&&!"".equals(filterMap.get("lastid"))&&filterMap.get("lastid")!=null) {
@@ -378,7 +377,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List discoverPictureSet(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view,votes,theme_cycle_id as themeCycleId,coverUrl from picture_set where status =1 and type=0 ");
+		sql.append("select id,uploadDate,descs,type,praise,userid,theme_cycle_id as themeCycleId,coverUrl from picture_set where status =1 and type=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			sql.append(" order by rand() limit :limit");
 		}

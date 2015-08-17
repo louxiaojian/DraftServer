@@ -105,10 +105,21 @@ public class PhotoAction extends ActionSupport{
 //				ps.setPhotoList(pList);
 //				result.add(ps);
 //			}
+			//图集所属用户信息
+//			for (int i = 0; i < list.size(); i++) {
+//				PictureSet ps=list.get(i);
+//				User user=(User)this.photoService.getObjectById(User.class, ps.getUserid()+"");
+//				User u=new User();
+//				u.setId(user.getId());
+//				u.setHeadPortrait(user.getHeadPortrait());
+//				u.setUsername(user.getUsername());
+//				ps.setUser(u);
+//				result.add(ps);
+//			}
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -152,7 +163,7 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("flag", flag);
 			filterMap.put("category", category);
 			List list =null;
-//			List result=new ArrayList();
+			List result=new ArrayList();
 			if("1".equals(category)){//热门
 				list = photoService.queryHotPhotosWall(filterMap);
 //				for (int i = 0; i < list.size(); i++) {
@@ -161,6 +172,17 @@ public class PhotoAction extends ActionSupport{
 //					ps.setPhotoList(pList);
 //					result.add(ps);
 //				}
+				//图集所属用户信息
+				for (int i = 0; i < list.size(); i++) {
+					RankPictureSet ps=(RankPictureSet)list.get(i);
+					User user=(User)this.photoService.getObjectById(User.class, ps.getUserid()+"");
+					User u=new User();
+					u.setId(user.getId());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					ps.setUser(u);
+					result.add(ps);
+				}
 			}else if("0".equals(category)){//新
 				list = photoService.queryPhotosWall(filterMap);
 //				for (int i = 0; i < list.size(); i++) {
@@ -169,10 +191,21 @@ public class PhotoAction extends ActionSupport{
 //					ps.setPhotoList(pList);
 //					result.add(ps);
 //				}
+				//图集所属用户信息
+				for (int i = 0; i < list.size(); i++) {
+					PictureSet ps=(PictureSet)list.get(i);
+					User user=(User)this.photoService.getObjectById(User.class, ps.getUserid()+"");
+					User u=new User();
+					u.setId(user.getId());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					ps.setUser(u);
+					result.add(ps);
+				}
 			}
-			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -223,12 +256,20 @@ public class PhotoAction extends ActionSupport{
 				//图集评论数
 				int comments=photoService.queryCommentByPictureSetId(ps.getId());
 				ps.setComments(comments);
+				//图集所属用户信息
+				User user=(User)this.photoService.getObjectById(User.class, ps.getUserid()+"");
+				User u=new User();
+				u.setId(user.getId());
+				u.setHeadPortrait(user.getHeadPortrait());
+				u.setUsername(user.getUsername());
+				ps.setUser(u);
 				result.add(ps);
+			
 			}
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -303,10 +344,10 @@ public class PhotoAction extends ActionSupport{
 				for (int i = 0; i < fileids.length; i++) {
 					pc.Delete(fileids[i]);
 				}
-				out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -334,7 +375,7 @@ public class PhotoAction extends ActionSupport{
 			UploadResult result = new UploadResult();
 			int ret = pc.Upload(files[0], result);
 			if(ret!=0){
-				out.print("{\"state\":\"1\",\"errorMsg\":\"upload failed\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 			}else{
 				//图片链接
 				Photo photo=new Photo();
@@ -347,7 +388,7 @@ public class PhotoAction extends ActionSupport{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -371,12 +412,12 @@ public class PhotoAction extends ActionSupport{
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,0);
 			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"已赞\"}");
 			}else{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -400,12 +441,12 @@ public class PhotoAction extends ActionSupport{
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,1);
 			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"已踩\"}");
 			}else{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -429,12 +470,12 @@ public class PhotoAction extends ActionSupport{
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,2);
 			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"已举报\"}");
 			}else{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -463,7 +504,7 @@ public class PhotoAction extends ActionSupport{
 
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -487,12 +528,12 @@ public class PhotoAction extends ActionSupport{
 			String pictureSetId=request.getParameter("pictureSetId");
 			String result=photoService.OperationPictureSet(userid,pictureSetId,3);
 			if("failed".equals(result)){
-				out.print("{\"state\":1,\"errorMsg\":\"operated\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"已投票\"}");
 			}else{
 				out.print("{\"state\":0}");
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -542,11 +583,30 @@ public class PhotoAction extends ActionSupport{
 				//图集评论数
 				int comments=photoService.queryCommentByPictureSetId(ps.getId());
 				ps.setComments(comments);
+				//图集所属用户信息
+				User user=(User)this.photoService.getObjectById(User.class, ps.getUserid()+"");
+				User u=new User();
+				u.setId(user.getId());
+				u.setHeadPortrait(user.getHeadPortrait());
+				u.setUsername(user.getUsername());
+				ps.setUser(u);
 				result.add(ps);
 			}
+
+			//图集所属用户信息
+//			for (int i = 0; i < list.size(); i++) {
+//				PictureSet ps=(PictureSet)list.get(i);
+//				User user=(User)this.photoService.getObjectById(User.class, ps.getUserid()+"");
+//				User u=new User();
+//				u.setId(user.getId());
+//				u.setHeadPortrait(user.getHeadPortrait());
+//				u.setUsername(user.getUsername());
+//				ps.setUser(u);
+//				result.add(ps);
+//			}
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -597,7 +657,7 @@ public class PhotoAction extends ActionSupport{
 //			}
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -623,7 +683,7 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -653,7 +713,7 @@ public class PhotoAction extends ActionSupport{
 			
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -687,13 +747,13 @@ public class PhotoAction extends ActionSupport{
 				filterMap.put("userId", userId);
 				List<?> list=photoService.validateIsAttend(filterMap);
 				if(list!=null&&list.size()>0){//参与过
-					out.print("{\"state\":0,\"errorMsg\":\"have participated\"}");
+					out.print("{\"state\":0,\"errorMsg\":\"已参加\"}");
 				}else{//未参与
 					out.print("{\"state\":0}");
 				}
 			}
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -731,7 +791,7 @@ public class PhotoAction extends ActionSupport{
 			this.photoService.saveEntity(comment);
 			out.print("{\"state\":0,\"result\":"+comment.getId()+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -766,7 +826,7 @@ public class PhotoAction extends ActionSupport{
 			List list=this.photoService.queryComment(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -803,7 +863,7 @@ public class PhotoAction extends ActionSupport{
 			List list=photoService.queryReviewRecords(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		} catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		} finally {
@@ -832,7 +892,7 @@ public class PhotoAction extends ActionSupport{
 			photoService.reportUser(filterMap);
 			out.print("{\"state\":0}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -871,7 +931,7 @@ public class PhotoAction extends ActionSupport{
 //			}
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{
@@ -908,7 +968,7 @@ public class PhotoAction extends ActionSupport{
 			List list=this.photoService.queryComment(filterMap);
 			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+",\"comments\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error(e);
 		}finally{

@@ -21,6 +21,7 @@ public class PictureSet {
 	private int themeCycleId;
 	private List<Photo> photoList;
 	private int comments;
+	private User user;//图集所属用户
 	
 	public int getId() {
 		return id;
@@ -117,6 +118,12 @@ public class PictureSet {
 	}
 	public void setCoverUrl(String coverUrl) {
 		this.coverUrl = coverUrl;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 }

@@ -20,6 +20,8 @@ public class User {
 	private int orgId;//用户权限，0普通用户，1管理员
 	private Date validateDate;//真人验证审批时间
 	private int report;
+	private String fileid;//头像图片 万象fileid
+	private int isAttention;//是否已关注，0已关注，1未关注
 	
 	//选秀排名所用
 	private int praise;
@@ -131,6 +133,18 @@ public class User {
 	}
 	public void setReport(int report) {
 		this.report = report;
+	}
+	public String getFileid() {
+		return fileid;
+	}
+	public void setFileid(String fileid) {
+		this.fileid = fileid;
+	}
+	public int getIsAttention() {
+		return isAttention;
+	}
+	public void setIsAttention(int isAttention) {
+		this.isAttention = isAttention;
 	}
 	
 }
