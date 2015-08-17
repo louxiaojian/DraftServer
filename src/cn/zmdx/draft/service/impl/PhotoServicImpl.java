@@ -31,17 +31,20 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public void uploadPhoto(Map<String, Object> filterMap) {
 		PictureSet ps=(PictureSet)filterMap.get("pictureSet");
-		this.photoDao.saveEntity(ps);
 		for(int i=0;i<(Integer)filterMap.get("count");i++){
 			Photo photo =(Photo)filterMap.get("photo"+i);
 			photo.setPictureSetId(ps.getId());
 			this.photoDao.saveEntity(photo);
+			if(i==0){
+				ps.setCoverUrl(photo.getPhotoUrl());
+			}
 			if(filterMap.get("cyclePhoto")!=null){
 				CyclePhotoSet cyclePhoto=(CyclePhotoSet)filterMap.get("cyclePhoto");
 				cyclePhoto.setPhotoSetId(ps.getId());
 				this.photoDao.saveEntity(cyclePhoto);
 			}
 		}
+		this.photoDao.saveEntity(ps);
 	}
 
 	@Override

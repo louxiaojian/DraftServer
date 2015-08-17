@@ -19,6 +19,7 @@ public class RankPictureSet {
 	private int view;//浏览量
 	private int votes;//选秀得票数
 	private int themeCycleId;
+	private String coverUrl;//图集封面url
 	private List<Photo> photoList;
 	private int comments;
 	
@@ -117,5 +118,11 @@ public class RankPictureSet {
 	}
 	public void setComments(int comments) {
 		this.comments = comments;
+	}
+	public String getCoverUrl() {
+		return coverUrl;
+	}
+	public void setCoverUrl(String coverUrl) {
+		this.coverUrl = coverUrl;
 	}
 }

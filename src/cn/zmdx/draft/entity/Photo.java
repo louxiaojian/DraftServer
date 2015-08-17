@@ -16,7 +16,7 @@ public class Photo {
 	private int userid;
 //	private int report;//举报次数
 //	private int view;//浏览量
-//	private int votes;//选秀得票数
+	private String fileid;//万象fileid
 	private int pictureSetId;//图集id
 	
 	public int getId() {
@@ -102,6 +102,12 @@ public class Photo {
 	}
 	public void setPictureSetId(int pictureSetId) {
 		this.pictureSetId = pictureSetId;
+	}
+	public String getFileid() {
+		return fileid;
+	}
+	public void setFileid(String fileid) {
+		this.fileid = fileid;
 	}
 	
 }

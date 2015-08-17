@@ -17,6 +17,7 @@ public class PictureSet {
 	private int report;//举报次数
 	private int view;//浏览量
 	private int votes;//选秀得票数
+	private String coverUrl;//图集封面url
 	private int themeCycleId;
 	private List<Photo> photoList;
 	private int comments;
@@ -110,6 +111,12 @@ public class PictureSet {
 	}
 	public void setComments(int comments) {
 		this.comments = comments;
+	}
+	public String getCoverUrl() {
+		return coverUrl;
+	}
+	public void setCoverUrl(String coverUrl) {
+		this.coverUrl = coverUrl;
 	}
 	
 }

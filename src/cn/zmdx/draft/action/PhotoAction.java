@@ -97,16 +97,16 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("flag", flag);
 			filterMap.put("userid", userid);
 			filterMap.put("currentUserId", currentUserId);
-			List result=new ArrayList();
+//			List result=new ArrayList();
 			List<PictureSet> list = photoService.queryPersonalPhotos(filterMap);
-			for (int i = 0; i < list.size(); i++) {
-				PictureSet ps=list.get(i);
-				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
-				ps.setPhotoList(pList);
-				result.add(ps);
-			}
+//			for (int i = 0; i < list.size(); i++) {
+//				PictureSet ps=list.get(i);
+//				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+//				ps.setPhotoList(pList);
+//				result.add(ps);
+//			}
 			
-			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
@@ -152,25 +152,25 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("flag", flag);
 			filterMap.put("category", category);
 			List list =null;
-			List result=new ArrayList();
+//			List result=new ArrayList();
 			if("1".equals(category)){//热门
 				list = photoService.queryHotPhotosWall(filterMap);
-				for (int i = 0; i < list.size(); i++) {
-					RankPictureSet ps=(RankPictureSet)list.get(i);
-					List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
-					ps.setPhotoList(pList);
-					result.add(ps);
-				}
+//				for (int i = 0; i < list.size(); i++) {
+//					RankPictureSet ps=(RankPictureSet)list.get(i);
+//					List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
+//					ps.setPhotoList(pList);
+//					result.add(ps);
+//				}
 			}else if("0".equals(category)){//新
 				list = photoService.queryPhotosWall(filterMap);
-				for (int i = 0; i < list.size(); i++) {
-					PictureSet ps=(PictureSet)list.get(i);
-					List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
-					ps.setPhotoList(pList);
-					result.add(ps);
-				}
+//				for (int i = 0; i < list.size(); i++) {
+//					PictureSet ps=(PictureSet)list.get(i);
+//					List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+//					ps.setPhotoList(pList);
+//					result.add(ps);
+//				}
 			}
-			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+"}");
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
@@ -218,8 +218,8 @@ public class PhotoAction extends ActionSupport{
 			for (int i = 0; i < list.size(); i++) {
 				PictureSet ps=list.get(i);
 				//图集所有照片
-				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
-				ps.setPhotoList(pList);
+//				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+//				ps.setPhotoList(pList);
 				//图集评论数
 				int comments=photoService.queryCommentByPictureSetId(ps.getId());
 				ps.setComments(comments);
@@ -283,6 +283,7 @@ public class PhotoAction extends ActionSupport{
 					photo.setUploadDate(new Date());
 					photo.setUserid(Integer.parseInt(userid));
 					photo.setType(0);//图集
+					photo.setFileid(result.fileid);
 					filterMap.put("photo"+i, photo);
 					fileids[fileids.length]=result.fileid;
 				}
@@ -536,8 +537,8 @@ public class PhotoAction extends ActionSupport{
 			for (int i = 0; i < list.size(); i++) {
 				RankPictureSet ps=(RankPictureSet)list.get(i);
 				//图集所有图片
-				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
-				ps.setPhotoList(pList);
+//				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
+//				ps.setPhotoList(pList);
 				//图集评论数
 				int comments=photoService.queryCommentByPictureSetId(ps.getId());
 				ps.setComments(comments);
@@ -861,14 +862,51 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("limit", limit);
 			List list=photoService.discoverPictureSet(filterMap);
 			
+//			List result=new ArrayList();
+//			for (int i = 0; i < list.size(); i++) {
+//				PictureSet ps=(PictureSet)list.get(i);
+//				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+//				ps.setPhotoList(pList);
+//				result.add(ps);
+//			}
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			e.printStackTrace();
+			logger.error(e);
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 查看图集及加载评论
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-17 时间：上午10:52:05
+	 */
+	public void viewPictureSet(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = null ;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			//图集id
+			String id=request.getParameter("id");
+			
+			PictureSet ps=(PictureSet)this.photoService.getObjectById(PictureSet.class,id);
 			List result=new ArrayList();
-			for (int i = 0; i < list.size(); i++) {
-				PictureSet ps=(PictureSet)list.get(i);
+			if(ps!=null){
 				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
 				ps.setPhotoList(pList);
 				result.add(ps);
 			}
-			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
+			Map<String, Object> filterMap = new HashMap();
+			filterMap.put("pictureSetId", id);
+			filterMap.put("limit", 20);
+			List list=this.photoService.queryComment(filterMap);
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(result, true)+",\"comments\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();
