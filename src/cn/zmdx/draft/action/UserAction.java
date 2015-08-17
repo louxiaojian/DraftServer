@@ -97,7 +97,7 @@ public class UserAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
-			String pwd=request.getParameter("pwd");
+			String pwd=request.getParameter("password");
 			String code=request.getParameter("captcha");
 			//获取当前可用的验证码
 			Captcha captcha=this.userService.queryUsableCaptcha(loginname);
@@ -116,12 +116,14 @@ public class UserAction extends ActionSupport {
 							newUser.setAge(0);
 							newUser.setRegistrationDate(new Date());
 							newUser.setOrgId(0);
-							this.userService.saveUser(newUser);
+							this.userService.register(newUser,captcha);
 							out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(newUser))+"}");
 						}else{//用户名已存在
 							out.print("{\"state\":1,\"errorMsg\":\"loginname already exist\"}");
 						}
 					}else{//验证码失效
+						captcha.setStatus("1");
+						this.userService.updateObject(captcha);
 						out.print("{\"state\":1,\"errorMsg\":\"verification code has expired\"}");
 					}
 				}else{//验证码错误
@@ -205,7 +207,7 @@ public class UserAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
-			String pwd=request.getParameter("pwd");
+			String pwd=request.getParameter("password");
 			User user=userService.findByName(loginname);
 			if(user==null){
 				out.print("{\"state\":1,\"errorMsg\":\"loginname does not exist\"}");
@@ -592,6 +594,62 @@ public class UserAction extends ActionSupport {
 			logger.error(e);
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 忘记密码，重置密码
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-15 时间：下午4:59:11
+	 */
+	public void resetPassword(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		PrintWriter out =null;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			HttpServletRequest request=ServletActionContext.getRequest();
+			String loginname=request.getParameter("loginname");
+			String pwd=request.getParameter("password");
+			String code=request.getParameter("captcha");
+			//获取当前可用的验证码
+			Captcha captcha=this.userService.queryUsableCaptcha(loginname);
+			if(captcha!=null){
+				if(code.equals(captcha.getCode())){
+					if(captcha.getDeadline().getTime()>new Date().getTime()){
+						Sha1 sha1=new Sha1();
+						pwd=sha1.Digest(pwd);
+						User user=userService.findByName(loginname);
+						if(user!=null){
+							user.setPassword(pwd);
+							this.userService.resetPassword(user,captcha);
+							out.print("{\"state\":0,\"userInfo\":"+JSON.toJSONString(this.getUser(user))+"}");
+						}else{//用户名不存在
+							out.print("{\"state\":1,\"errorMsg\":\"loginname do not exist\"}");
+						}
+					}else{//验证码失效
+						captcha.setStatus("1");
+						this.userService.updateObject(captcha);
+						out.print("{\"state\":1,\"errorMsg\":\"verification code has expired\"}");
+					}
+				}else{//验证码错误
+					out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
+				}
+			}else{//未获取验证码
+//				out.print("{\"state\":1,\"errorMsg\":\"no available code\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"verification code error\"}");
+			}
+		} catch (IOException ie) {
+			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			logger.error(ie);
+			ie.printStackTrace();
+		}catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			logger.error(e);
+			e.printStackTrace();
+		}finally{
 			out.flush();
 			out.close();
 		}

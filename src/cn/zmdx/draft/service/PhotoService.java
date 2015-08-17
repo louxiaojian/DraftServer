@@ -164,4 +164,12 @@ public interface PhotoService {
 	 * @return
 	 */
 	public int queryCommentByPictureSetId(int id);
+	/**
+	 * 发现照片集
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-14 时间：下午12:04:58
+	 * @param filterMap
+	 * @return
+	 */
+	public List discoverPictureSet(Map<String, String> filterMap);
 }

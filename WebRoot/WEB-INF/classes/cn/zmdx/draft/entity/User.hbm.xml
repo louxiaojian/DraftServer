@@ -20,6 +20,7 @@
 		<property name="orgId" column="org_id"/>
 		<property name="gender" column="gender"/>
 		<property name="validateDate" column="validateDate"/>
+		<property name="report" column="report"/>
 	</class>
 	
 </hibernate-mapping>

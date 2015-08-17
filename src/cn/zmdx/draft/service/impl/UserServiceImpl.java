@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public Captcha createCaptcha(String loginname, String code) {
-		//将loginname之前的验证码失效
+		//将loginname之前的验证码设置为已用
 		this.userDao.updateCaptchaByLoginname(loginname);
 		Captcha captcha=new Captcha();
 		captcha.setCode(code);
@@ -85,5 +85,24 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List queryFans(Map<String, String> filterMap) {
 		return this.userDao.queryFans(filterMap);
+	}
+
+	@Override
+	public void register(User newUser, Captcha captcha) {
+		this.userDao.saveEntity(newUser);
+		captcha.setStatus("2");//验证码已用
+		this.userDao.updateEntity(captcha);
+	}
+	
+	@Override
+	public void resetPassword(User user, Captcha captcha) {
+		this.userDao.updateEntity(user);
+		captcha.setStatus("2");//验证码已用
+		this.userDao.updateEntity(captcha);
+	}
+
+	@Override
+	public void updateObject(Object object) {
+		this.userDao.updateEntity(object);
 	}
 }

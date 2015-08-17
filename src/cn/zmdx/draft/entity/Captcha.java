@@ -9,7 +9,7 @@ public class Captcha {
 	private Date createtime;//验证码生成时间
 	private Date deadline;//验证码有效期截止时间
 	private String telephone;//注册手机号
-	private String status;//状态：0，可用，1过期
+	private String status;//状态：0，可用，1过期，2已用
 	
 	public int getId() {
 		return id;

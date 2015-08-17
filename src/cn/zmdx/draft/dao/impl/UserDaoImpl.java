@@ -55,7 +55,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
 	@Override
 	public void updateCaptchaByLoginname(String loginname) {
-		Query query=getSession().createSQLQuery("update captcha set status=1 where telephone=? and status=0");
+		Query query=getSession().createSQLQuery("update captcha set status=2 where telephone=? and status=0");
 		query.setString(0, loginname);
 		query.executeUpdate();
 	}

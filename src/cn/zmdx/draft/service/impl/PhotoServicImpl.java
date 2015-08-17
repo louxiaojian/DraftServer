@@ -157,6 +157,9 @@ public class PhotoServicImpl implements PhotoService {
 		or.setBeingInformerId(Integer.parseInt(filterMap.get("beingInformerId")));//被举报人id
 		or.setType(1);
 		or.setDatetime(new Date());
+		User user=(User)this.photoDao.getEntity(User.class, Integer.parseInt(filterMap.get("beingInformerId")));
+		user.setReport(user.getReport()+1);
+		this.photoDao.updateEntity(user);
 		this.photoDao.saveEntity(or);
 	}
 
@@ -168,6 +171,11 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public int queryCommentByPictureSetId(int id) {
 		return this.photoDao.queryCommentByPictureSetId(id);
+	}
+
+	@Override
+	public List discoverPictureSet(Map<String, String> filterMap) {
+		return this.photoDao.discoverPictureSet(filterMap);
 	}
 	
 }

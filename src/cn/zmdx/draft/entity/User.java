@@ -19,6 +19,7 @@ public class User {
 	private Date registrationDate;//注册时间
 	private int orgId;//用户权限，0普通用户，1管理员
 	private Date validateDate;//真人验证审批时间
+	private int report;
 	
 	//选秀排名所用
 	private int praise;
@@ -124,6 +125,12 @@ public class User {
 	}
 	public void setPraise(int praise) {
 		this.praise = praise;
+	}
+	public int getReport() {
+		return report;
+	}
+	public void setReport(int report) {
+		this.report = report;
 	}
 	
 }

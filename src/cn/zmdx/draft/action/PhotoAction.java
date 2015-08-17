@@ -606,7 +606,7 @@ public class PhotoAction extends ActionSupport{
 	}
 	
 	/**
-	 * 获取所有主题
+	 * 获取所有选秀主题
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-9 时间：下午5:29:08
 	 */
@@ -830,6 +830,45 @@ public class PhotoAction extends ActionSupport{
 			filterMap.put("beingInformerId", beingInformerId);
 			photoService.reportUser(filterMap);
 			out.print("{\"state\":0}");
+		}catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
+			e.printStackTrace();
+			logger.error(e);
+		}finally{
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 发现照片集
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-14 时间：下午12:04:17
+	 */
+	public void discoverPictureSet(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request= ServletActionContext.getRequest();
+		PrintWriter out = null ;
+		try{
+			out = ServletActionContext.getResponse().getWriter();
+			//查询数据数量
+			String limit=request.getParameter("limit");
+			if ("".equals(limit)||limit==null|| "0".equals(limit)){
+				limit = "10";
+			}
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("limit", limit);
+			List list=photoService.discoverPictureSet(filterMap);
+			
+			List result=new ArrayList();
+			for (int i = 0; i < list.size(); i++) {
+				PictureSet ps=(PictureSet)list.get(i);
+				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+				ps.setPhotoList(pList);
+				result.add(ps);
+			}
+			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"system error\"}");
 			e.printStackTrace();

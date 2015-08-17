@@ -154,11 +154,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryThemes(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,name,descs from (select id,name,descs from themes order by id desc ) t");
+		sql.append("select id,theme_title as themeTitle,tag,starttime,endtime,status,bg_url as bgUrl,descs from theme_cycle");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
-				.setResultTransformer(Transformers.aliasToBean(Themes.class));
+				.setResultTransformer(Transformers.aliasToBean(Cycle.class));
 		return query.list();
 	}
 
@@ -373,6 +373,22 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	public int queryCommentByPictureSetId(int id) {
 		List list=this.template.find("from Comment where pictureSetId=?",id);
 		return list.size();
+	}
+
+	@Override
+	public List discoverPictureSet(Map<String, String> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select id,uploadDate,descs,type,status,praise,tread,auditingDate,userid,report,view,votes,theme_cycle_id as themeCycleId from picture_set where status =1 and type=0 ");
+		if (filterMap != null && !filterMap.isEmpty()) {
+			sql.append(" order by rand() limit :limit");
+		}
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(PictureSet.class));
+		if(!"".equals(filterMap.get("limit"))&&filterMap.get("limit")!=null){
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
+		return query.list();
 	}
 
 }

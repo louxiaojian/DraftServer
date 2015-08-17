@@ -109,5 +109,30 @@ public interface UserService {
 	 * @param filterMap
 	 * @return
 	 */
-	List queryFans(Map<String, String> filterMap);
+	public List queryFans(Map<String, String> filterMap);
+
+	/**
+	 * 用户注册
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-15 时间：下午4:51:53
+	 * @param newUser
+	 */
+	public void register(User newUser, Captcha captch);
+
+	/**
+	 * 忘记密码，重置密码
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-15 时间：下午5:07:38
+	 * @param user
+	 * @param captcha
+	 */
+	public void resetPassword(User user, Captcha captcha);
+
+	/**
+	 * 修改object对象
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-15 时间：下午5:13:44
+	 * @param object
+	 */
+	public void updateObject(Object object);
 }
