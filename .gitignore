@@ -12,7 +12,5 @@
 hs_err_pid*
 build/
 .settings/
-WebRoot/WEB-INF/classes/
-src/
 
 
