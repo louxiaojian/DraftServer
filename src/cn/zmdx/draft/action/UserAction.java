@@ -122,7 +122,7 @@ public class UserAction extends ActionSupport {
 								newUser.setRegistrationDate(new Date());
 								newUser.setOrgId(0);
 								this.userService.register(newUser,captcha);
-								out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(newUser))+"}");
+								out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(this.getUser(newUser))+"}}");
 							}else{//用户名已存在
 								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
 							}
@@ -176,7 +176,7 @@ public class UserAction extends ActionSupport {
 				System.out.println(returnCode);
 				if("0".equals(returnCode)){
 					Captcha captcha=this.userService.createCaptcha(telephone,code);
-					out.print("{\"state\":0,\"result\":"+JSON.toJSONString(captcha)+"}");
+					out.print("{\"state\":0,\"result\":{\"captcha\":"+JSON.toJSONString(captcha)+"}}");
 				}else if("107".equals(returnCode)){//手机号错误
 					out.print("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
 				}else if("109".equals(returnCode)){//短信额度不足
@@ -213,7 +213,7 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request=ServletActionContext.getRequest();
 			String loginname=request.getParameter("loginname");
 			String pwd=request.getParameter("password");
-			if("".equals(loginname)||loginname!=null||"".equals(pwd)||pwd!=null){
+			if("".equals(loginname)||loginname==null||"".equals(pwd)||pwd==null){
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
 			}else{
 				User user=userService.findByName(loginname);
@@ -224,7 +224,7 @@ public class UserAction extends ActionSupport {
 					pwd=sha1.Digest(pwd);
 					if(user.getPassword().equals(pwd)){
 						UserCookieUtil.saveCookie(user, ServletActionContext.getResponse());
-						out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(user))+"}");
+						out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(this.getUser(user))+"}}");
 					}else{
 						out.print("{\"state\":1,\"errorMsg\":\"密码错误\"}");
 					}
@@ -297,7 +297,7 @@ public class UserAction extends ActionSupport {
 				}
 				user.setHeadPortrait(result.download_url);
 				this.userService.updateUser(user);
-				out.print("{\"state\":0,\"result\":\""+result.download_url+"\"}");
+				out.print("{\"state\":0,\"result\":\"{\"url\":"+result.download_url+"\"}}");
 			}
 		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
@@ -342,7 +342,7 @@ public class UserAction extends ActionSupport {
 			user.setGender(Integer.parseInt(gender));
 			user.setIntroduction(introduction);
 			this.userService.updateUser(user);
-			out.print("{\"state\":0,\"result\":"+JSON.toJSON(this.getUser(user))+"}");
+			out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSON(this.getUser(user))+"}}");
 		} catch (IOException ie) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
@@ -378,7 +378,7 @@ public class UserAction extends ActionSupport {
 				if(oldPassowrd.equals(user.getPassword())){
 					user.setPassword(sha1.Digest(newPassowrd));
 					this.userService.updateUser(user);
-					out.print("{\"state\":0,\"result\":"+JSON.toJSON(this.getUser(user))+"}");
+					out.print("{\"state\":0}");
 				}else{//原密码错误
 					out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
 				}
@@ -426,12 +426,12 @@ public class UserAction extends ActionSupport {
 			}
 			List photoSet=new ArrayList();
 			List<PictureSet> list = photoService.queryPersonalPhotos(filterMap);
-			for (int i = 0; i < list.size(); i++) {
-				PictureSet ps=list.get(i);
-				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
-				ps.setPhotoList(pList);
-				photoSet.add(ps);
-			}
+//			for (int i = 0; i < list.size(); i++) {
+//				PictureSet ps=list.get(i);
+//				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
+//				ps.setPhotoList(pList);
+//				photoSet.add(ps);
+//			}
 			//获取要查看的用户的关注
 			Map<String, String> filterMap1 = new HashMap();
 			if (userId != null && !"".equals(userId)) {
@@ -447,7 +447,7 @@ public class UserAction extends ActionSupport {
 			if(user!=null){
 				User newUser=this.getUser(user);
 				newUser.setIsAttention(user.getIsAttention());
-				out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(newUser)+",\"photoSet\":"+JSON.toJSONString(photoSet, true)+",\"attentionList\":"+JSON.toJSONString(attentionList, true)+",\"fansList\":"+JSON.toJSONString(fansList, true)+"}}");
+				out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(newUser)+",\"photoSet\":"+JSON.toJSONString(list, true)+",\"attentionUserList\":"+JSON.toJSONString(attentionList, true)+",\"fansUserList\":"+JSON.toJSONString(fansList, true)+"}}");
 			}else{
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			}
@@ -588,7 +588,7 @@ public class UserAction extends ActionSupport {
 				filterMap.put("fansUserId", fansUserId);
 			}
 			List list=userService.queryAttentions(filterMap);
-			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(list, true)+"}}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
@@ -617,7 +617,7 @@ public class UserAction extends ActionSupport {
 				filterMap.put("attentionUserId", attentionUserId);
 			}
 			List list=userService.queryFans(filterMap);
-			out.print("{\"state\":0,\"result\":"+JSON.toJSONString(list, true)+"}");
+			out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(list, true)+"}}");
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e);
@@ -654,7 +654,7 @@ public class UserAction extends ActionSupport {
 						if(user!=null){
 							user.setPassword(pwd);
 							this.userService.resetPassword(user,captcha);
-							out.print("{\"state\":0,\"result\":"+JSON.toJSONString(this.getUser(user))+"}");
+							out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(this.getUser(user))+"}}");
 						}else{//用户名不存在
 							out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 						}
