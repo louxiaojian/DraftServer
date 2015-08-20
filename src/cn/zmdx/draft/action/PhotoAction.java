@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import cn.zmdx.draft.entity.Comment;
+import cn.zmdx.draft.entity.Cycle;
 import cn.zmdx.draft.entity.CyclePhotoSet;
 import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.entity.PictureSet;
@@ -353,16 +354,28 @@ public class PhotoAction extends ActionSupport {
 					}
 					if (errorcount == 0) {
 						filterMap.put("count", files.length);
-						if ("1".equals(type)) {
-							// 图片选秀信息
-							CyclePhotoSet cyclePhoto = new CyclePhotoSet();
-							cyclePhoto.setThemeCycleId(Integer
-									.parseInt(themeCycleId));
-							cyclePhoto.setThemeTitle(themeTitle);
-							filterMap.put("cyclePhoto", cyclePhoto);
+						if ("1".equals(type)) {//选秀
+							Cycle cycle=(Cycle)this.photoService.getObjectById(Cycle.class, themeCycleId);
+							if(!"1".equals(cycle.getStatus())){//选秀非进行中的状态
+								// 删除本次所有上传照片
+								for (int i = 0; i < fileids.length; i++) {
+									pc.Delete(fileids[i]);
+								}
+								out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
+							}else{
+								// 图片选秀信息
+								CyclePhotoSet cyclePhoto = new CyclePhotoSet();
+								cyclePhoto.setThemeCycleId(Integer
+										.parseInt(themeCycleId));
+								cyclePhoto.setThemeTitle(themeTitle);
+								filterMap.put("cyclePhoto", cyclePhoto);
+								photoService.uploadPhoto(filterMap);
+								out.print("{\"state\":0}");
+							}
+						}else{
+							photoService.uploadPhoto(filterMap);
+							out.print("{\"state\":0}");
 						}
-						photoService.uploadPhoto(filterMap);
-						out.print("{\"state\":0}");
 					} else {// 失败删除本次所有上传照片
 						for (int i = 0; i < fileids.length; i++) {
 							pc.Delete(fileids[i]);

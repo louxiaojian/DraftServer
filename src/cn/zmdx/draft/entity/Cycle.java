@@ -8,10 +8,10 @@ public class Cycle {
 	private String themeTitle;//主题标题
 	private Date starttime;//选秀开始时间
 	private Date endtime;//选秀结束时间
-	private String status;//选秀状态，0:未开始，1:进行中，2:结束
+	private String status;//选秀状态，0:结束，1:进行中，2:未开始
 	private String bgUrl;//背景图
 	private String descs;//主题描述
-	private String tagUrl;//标签
+	private String tag;//标签
 	
 	public int getId() {
 		return id;
@@ -55,10 +55,10 @@ public class Cycle {
 	public void setDescs(String descs) {
 		this.descs = descs;
 	}
-	public String getTagUrl() {
-		return tagUrl;
+	public String getTag() {
+		return tag;
 	}
-	public void setTagUrl(String tagUrl) {
-		this.tagUrl = tagUrl;
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 }

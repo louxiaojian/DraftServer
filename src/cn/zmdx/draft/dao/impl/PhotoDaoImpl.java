@@ -133,7 +133,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryThemes(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,theme_title as themeTitle,tag_url as tagUrl,starttime,endtime,status,bg_url as bgUrl,descs from theme_cycle");
+		sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs from theme_cycle order by status,starttime asc");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
