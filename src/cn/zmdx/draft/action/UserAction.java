@@ -28,7 +28,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.qcloud.UploadResult;
 
 public class UserAction extends ActionSupport {
-	private Logger logger=Logger.getLogger(UserAction.class);
+	private Logger logger = Logger.getLogger(UserAction.class);
 	private UserServiceImpl userService;
 	private PhotoService photoService;
 	// 上传文件域
@@ -37,22 +37,22 @@ public class UserAction extends ActionSupport {
 	private String imageContentType;
 	// 封装上传文件名
 	private String imageFileName;
-	private final static String uri = "http://222.73.117.158/msg/";//应用地址
-	private final static String account = "Zmdx888";//账号
-	private final static String pswd = "Zmdx888888";//密码
-//	private final static String account = "jiekou-clcs-04";//账号
-//	private final static String pswd = "Tch147369";//密码
-//	private final static String mobiles = "15010118286";//手机号码，多个号码使用","分割
-	private final static String contentLeft = "亲爱的用户，您的验证码是";//短信内容
-	private final static String contentRight = "，5分钟内有效。";//短信内容
-	private final static boolean needstatus = true;//是否需要状态报告，需要true，不需要false
-	private final static String product = null;//产品ID
-	private final static String extno = null;//扩展码
-    public static final int APP_ID_V2 = 10002468;
+	private final static String uri = "http://222.73.117.158/msg/";// 应用地址
+	private final static String account = "Zmdx888";// 账号
+	private final static String pswd = "Zmdx888888";// 密码
+	// private final static String account = "jiekou-clcs-04";//账号
+	// private final static String pswd = "Tch147369";//密码
+	// private final static String mobiles = "15010118286";//手机号码，多个号码使用","分割
+	private final static String contentLeft = "亲爱的用户，您的验证码是";// 短信内容
+	private final static String contentRight = "，5分钟内有效。";// 短信内容
+	private final static boolean needstatus = true;// 是否需要状态报告，需要true，不需要false
+	private final static String product = null;// 产品ID
+	private final static String extno = null;// 扩展码
+	public static final int APP_ID_V2 = 10002468;
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
-    public static final String BUCKET = "headpic";        //空间名
-	
+	public static final String BUCKET = "headpic"; // 空间名
+
 	public UserServiceImpl getUserService() {
 		return userService;
 	}
@@ -85,68 +85,77 @@ public class UserAction extends ActionSupport {
 	}
 	/**
 	 * 用户注册
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-7 时间：下午12:37:15
 	 * @throws IOException
 	 */
-	public void register(){
+	public void register() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out =null;
-		try{
+		PrintWriter out = null;
+		try {
 			out = ServletActionContext.getResponse().getWriter();
-			HttpServletRequest request=ServletActionContext.getRequest();
-			String loginname=request.getParameter("loginname");
-			String pwd=request.getParameter("password");
-			String code=request.getParameter("captcha");
+			HttpServletRequest request = ServletActionContext.getRequest();
+			String loginname = request.getParameter("loginname");
+			String pwd = request.getParameter("password");
+			String code = request.getParameter("captcha");
 
-			if("".equals(loginname)||loginname!=null||"".equals(pwd)||pwd!=null){
+			if ("".equals(loginname) || loginname != null || "".equals(pwd)
+					|| pwd != null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名、密码不能为空\"}");
-			}else{
-				//获取当前可用的验证码
-				Captcha captcha=this.userService.queryUsableCaptcha(loginname);
-				if(captcha!=null){
-					if(code.equals(captcha.getCode())){
-						if(captcha.getDeadline().getTime()>new Date().getTime()){
-							Sha1 sha1=new Sha1();
-							pwd=sha1.Digest(pwd);
-							User user=userService.findByName(loginname);
-							if(user==null){
-								User newUser =new User();
+			} else {
+				// 获取当前可用的验证码
+				Captcha captcha = this.userService
+						.queryUsableCaptcha(loginname);
+				if (captcha != null) {
+					if (code.equals(captcha.getCode())) {
+						if (captcha.getDeadline().getTime() > new Date()
+								.getTime()) {
+							Sha1 sha1 = new Sha1();
+							pwd = sha1.Digest(pwd);
+							User user = userService.findByName(loginname);
+							if (user == null) {
+								User newUser = new User();
 								newUser.setLoginname(loginname);
-								newUser.setUsername(loginname);
+								newUser.setUsername("手机用户"
+										+ loginname.substring(7));
 								newUser.setPassword(pwd);
 								newUser.setFlag("1");
 								newUser.setIsvalidate("0");
 								newUser.setAge(0);
 								newUser.setRegistrationDate(new Date());
 								newUser.setOrgId(0);
-								this.userService.register(newUser,captcha);
-								out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(this.getUser(newUser))+"}}");
-							}else{//用户名已存在
+								this.userService.register(newUser, captcha);
+								out.print("{\"state\":0,\"result\":{\"user\":"
+										+ JSON.toJSONString(this
+												.getUser(newUser)) + "}}");
+							} else {// 用户名已存在
 								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
 							}
-						}else{//验证码失效
+						} else {// 验证码失效
 							captcha.setStatus("1");
 							this.userService.updateObject(captcha);
 							out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 						}
-					}else{//验证码错误
+					} else {// 验证码错误
 						out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
 					}
-				}else{//未获取验证码
+				} else {// 未获取验证码
 					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
@@ -154,424 +163,525 @@ public class UserAction extends ActionSupport {
 
 	/**
 	 * 生成验证码
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-29 时间：上午10:58:56
 	 */
-	public void createCaptcha(){
+	public void createCaptcha() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out =null;
-		try{
+		PrintWriter out = null;
+		try {
 			out = ServletActionContext.getResponse().getWriter();
-			HttpServletRequest request=ServletActionContext.getRequest();
-			String telephone=request.getParameter("loginname");
-			//验证该手机号今日是否能获取
-			int count=this.userService.qualificationByTelephone(telephone);
-			if(count>30){
-				out.print("{\"state\":1,\"errorMsg\":\"can't get today\"}");
-			}else{
-				String code=String.valueOf((int)((Math.random()*9+1)*100000));
-				String returnString = HttpSender.batchSend(uri, account, pswd, telephone, contentLeft+code+contentRight, needstatus, product, extno);
-				String returnCode= returnString.split("\n")[0].split(",")[1];
-				System.out.println(returnCode);
-				if("0".equals(returnCode)){
-					Captcha captcha=this.userService.createCaptcha(telephone,code);
-					out.print("{\"state\":0,\"result\":{\"captcha\":"+JSON.toJSONString(captcha)+"}}");
-				}else if("107".equals(returnCode)){//手机号错误
-					out.print("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
-				}else if("109".equals(returnCode)){//短信额度不足
-					out.print("{\"state\":1,\"errorCode\":\"短信额度不足\",\"errorMsg\":\"系统异常\"}");
-				}else {
-					out.print("{\"state\":1,\"errorMsg\":\"系统异常\"}");
+			HttpServletRequest request = ServletActionContext.getRequest();
+			String telephone = request.getParameter("loginname");
+			if ("".equals(telephone) || telephone == null) {
+				out.print("{\"state\":1,\"errorMsg\":\"请先填写手机号\"}");
+			} else {
+				// 验证该手机号今日是否能获取
+				int count = this.userService
+						.qualificationByTelephone(telephone);
+				if (count > 30) {
+					out.print("{\"state\":1,\"errorMsg\":\"今日已无发送资格\"}");
+				} else {
+					String code = String
+							.valueOf((int) ((Math.random() * 9 + 1) * 100000));
+					String returnString = HttpSender.batchSend(uri, account,
+							pswd, telephone, contentLeft + code + contentRight,
+							needstatus, product, extno);
+					String returnCode = returnString.split("\n")[0].split(",")[1];
+					System.out.println(returnCode);
+					if ("0".equals(returnCode)) {
+						Captcha captcha = this.userService.createCaptcha(
+								telephone, code);
+						out.print("{\"state\":0,\"result\":{\"captcha\":"
+								+ JSON.toJSONString(captcha) + "}}");
+					} else if ("107".equals(returnCode)) {// 手机号错误
+						out.print("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
+					} else if ("109".equals(returnCode)) {// 短信额度不足
+						out.print("{\"state\":1,\"errorCode\":\"短信额度不足\",\"errorMsg\":\"系统异常\"}");
+					} else {
+						out.print("{\"state\":1,\"errorMsg\":\"系统异常\"}");
+					}
 				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 登录
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-6 时间：下午5:24:15
 	 * @throws IOException
 	 */
-	public void login(){
+	public void login() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out =null;
-		try{
+		PrintWriter out = null;
+		try {
 			out = ServletActionContext.getResponse().getWriter();
-			HttpServletRequest request=ServletActionContext.getRequest();
-			String loginname=request.getParameter("loginname");
-			String pwd=request.getParameter("password");
-			if("".equals(loginname)||loginname==null||"".equals(pwd)||pwd==null){
+			HttpServletRequest request = ServletActionContext.getRequest();
+			String loginname = request.getParameter("loginname");
+			String pwd = request.getParameter("password");
+			if ("".equals(loginname) || loginname == null || "".equals(pwd)
+					|| pwd == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
-			}else{
-				User user=userService.findByName(loginname);
-				if(user==null){
+			} else {
+				User user = userService.findByName(loginname);
+				if (user == null) {
 					out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
-				}else{
-					Sha1 sha1=new Sha1();
-					pwd=sha1.Digest(pwd);
-					if(user.getPassword().equals(pwd)){
-						UserCookieUtil.saveCookie(user, ServletActionContext.getResponse());
-						out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(this.getUser(user))+"}}");
-					}else{
+				} else {
+					Sha1 sha1 = new Sha1();
+					pwd = sha1.Digest(pwd);
+					if (user.getPassword().equals(pwd)) {
+						UserCookieUtil.saveCookie(user,
+								ServletActionContext.getResponse());
+						out.print("{\"state\":0,\"result\":{\"user\":"
+								+ JSON.toJSONString(this.getUser(user)) + "}}");
+					} else {
 						out.print("{\"state\":1,\"errorMsg\":\"密码错误\"}");
 					}
 				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 注销登录
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-24 时间：下午12:05:37
 	 */
-	public void logout(){
+	public void logout() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out =null;
-		try{
+		PrintWriter out = null;
+		try {
 			out = ServletActionContext.getResponse().getWriter();
-			HttpServletRequest request=ServletActionContext.getRequest();
-//			String loginname=request.getParameter("loginname");
+			HttpServletRequest request = ServletActionContext.getRequest();
+			// String loginname=request.getParameter("loginname");
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
 			out.print("{\"state\":0}");
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 上传头像
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-6 时间：下午4:59:19
 	 * @throws IOException
 	 */
-	public void uploadPhoto() throws IOException{
+	public void uploadPhoto() throws IOException {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
 		PrintWriter out = ServletActionContext.getResponse().getWriter();
 		try {
-			HttpServletRequest request=ServletActionContext.getRequest();
-			int id = Integer.parseInt(request.getParameter("userId"));
-			User user=this.userService.getById(id);
-			PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2, BUCKET);
-			UploadResult result = new UploadResult();
-			int ret = pc.Upload(getImage(), result);
-			if(ret!=0){
-				out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
-			}else{
-				//删除原有头像图片
-				if(!"".equals(user.getFileid())&&user.getFileid()!=null){
-					ret=pc.Delete(user.getFileid());
+			HttpServletRequest request = ServletActionContext.getRequest();
+			String id = request.getParameter("userId");
+			if (id == null || "".equals(id)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不能为空\"}");
+			} else {
+				User user = this.userService.getById(Integer.parseInt(id));
+				PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2,
+						SECRET_KEY_V2, BUCKET);
+				UploadResult result = new UploadResult();
+				int ret = pc.Upload(getImage(), result);
+				if (ret != 0) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
+				} else {
+					// 删除原有头像图片
+					if (!"".equals(user.getFileid())
+							&& user.getFileid() != null) {
+						ret = pc.Delete(user.getFileid());
+					}
+					user.setHeadPortrait(result.download_url);
+					this.userService.updateUser(user);
+					out.print("{\"state\":0,\"result\":\"{\"url\":"
+							+ result.download_url + "\"}}");
 				}
-				user.setHeadPortrait(result.download_url);
-				this.userService.updateUser(user);
-				out.print("{\"state\":0,\"result\":\"{\"url\":"+result.download_url+"\"}}");
 			}
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 完善个人信息
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-7 时间：下午12:53:03
 	 * @throws IOException
 	 */
-	public void perfectInformation(){
+	public void perfectInformation() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out =null;
-		try{
+		PrintWriter out = null;
+		try {
 			out = ServletActionContext.getResponse().getWriter();
-			HttpServletRequest request=ServletActionContext.getRequest();
-			int id=Integer.parseInt(request.getParameter("userId"));
-			String username=request.getParameter("username");//昵称
-			String address=request.getParameter("address");//地址
-			String telephone=request.getParameter("telephone");//联系电话
-			String name=request.getParameter("name");//真实姓名
-			String ageStr=request.getParameter("age");//年龄
-			String gender=request.getParameter("gender");//年龄
-			String introduction=request.getParameter("introduction");//个人介绍
-			int age=0;
-			if(!"".equals(ageStr)&&ageStr!=null){
-				age=Integer.parseInt(ageStr);
+			HttpServletRequest request = ServletActionContext.getRequest();
+			String id = request.getParameter("userId");
+			String username = request.getParameter("username");// 昵称
+			String address = request.getParameter("address");// 地址
+			String telephone = request.getParameter("telephone");// 联系电话
+			String name = request.getParameter("name");// 真实姓名
+			String ageStr = request.getParameter("age");// 年龄
+			String gender = request.getParameter("gender");// 年龄
+			String introduction = request.getParameter("introduction");// 个人介绍
+			int age = 0;
+			if (!"".equals(ageStr) && ageStr != null) {
+				age = Integer.parseInt(ageStr);
 			}
-			User user=this.userService.getById(id);
-			user.setUsername(username);
-			user.setAddress(address);
-			user.setTelephone(telephone);
-			user.setName(name);
-			user.setAge(age);
-			user.setGender(Integer.parseInt(gender));
-			user.setIntroduction(introduction);
-			this.userService.updateUser(user);
-			out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSON(this.getUser(user))+"}}");
+			if (id == null || "".equals(id)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不能为空\"}");
+			} else {
+				User user = this.userService.getById(Integer.parseInt(id));
+				user.setUsername(username);
+				user.setAddress(address);
+				user.setTelephone(telephone);
+				user.setName(name);
+				user.setAge(age);
+				user.setGender(Integer.parseInt(gender));
+				user.setIntroduction(introduction);
+				this.userService.updateUser(user);
+				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSON(this.getUser(user)) + "}}");
+			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 修改密码
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-21 时间：上午11:41:41
 	 */
-	public void updatePassword(){
-		HttpServletRequest request=ServletActionContext.getRequest();
-		HttpServletResponse response =ServletActionContext.getResponse();
-		PrintWriter out= null;
+	public void updatePassword() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
 		try {
-			response.setContentType("text/json; charset=utf-8");
-			out= response.getWriter();
-			String oldPassowrd =request.getParameter("oldPassword");
-			String newPassowrd =request.getParameter("newPassword");
-			String userName=request.getParameter("loginName");
-			User user=userService.findByName(userName);
-			if(user!=null){
-				Sha1 sha1=new Sha1();
-				oldPassowrd=sha1.Digest(oldPassowrd);
-				if(oldPassowrd.equals(user.getPassword())){
-					user.setPassword(sha1.Digest(newPassowrd));
-					this.userService.updateUser(user);
-					out.print("{\"state\":0}");
-				}else{//原密码错误
-					out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
+			out = response.getWriter();
+			String oldPassowrd = request.getParameter("oldPassword");
+			String newPassowrd = request.getParameter("newPassword");
+			String userName = request.getParameter("loginName");
+			if ("".equals(userName) || userName == null) {
+				out.print("{\"state\":1,\"errorMsg\":\"用户名不能为空\"}");
+			} else {
+				User user = userService.findByName(userName);
+				if (user != null) {
+					Sha1 sha1 = new Sha1();
+					oldPassowrd = sha1.Digest(oldPassowrd);
+					if (oldPassowrd.equals(user.getPassword())) {
+						user.setPassword(sha1.Digest(newPassowrd));
+						this.userService.updateUser(user);
+						out.print("{\"state\":0}");
+					} else {// 原密码错误
+						out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
+					}
+				} else {
+					out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 				}
-			}else{
-				out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 查看用户信息
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-27 时间：下午4:51:02
 	 */
-	public void viewUserInfo(){
-		HttpServletRequest request=ServletActionContext.getRequest();
-		HttpServletResponse response =ServletActionContext.getResponse();
-		PrintWriter out= null;
+	public void viewUserInfo() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
 		try {
-			response.setContentType("text/json; charset=utf-8");
-			out= response.getWriter();
-			String userId=request.getParameter("userId");//要查看的用户
-			String currentUserId=request.getParameter("currentUserId");//当前用户
-			User user=userService.getById(Integer.parseInt(userId));
-			//获取用户图集
+			out = response.getWriter();
+			String userId = request.getParameter("userId");// 要查看的用户
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			User user = userService.getById(Integer.parseInt(userId));
+			// 获取用户图集
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("userid", userId);
 			filterMap.put("currentUserId", currentUserId);
 			filterMap.put("limit", "20");
-			//验证是否已经关注
-			UserAttentionFans u=this.userService.isAttention(currentUserId,userId);
-			if(u!=null){//已关注
-				user.setIsAttention(0);
-			}else{//未关注
-			}
-			List photoSet=new ArrayList();
-			List<PictureSet> list = photoService.queryPersonalPhotos(filterMap);
-//			for (int i = 0; i < list.size(); i++) {
-//				PictureSet ps=list.get(i);
-//				List<Photo> pList=photoService.queryPhotoByPictureSetId(ps.getId());
-//				ps.setPhotoList(pList);
-//				photoSet.add(ps);
-//			}
-			//获取要查看的用户的关注
-			Map<String, String> filterMap1 = new HashMap();
-			if (userId != null && !"".equals(userId)) {
-				filterMap1.put("fansUserId", userId);
-			}
-			List attentionList=userService.queryAttentions(filterMap1);
-			//获取要查看的用户的粉丝
-			Map<String, String> filterMap2 = new HashMap();
-			if (userId != null && !"".equals(userId)) {
-				filterMap2.put("attentionUserId", userId);
-			}
-			List fansList=userService.queryFans(filterMap2);
-			if(user!=null){
-				User newUser=this.getUser(user);
-				newUser.setIsAttention(user.getIsAttention());
-				out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(newUser)+",\"photoSet\":"+JSON.toJSONString(list, true)+",\"attentionUserList\":"+JSON.toJSONString(attentionList, true)+",\"fansUserList\":"+JSON.toJSONString(fansList, true)+"}}");
-			}else{
+			if (userId == null || "".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				// 验证是否已经关注
+				UserAttentionFans u = this.userService.isAttention(
+						currentUserId, userId);
+				if (u != null) {// 已关注
+					user.setIsAttention(0);
+				} else {// 未关注
+					user.setIsAttention(1);
+				}
+				List photoSet = new ArrayList();
+				List<PictureSet> list = photoService
+						.queryPersonalPhotos(filterMap);
+				// for (int i = 0; i < list.size(); i++) {
+				// PictureSet ps=list.get(i);
+				// List<Photo>
+				// pList=photoService.queryPhotoByPictureSetId(ps.getId());
+				// ps.setPhotoList(pList);
+				// photoSet.add(ps);
+				// }
+				// 获取要查看的用户的关注
+				Map<String, String> filterMap1 = new HashMap();
+				if (userId != null && !"".equals(userId)) {
+					filterMap1.put("fansUserId", userId);
+				}
+				List attentionList = userService.queryAttentions(filterMap1);
+				// 获取要查看的用户的粉丝
+				Map<String, String> filterMap2 = new HashMap();
+				if (userId != null && !"".equals(userId)) {
+					filterMap2.put("attentionUserId", userId);
+				}
+				List fansList = userService.queryFans(filterMap2);
+				if (user != null) {
+					User newUser = this.getUser(user);
+					newUser.setIsAttention(user.getIsAttention());
+					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(newUser) + ",\"photoSet\":"
+							+ JSON.toJSONString(list, true)
+							+ ",\"attentionUserList\":"
+							+ JSON.toJSONString(attentionList, true)
+							+ ",\"fansUserList\":"
+							+ JSON.toJSONString(fansList, true) + "}}");
+				} else {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				}
 			}
-			} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (IOException ie) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 关注
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-6 时间：下午12:51:44
 	 */
-	public void attention(){
-		HttpServletRequest request=ServletActionContext.getRequest();
-		HttpServletResponse response =ServletActionContext.getResponse();
-		PrintWriter out= null;
+	public void attention() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
 		try {
-			response.setContentType("text/json; charset=utf-8");
-			out= response.getWriter();
-			String fansUserId=request.getParameter("currentUserId");
-			String attentionUserId=request.getParameter("attentionUserId");
-			//是否关注过
-			UserAttentionFans u=this.userService.isAttention(fansUserId,attentionUserId);
-			if(u!=null){
-				out.print("{\"state\":1,\"errorMsg\":\"已关注\"}");
-			}else{
-				UserAttentionFans uaf=new UserAttentionFans();
-				uaf.setAttentionUserId(Integer.parseInt(attentionUserId));
-				uaf.setFansUserId(Integer.parseInt(fansUserId));
-				uaf.setAttentionTime(new Date());
-				this.userService.saveObject(uaf);
-				out.print("{\"state\":0}");
+			out = response.getWriter();
+			String fansUserId = request.getParameter("currentUserId");
+			String attentionUserId = request.getParameter("attentionUserId");
+			if (fansUserId == null || "".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				if (attentionUserId == null || "".equals(attentionUserId)) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				} else {
+					// 是否关注过
+					UserAttentionFans u = this.userService.isAttention(
+							fansUserId, attentionUserId);
+					if (u != null) {
+						out.print("{\"state\":1,\"errorMsg\":\"已关注\"}");
+					} else {
+						UserAttentionFans uaf = new UserAttentionFans();
+						uaf.setAttentionUserId(Integer
+								.parseInt(attentionUserId));
+						uaf.setFansUserId(Integer.parseInt(fansUserId));
+						uaf.setAttentionTime(new Date());
+						this.userService.saveObject(uaf);
+						out.print("{\"state\":0}");
+					}
+				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 验证是否已关注
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-6 时间：下午2:23:52
 	 */
-	public void isAttention(){
-		HttpServletRequest request=ServletActionContext.getRequest();
-		HttpServletResponse response =ServletActionContext.getResponse();
-		PrintWriter out= null;
+	public void isAttention() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
 		try {
-			response.setContentType("text/json; charset=utf-8");
-			out= response.getWriter();
-			String fansUserId=request.getParameter("currentUserId");
-			String attentionUserId=request.getParameter("attentionUserId");
-			//是否关注过
-			UserAttentionFans u=this.userService.isAttention(fansUserId,attentionUserId);
-			if(u!=null){//已关注
-				out.print("{\"state\":0}");
-			}else{//未关注
-				out.print("{\"state\":1,\"errorMsg\":\"未关注\"}");
+			out = response.getWriter();
+			String fansUserId = request.getParameter("currentUserId");
+			String attentionUserId = request.getParameter("attentionUserId");
+			if (fansUserId == null || "".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				if (attentionUserId == null || "".equals(attentionUserId)) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				} else {
+					// 是否关注过
+					UserAttentionFans u = this.userService.isAttention(
+							fansUserId, attentionUserId);
+					if (u != null) {// 已关注
+						out.print("{\"state\":0}");
+					} else {// 未关注
+						out.print("{\"state\":1,\"errorMsg\":\"未关注\"}");
+					}
+				}
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 取消关注
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-6 时间：下午2:25:23
 	 */
-	public void cancelAttention(){
-		HttpServletRequest request=ServletActionContext.getRequest();
-		HttpServletResponse response =ServletActionContext.getResponse();
-		PrintWriter out= null;
+	public void cancelAttention() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
 		try {
-			response.setContentType("text/json; charset=utf-8");
-			out= response.getWriter();
-			String fansUserId=request.getParameter("currentUserId");
-			String attentionUserId=request.getParameter("attentionUserId");
-			//是否关注过
-			this.userService.cancelAttention(fansUserId,attentionUserId);
-			out.print("{\"state\":0}");
+			out = response.getWriter();
+			String fansUserId = request.getParameter("currentUserId");
+			String attentionUserId = request.getParameter("attentionUserId");
+			if (fansUserId == null || "".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				if (attentionUserId == null || "".equals(attentionUserId)) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				} else {
+					// 是否关注过
+					this.userService.cancelAttention(fansUserId,
+							attentionUserId);
+					out.print("{\"state\":0}");
+				}
+			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 查看我关注的人
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-6 时间：下午2:34:42
 	 * @throws IOException
@@ -579,18 +689,24 @@ public class UserAction extends ActionSupport {
 	public void queryAttentions() throws IOException {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
 		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/json; charset=utf-8");
-			String fansUserId=request.getParameter("currentUserId");
-			Map<String, String> filterMap = new HashMap();
-			if (fansUserId != null && !"".equals(fansUserId)) {
-				filterMap.put("fansUserId", fansUserId);
+			String fansUserId = request.getParameter("currentUserId");
+			if (fansUserId == null || "".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				if (fansUserId != null && !"".equals(fansUserId)) {
+					filterMap.put("fansUserId", fansUserId);
+				}
+				List list = userService.queryAttentions(filterMap);
+				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(list, true) + "}}");
 			}
-			List list=userService.queryAttentions(filterMap);
-			out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(list, true)+"}}");
 		} catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
 		} finally {
@@ -598,9 +714,10 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 查看我的粉丝
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-6 时间：下午2:34:42
 	 * @throws IOException
@@ -608,90 +725,109 @@ public class UserAction extends ActionSupport {
 	public void queryFans() throws IOException {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
 		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/json; charset=utf-8");
-			String attentionUserId=request.getParameter("currentUserId");
-			Map<String, String> filterMap = new HashMap();
-			if (attentionUserId != null && !"".equals(attentionUserId)) {
-				filterMap.put("attentionUserId", attentionUserId);
+			String attentionUserId = request.getParameter("currentUserId");
+			if (attentionUserId == null || "".equals(attentionUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				if (attentionUserId != null && !"".equals(attentionUserId)) {
+					filterMap.put("attentionUserId", attentionUserId);
+				}
+				List list = userService.queryFans(filterMap);
+				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(list, true) + "}}");
 			}
-			List list=userService.queryFans(filterMap);
-			out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(list, true)+"}}");
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e);
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 忘记密码，重置密码
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-15 时间：下午4:59:11
 	 */
-	public void resetPassword(){
+	public void resetPassword() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
-		PrintWriter out =null;
-		try{
+		PrintWriter out = null;
+		try {
 			out = ServletActionContext.getResponse().getWriter();
-			HttpServletRequest request=ServletActionContext.getRequest();
-			String loginname=request.getParameter("loginname");
-			String pwd=request.getParameter("password");
-			String code=request.getParameter("captcha");
-			//获取当前可用的验证码
-			Captcha captcha=this.userService.queryUsableCaptcha(loginname);
-			if(captcha!=null){
-				if(code.equals(captcha.getCode())){
-					if(captcha.getDeadline().getTime()>new Date().getTime()){
-						Sha1 sha1=new Sha1();
-						pwd=sha1.Digest(pwd);
-						User user=userService.findByName(loginname);
-						if(user!=null){
-							user.setPassword(pwd);
-							this.userService.resetPassword(user,captcha);
-							out.print("{\"state\":0,\"result\":{\"user\":"+JSON.toJSONString(this.getUser(user))+"}}");
-						}else{//用户名不存在
-							out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
+			HttpServletRequest request = ServletActionContext.getRequest();
+			String loginname = request.getParameter("loginname");
+			String pwd = request.getParameter("password");
+			String code = request.getParameter("captcha");
+			if ("".equals(loginname) || loginname == null || pwd == null
+					|| "".equals(pwd)) {
+				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
+			} else {
+				// 获取当前可用的验证码
+				Captcha captcha = this.userService
+						.queryUsableCaptcha(loginname);
+				if (captcha != null) {
+					if (code.equals(captcha.getCode())) {
+						if (captcha.getDeadline().getTime() > new Date()
+								.getTime()) {
+							Sha1 sha1 = new Sha1();
+							pwd = sha1.Digest(pwd);
+							User user = userService.findByName(loginname);
+							if (user != null) {
+								user.setPassword(pwd);
+								this.userService.resetPassword(user, captcha);
+								out.print("{\"state\":0,\"result\":{\"user\":"
+										+ JSON.toJSONString(this.getUser(user))
+										+ "}}");
+							} else {// 用户名不存在
+								out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
+							}
+						} else {// 验证码失效
+							captcha.setStatus("1");
+							this.userService.updateObject(captcha);
+							out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 						}
-					}else{//验证码失效
-						captcha.setStatus("1");
-						this.userService.updateObject(captcha);
-						out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
+					} else {// 验证码错误
+						out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
 					}
-				}else{//验证码错误
-					out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
+				} else {// 未获取验证码
+					// out.print("{\"state\":1,\"errorMsg\":\"no available code\"}");
+					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 				}
-			}else{//未获取验证码
-//				out.print("{\"state\":1,\"errorMsg\":\"no available code\"}");
-				out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 			}
 		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+ie.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(ie);
 			ie.printStackTrace();
-		}catch (Exception e) {
-			out.print("{\"state\":\"2\",\"errorCode\":\""+e.getMessage()+"\",\"errorMsg\":\"系统异常\"}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
 			e.printStackTrace();
-		}finally{
+		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
 	 * 转换用户信息
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-8 时间：下午4:24:26
 	 * @param user
 	 * @return
 	 */
-	public User getUser(User user){
-		User newUser=new User();
+	public User getUser(User user) {
+		User newUser = new User();
 		newUser.setId(user.getId());
 		newUser.setAge(user.getAge());
 		newUser.setAddress(user.getAddress());

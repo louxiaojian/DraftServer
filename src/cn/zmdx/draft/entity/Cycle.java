@@ -11,7 +11,7 @@ public class Cycle {
 	private String status;//选秀状态，0:未开始，1:进行中，2:结束
 	private String bgUrl;//背景图
 	private String descs;//主题描述
-	private String tag;//标签
+	private String tagUrl;//标签
 	
 	public int getId() {
 		return id;
@@ -55,10 +55,10 @@ public class Cycle {
 	public void setDescs(String descs) {
 		this.descs = descs;
 	}
-	public String getTag() {
-		return tag;
+	public String getTagUrl() {
+		return tagUrl;
 	}
-	public void setTag(String tag) {
-		this.tag = tag;
+	public void setTagUrl(String tagUrl) {
+		this.tagUrl = tagUrl;
 	}
 }

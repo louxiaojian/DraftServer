@@ -11,7 +11,7 @@
 		<property name="status" column="status" />	
 		<property name="bgUrl" column="bg_url"/>
 		<property name="descs" column="descs" />
-		<property name="tag" column="tag" />
+		<property name="tagUrl" column="tag_url" />
 	</class>
 	
 </hibernate-mapping>
