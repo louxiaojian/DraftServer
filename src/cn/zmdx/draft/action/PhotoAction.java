@@ -1144,14 +1144,20 @@ public class PhotoAction extends ActionSupport {
 					// ps.setPhotoList(pList);
 					// result.add(ps);
 				}
+				//加载评论
 				Map<String, Object> filterMap = new HashMap();
 				filterMap.put("pictureSetId", id);
 				filterMap.put("limit", 20);
 				List list = this.photoService.queryComment(filterMap);
+				//加载图集点赞人
+				Map<String, String> praiseFilterMap = new HashMap();
+				praiseFilterMap.put("pictureSetId", id);
+				praiseFilterMap.put("limit", "3");
+				List praiseList=this.photoService.queryPraiseUsers(praiseFilterMap);
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSON(ps) + ",\"photoList\":"
 						+ JSON.toJSONString(pList, true) + ",\"comments\":"
-						+ JSON.toJSONString(list, true) + "}}");
+						+ JSON.toJSONString(list, true) + ",\"praiseUsers\":"+JSON.toJSONString(praiseList,true)+"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()

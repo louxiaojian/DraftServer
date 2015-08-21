@@ -133,7 +133,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryThemes(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs from theme_cycle order by status,starttime asc");
+		sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs,detail_image_url as detailImageUrl from theme_cycle order by status,starttime asc");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -344,6 +344,30 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				.setResultTransformer(Transformers.aliasToBean(PictureSet.class));
 		if(!"".equals(filterMap.get("limit"))&&filterMap.get("limit")!=null){
 			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
+		return query.list();
+	}
+
+	@Override
+	public List queryPraiseUsers(Map<String, String> praiseFilterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction from users u left join operation_records on informer_id=u.id where operation_type=0 ");
+		if (praiseFilterMap != null && !praiseFilterMap.isEmpty()) {
+			if(!"".equals(praiseFilterMap.get("pictureSetId"))&&praiseFilterMap.get("pictureSetId")!=null){
+				sql.append(" and picture_set_id=:pictureSetId ");
+			}
+			if(!"".equals(praiseFilterMap.get("limit"))&&praiseFilterMap.get("limit")!=null){
+				sql.append(" order by datetime desc limit :limit");
+			}
+		}
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(User.class));
+		if(!"".equals(praiseFilterMap.get("pictureSetId"))&&praiseFilterMap.get("pictureSetId")!=null){
+			query.setInteger("pictureSetId", Integer.parseInt(praiseFilterMap.get("pictureSetId")));
+		}
+		if(!"".equals(praiseFilterMap.get("limit"))&&praiseFilterMap.get("limit")!=null){
+			query.setInteger("limit", Integer.parseInt(praiseFilterMap.get("limit")));
 		}
 		return query.list();
 	}

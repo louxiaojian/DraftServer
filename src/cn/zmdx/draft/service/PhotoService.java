@@ -172,4 +172,12 @@ public interface PhotoService {
 	 * @return
 	 */
 	public List discoverPictureSet(Map<String, String> filterMap);
+	/**
+	 * 加载图集点赞人
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-21 时间：下午12:28:41
+	 * @param praiseFilterMap
+	 * @return
+	 */
+	public List queryPraiseUsers(Map<String, String> praiseFilterMap);
 }

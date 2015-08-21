@@ -12,6 +12,7 @@
 		<property name="bgUrl" column="bg_url"/>
 		<property name="descs" column="descs" />
 		<property name="tag" column="tag_url" />
+		<property name="detailImageUrl" column="detail_image_url" />
 	</class>
 	
 </hibernate-mapping>

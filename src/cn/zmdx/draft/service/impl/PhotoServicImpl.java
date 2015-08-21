@@ -180,5 +180,10 @@ public class PhotoServicImpl implements PhotoService {
 	public List discoverPictureSet(Map<String, String> filterMap) {
 		return this.photoDao.discoverPictureSet(filterMap);
 	}
+
+	@Override
+	public List queryPraiseUsers(Map<String, String> praiseFilterMap) {
+		return this.photoDao.queryPraiseUsers(praiseFilterMap);
+	}
 	
 }
