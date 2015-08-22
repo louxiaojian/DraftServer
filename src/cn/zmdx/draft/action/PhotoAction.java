@@ -153,6 +153,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			// 标示，0查询lastModified之后的数据，1查询lastModified之前的数据
 			String category = request.getParameter("category");// 0 新，1 热门
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -178,6 +179,13 @@ public class PhotoAction extends ActionSupport {
 				// 图集所属用户信息
 				for (int i = 0; i < list.size(); i++) {
 					RankPictureSet ps = (RankPictureSet) list.get(i);
+					//验证当前用户是否已赞
+					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getPictureSetId()+"");
+					if(count>0){//已赞
+						ps.setIsUserPraised("1");
+					}else{//未赞
+						ps.setIsUserPraised("0");
+					}
 					User user = (User) this.photoService.getObjectById(
 							User.class, ps.getUserid() + "");
 					User u = new User();
@@ -199,6 +207,13 @@ public class PhotoAction extends ActionSupport {
 				// 图集所属用户信息
 				for (int i = 0; i < list.size(); i++) {
 					PictureSet ps = (PictureSet) list.get(i);
+					//验证当前用户是否已赞
+					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getId()+"");
+					if(count>0){//已赞
+						ps.setIsUserPraised("1");
+					}else{//未赞
+						ps.setIsUserPraised("0");
+					}
 					User user = (User) this.photoService.getObjectById(
 							User.class, ps.getUserid() + "");
 					User u = new User();
@@ -242,6 +257,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeId");
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -262,6 +278,13 @@ public class PhotoAction extends ActionSupport {
 					// List<Photo>
 					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
 					// ps.setPhotoList(pList);
+					//验证当前用户是否已赞
+					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getId()+"");
+					if(count>0){//已赞
+						ps.setIsUserPraised("1");
+					}else{//未赞
+						ps.setIsUserPraised("0");
+					}
 					// 图集评论数
 					int comments = photoService.queryCommentByPictureSetId(ps
 							.getId());
@@ -665,6 +688,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeCycleId");
+			String currentUserId = request.getParameter("currentUserId");//当前用户
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -685,6 +709,13 @@ public class PhotoAction extends ActionSupport {
 					// List<Photo>
 					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 					// ps.setPhotoList(pList);
+					//验证当前用户是否已赞
+					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getPictureSetId()+"");
+					if(count>0){//已赞
+						ps.setIsUserPraised("1");
+					}else{//未赞
+						ps.setIsUserPraised("0");
+					}
 					// 图集评论数
 					int comments = photoService.queryCommentByPictureSetId(ps
 							.getId());

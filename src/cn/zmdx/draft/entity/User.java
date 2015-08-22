@@ -21,7 +21,7 @@ public class User {
 	private Date validateDate;//真人验证审批时间
 	private int report;
 	private String fileid;//头像图片 万象fileid
-	private int isAttention;//是否已关注，0已关注，1未关注
+	private String isAttention;//是否已关注，0已关注，1未关注
 	
 	//选秀排名所用
 	private int praise;
@@ -140,10 +140,10 @@ public class User {
 	public void setFileid(String fileid) {
 		this.fileid = fileid;
 	}
-	public int getIsAttention() {
+	public String getIsAttention() {
 		return isAttention;
 	}
-	public void setIsAttention(int isAttention) {
+	public void setIsAttention(String isAttention) {
 		this.isAttention = isAttention;
 	}
 	

@@ -419,7 +419,7 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String oldPassowrd = request.getParameter("oldPassword");
 			String newPassowrd = request.getParameter("newPassword");
-			String userName = request.getParameter("loginName");
+			String userName = request.getParameter("loginname");
 			if ("".equals(userName) || userName == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名不能为空\"}");
 			} else {
@@ -481,9 +481,9 @@ public class UserAction extends ActionSupport {
 				UserAttentionFans u = this.userService.isAttention(
 						currentUserId, userId);
 				if (u != null) {// 已关注
-					user.setIsAttention(0);
+					user.setIsAttention("0");
 				} else {// 未关注
-					user.setIsAttention(1);
+					user.setIsAttention("1");
 				}
 				List photoSet = new ArrayList();
 				List<PictureSet> list = photoService
@@ -550,7 +550,7 @@ public class UserAction extends ActionSupport {
 		try {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
-			String attentionUserId = request.getParameter("attentionUserId");
+			String attentionUserId = request.getParameter("userId");
 			if (fansUserId == null || "".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {
@@ -603,7 +603,7 @@ public class UserAction extends ActionSupport {
 		try {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
-			String attentionUserId = request.getParameter("attentionUserId");
+			String attentionUserId = request.getParameter("userId");
 			if (fansUserId == null || "".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {
@@ -650,7 +650,7 @@ public class UserAction extends ActionSupport {
 		try {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
-			String attentionUserId = request.getParameter("attentionUserId");
+			String attentionUserId = request.getParameter("userId");
 			if (fansUserId == null || "".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {
@@ -692,7 +692,7 @@ public class UserAction extends ActionSupport {
 		response.setContentType("text/json; charset=utf-8");
 		PrintWriter out = response.getWriter();
 		try {
-			String fansUserId = request.getParameter("currentUserId");
+			String fansUserId = request.getParameter("userId");
 			if (fansUserId == null || "".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {
@@ -728,7 +728,7 @@ public class UserAction extends ActionSupport {
 		response.setContentType("text/json; charset=utf-8");
 		PrintWriter out = response.getWriter();
 		try {
-			String attentionUserId = request.getParameter("currentUserId");
+			String attentionUserId = request.getParameter("userId");
 			if (attentionUserId == null || "".equals(attentionUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {

@@ -180,4 +180,12 @@ public interface PhotoService {
 	 * @return
 	 */
 	public List queryPraiseUsers(Map<String, String> praiseFilterMap);
+	/**
+	 * 验证用户是否已点赞
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-21 时间：下午8:08:59
+	 * @param currentUserId
+	 * @param pictureSetId
+	 */
+	public int isPraisedPictureSet(String currentUserId,String pictureSetId);
 }

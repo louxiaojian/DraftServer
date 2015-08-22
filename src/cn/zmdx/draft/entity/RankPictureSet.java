@@ -23,6 +23,7 @@ public class RankPictureSet {
 	private List<Photo> photoList;
 	private int comments;
 	private User user;//图集所属用户
+	private String isUserPraised;//用户是否点赞
 	
 	public int getId() {
 		return id;
@@ -131,5 +132,11 @@ public class RankPictureSet {
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	public String getIsUserPraised() {
+		return isUserPraised;
+	}
+	public void setIsUserPraised(String isUserPraised) {
+		this.isUserPraised = isUserPraised;
 	}
 }

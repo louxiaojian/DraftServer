@@ -185,5 +185,11 @@ public class PhotoServicImpl implements PhotoService {
 	public List queryPraiseUsers(Map<String, String> praiseFilterMap) {
 		return this.photoDao.queryPraiseUsers(praiseFilterMap);
 	}
+
+	@Override
+	public int isPraisedPictureSet(String currentUserId,String pictureSetId) {
+		List list=this.photoDao.queryPhotoByPictureSetId(currentUserId,pictureSetId,0);
+		return list.size();
+	}
 	
 }
