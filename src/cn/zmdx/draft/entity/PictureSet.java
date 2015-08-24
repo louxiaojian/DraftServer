@@ -19,10 +19,11 @@ public class PictureSet {
 	private int votes;//选秀得票数
 	private String coverUrl;//图集封面url
 	private int themeCycleId;
-	private List<Photo> photoList;
+	private List<Photo> photoList;//图集所有图片
 	private int comments;
 	private User user;//图集所属用户
 	private String isUserPraised;//用户是否点赞
+	private List<User> praiseUserList;
 	
 	public int getId() {
 		return id;
@@ -131,6 +132,12 @@ public class PictureSet {
 	}
 	public void setIsUserPraised(String isUserPraised) {
 		this.isUserPraised = isUserPraised;
+	}
+	public List<User> getPraiseUserList() {
+		return praiseUserList;
+	}
+	public void setPraiseUserList(List<User> praiseUserList) {
+		this.praiseUserList = praiseUserList;
 	}
 	
 }

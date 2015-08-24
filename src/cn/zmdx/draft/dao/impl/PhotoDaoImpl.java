@@ -312,9 +312,9 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 			int operationType) {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select id from operation_records where operation_type=:operationType");
-		if (userid != null && !"".equals(userid)) {
+//		if (userid != null && !"".equals(userid)) {
 			sql.append(" and informer_id =:userid");
-		}
+//		}
 		if (pictureSetId != null && !"".equals(pictureSetId)) {
 			sql.append(" and picture_set_id=:pictureSetId");
 		}

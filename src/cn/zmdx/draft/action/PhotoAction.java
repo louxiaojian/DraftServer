@@ -179,11 +179,12 @@ public class PhotoAction extends ActionSupport {
 				// 图集所属用户信息
 				for (int i = 0; i < list.size(); i++) {
 					RankPictureSet ps = (RankPictureSet) list.get(i);
-					//验证当前用户是否已赞
-					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getPictureSetId()+"");
-					if(count>0){//已赞
+					// 验证当前用户是否已赞
+					int count = this.photoService.isPraisedPictureSet(
+							currentUserId, ps.getPictureSetId() + "");
+					if (count > 0) {// 已赞
 						ps.setIsUserPraised("1");
-					}else{//未赞
+					} else {// 未赞
 						ps.setIsUserPraised("0");
 					}
 					User user = (User) this.photoService.getObjectById(
@@ -207,11 +208,12 @@ public class PhotoAction extends ActionSupport {
 				// 图集所属用户信息
 				for (int i = 0; i < list.size(); i++) {
 					PictureSet ps = (PictureSet) list.get(i);
-					//验证当前用户是否已赞
-					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getId()+"");
-					if(count>0){//已赞
+					// 验证当前用户是否已赞
+					int count = this.photoService.isPraisedPictureSet(
+							currentUserId, ps.getId() + "");
+					if (count > 0) {// 已赞
 						ps.setIsUserPraised("1");
-					}else{//未赞
+					} else {// 未赞
 						ps.setIsUserPraised("0");
 					}
 					User user = (User) this.photoService.getObjectById(
@@ -278,11 +280,12 @@ public class PhotoAction extends ActionSupport {
 					// List<Photo>
 					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
 					// ps.setPhotoList(pList);
-					//验证当前用户是否已赞
-					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getId()+"");
-					if(count>0){//已赞
+					// 验证当前用户是否已赞
+					int count = this.photoService.isPraisedPictureSet(
+							currentUserId, ps.getId() + "");
+					if (count > 0) {// 已赞
 						ps.setIsUserPraised("1");
-					}else{//未赞
+					} else {// 未赞
 						ps.setIsUserPraised("0");
 					}
 					// 图集评论数
@@ -377,15 +380,16 @@ public class PhotoAction extends ActionSupport {
 					}
 					if (errorcount == 0) {
 						filterMap.put("count", files.length);
-						if ("1".equals(type)) {//选秀
-							Cycle cycle=(Cycle)this.photoService.getObjectById(Cycle.class, themeCycleId);
-							if(!"1".equals(cycle.getStatus())){//选秀非进行中的状态
+						if ("1".equals(type)) {// 选秀
+							Cycle cycle = (Cycle) this.photoService
+									.getObjectById(Cycle.class, themeCycleId);
+							if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
 								// 删除本次所有上传照片
 								for (int i = 0; i < fileids.length; i++) {
 									pc.Delete(fileids[i]);
 								}
 								out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
-							}else{
+							} else {
 								// 图片选秀信息
 								CyclePhotoSet cyclePhoto = new CyclePhotoSet();
 								cyclePhoto.setThemeCycleId(Integer
@@ -395,7 +399,7 @@ public class PhotoAction extends ActionSupport {
 								photoService.uploadPhoto(filterMap);
 								out.print("{\"state\":0}");
 							}
-						}else{
+						} else {
 							photoService.uploadPhoto(filterMap);
 							out.print("{\"state\":0}");
 						}
@@ -688,7 +692,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeCycleId");
-			String currentUserId = request.getParameter("currentUserId");//当前用户
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -709,11 +713,12 @@ public class PhotoAction extends ActionSupport {
 					// List<Photo>
 					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 					// ps.setPhotoList(pList);
-					//验证当前用户是否已赞
-					int count=this.photoService.isPraisedPictureSet(currentUserId,ps.getPictureSetId()+"");
-					if(count>0){//已赞
+					// 验证当前用户是否已赞
+					int count = this.photoService.isPraisedPictureSet(
+							currentUserId, ps.getPictureSetId() + "");
+					if (count > 0) {// 已赞
 						ps.setIsUserPraised("1");
-					}else{//未赞
+					} else {// 未赞
 						ps.setIsUserPraised("0");
 					}
 					// 图集评论数
@@ -1169,26 +1174,27 @@ public class PhotoAction extends ActionSupport {
 			} else {
 				PictureSet ps = (PictureSet) this.photoService.getObjectById(
 						PictureSet.class, id);
-				List pList = new ArrayList();
 				if (ps != null) {
-					pList = photoService.queryPhotoByPictureSetId(ps.getId());
-					// ps.setPhotoList(pList);
-					// result.add(ps);
+					// 图集所有图片
+					List pList = photoService.queryPhotoByPictureSetId(ps
+							.getId());
+					ps.setPhotoList(pList);
+					// 加载图集点赞人
+					Map<String, String> praiseFilterMap = new HashMap();
+					praiseFilterMap.put("pictureSetId", id);
+					praiseFilterMap.put("limit", "3");
+					List praiseList = this.photoService
+							.queryPraiseUsers(praiseFilterMap);
+					ps.setPraiseUserList(praiseList);
 				}
-				//加载评论
+				// 加载评论
 				Map<String, Object> filterMap = new HashMap();
 				filterMap.put("pictureSetId", id);
 				filterMap.put("limit", 20);
 				List list = this.photoService.queryComment(filterMap);
-				//加载图集点赞人
-				Map<String, String> praiseFilterMap = new HashMap();
-				praiseFilterMap.put("pictureSetId", id);
-				praiseFilterMap.put("limit", "3");
-				List praiseList=this.photoService.queryPraiseUsers(praiseFilterMap);
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
-						+ JSON.toJSON(ps) + ",\"photoList\":"
-						+ JSON.toJSONString(pList, true) + ",\"comments\":"
-						+ JSON.toJSONString(list, true) + ",\"praiseUsers\":"+JSON.toJSONString(praiseList,true)+"}}");
+						+ JSON.toJSON(ps) + ",\"comments\":"
+						+ JSON.toJSONString(list, true) + "}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
