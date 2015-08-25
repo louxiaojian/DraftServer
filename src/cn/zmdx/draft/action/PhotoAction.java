@@ -21,6 +21,7 @@ import cn.zmdx.draft.entity.RankPictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.util.SensitivewordFilter;
+import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
 import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
@@ -1185,6 +1186,9 @@ public class PhotoAction extends ActionSupport {
 					praiseFilterMap.put("limit", "3");
 					List praiseList = this.photoService
 							.queryPraiseUsers(praiseFilterMap);
+					//图集所属用户
+					User user=(User)this.photoService.getObjectById(User.class, String.valueOf(ps.getUserid()));
+					ps.setUser(UserUtil.getUser(user));
 					ps.setPraiseUserList(praiseList);
 				}
 				// 加载评论
@@ -1192,9 +1196,16 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("pictureSetId", id);
 				filterMap.put("limit", 20);
 				List list = this.photoService.queryComment(filterMap);
+				List commList=new ArrayList();
+				for (int i = 0; i < list.size(); i++) {
+					Comment comment=(Comment)list.get(i);
+					User user=(User)this.photoService.getObjectById(User.class, String.valueOf(comment.getUserId()));
+					comment.setUser(UserUtil.getUser(user));
+					commList.add(comment);
+				}
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSON(ps) + ",\"comments\":"
-						+ JSON.toJSONString(list, true) + "}}");
+						+ JSON.toJSONString(commList, true) + "}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()

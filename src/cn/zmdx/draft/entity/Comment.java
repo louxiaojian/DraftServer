@@ -17,6 +17,7 @@ public class Comment {
 	private int userId;//评论人id
 	private String username;//评论人昵称
 	private String parentusername;//评论回复人昵称
+	private User user;
 	
 	public int getId() {
 		return id;
@@ -65,6 +66,12 @@ public class Comment {
 	}
 	public void setPictureSetId(int pictureSetId) {
 		this.pictureSetId = pictureSetId;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

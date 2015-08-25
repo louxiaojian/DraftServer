@@ -8,12 +8,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+
 import cn.zmdx.draft.entity.Captcha;
-import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.entity.UserAttentionFans;
@@ -21,7 +23,9 @@ import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Sha1;
 import cn.zmdx.draft.util.UserCookieUtil;
+import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
+
 import com.alibaba.fastjson.JSON;
 import com.bcloud.msg.http.HttpSender;
 import com.opensymphony.xwork2.ActionSupport;
@@ -128,7 +132,7 @@ public class UserAction extends ActionSupport {
 								newUser.setOrgId(0);
 								this.userService.register(newUser, captcha);
 								out.print("{\"state\":0,\"result\":{\"user\":"
-										+ JSON.toJSONString(this
+										+ JSON.toJSONString(UserUtil
 												.getUser(newUser)) + "}}");
 							} else {// 用户名已存在
 								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
@@ -250,7 +254,7 @@ public class UserAction extends ActionSupport {
 						UserCookieUtil.saveCookie(user,
 								ServletActionContext.getResponse());
 						out.print("{\"state\":0,\"result\":{\"user\":"
-								+ JSON.toJSONString(this.getUser(user)) + "}}");
+								+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
 					} else {
 						out.print("{\"state\":1,\"errorMsg\":\"密码错误\"}");
 					}
@@ -387,7 +391,7 @@ public class UserAction extends ActionSupport {
 				user.setIntroduction(introduction);
 				this.userService.updateUser(user);
 				out.print("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSON(this.getUser(user)) + "}}");
+						+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
 			}
 		} catch (IOException ie) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
@@ -508,7 +512,7 @@ public class UserAction extends ActionSupport {
 				}
 				List fansList = userService.queryFans(filterMap2);
 				if (user != null) {
-					User newUser = this.getUser(user);
+					User newUser = UserUtil.getUser(user);
 					newUser.setIsAttention(user.getIsAttention());
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(newUser) + ",\"photoSet\":"
@@ -785,7 +789,7 @@ public class UserAction extends ActionSupport {
 								user.setPassword(pwd);
 								this.userService.resetPassword(user, captcha);
 								out.print("{\"state\":0,\"result\":{\"user\":"
-										+ JSON.toJSONString(this.getUser(user))
+										+ JSON.toJSONString(UserUtil.getUser(user))
 										+ "}}");
 							} else {// 用户名不存在
 								out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
@@ -818,25 +822,5 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	/**
-	 * 转换用户信息
-	 * 
-	 * @author louxiaojian
-	 * @date： 日期：2015-8-8 时间：下午4:24:26
-	 * @param user
-	 * @return
-	 */
-	public User getUser(User user) {
-		User newUser = new User();
-		newUser.setId(user.getId());
-		newUser.setAge(user.getAge());
-		newUser.setAddress(user.getAddress());
-		newUser.setIntroduction(user.getIntroduction());
-		newUser.setHeadPortrait(user.getHeadPortrait());
-		newUser.setUsername(user.getUsername());
-		newUser.setTelephone(user.getTelephone());
-		newUser.setLoginname(user.getLoginname());
-		newUser.setGender(user.getGender());
-		return newUser;
-	}
+	
 }
