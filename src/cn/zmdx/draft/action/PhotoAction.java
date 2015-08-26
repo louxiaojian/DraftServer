@@ -1186,8 +1186,9 @@ public class PhotoAction extends ActionSupport {
 					praiseFilterMap.put("limit", "3");
 					List praiseList = this.photoService
 							.queryPraiseUsers(praiseFilterMap);
-					//图集所属用户
-					User user=(User)this.photoService.getObjectById(User.class, String.valueOf(ps.getUserid()));
+					// 图集所属用户
+					User user = (User) this.photoService.getObjectById(
+							User.class, String.valueOf(ps.getUserid()));
 					ps.setUser(UserUtil.getUser(user));
 					ps.setPraiseUserList(praiseList);
 				}
@@ -1196,16 +1197,131 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("pictureSetId", id);
 				filterMap.put("limit", 20);
 				List list = this.photoService.queryComment(filterMap);
-				List commList=new ArrayList();
+				List commList = new ArrayList();
 				for (int i = 0; i < list.size(); i++) {
-					Comment comment=(Comment)list.get(i);
-					User user=(User)this.photoService.getObjectById(User.class, String.valueOf(comment.getUserId()));
+					Comment comment = (Comment) list.get(i);
+					User user = (User) this.photoService.getObjectById(
+							User.class, String.valueOf(comment.getUserId()));
 					comment.setUser(UserUtil.getUser(user));
 					commList.add(comment);
 				}
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSON(ps) + ",\"comments\":"
 						+ JSON.toJSONString(commList, true) + "}}");
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 选秀详情（最热、全部、排名）
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-26 时间：上午10:33:57
+	 */
+	public void loadCycleInfo() {
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		try {
+			out = ServletActionContext.getResponse().getWriter();
+			// lastid
+			String lastid = request.getParameter("lastId");
+			// 查询数据数量
+			String limit = request.getParameter("limit");
+			// 选秀主题周期id
+			String themeCycleId = request.getParameter("themeCycleId");
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "10";
+			}
+			if ("".equals(themeCycleId) || themeCycleId == null) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("themeCycleId", themeCycleId);
+				filterMap.put("lastid", lastid);
+				filterMap.put("limit", limit);
+				
+				// 选秀最新图集
+				List<PictureSet> list = photoService
+						.queryDraftPhotosWall(filterMap);
+
+				List result = new ArrayList();
+				for (int i = 0; i < list.size(); i++) {
+					PictureSet ps = list.get(i);
+					// 图集所有照片
+					// List<Photo>
+					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
+					// ps.setPhotoList(pList);
+					// 验证当前用户是否已赞
+					int count = this.photoService.isPraisedPictureSet(
+							currentUserId, ps.getId() + "");
+					if (count > 0) {// 已赞
+						ps.setIsUserPraised("1");
+					} else {// 未赞
+						ps.setIsUserPraised("0");
+					}
+					// 图集评论数
+					int comments = photoService.queryCommentByPictureSetId(ps
+							.getId());
+					ps.setComments(comments);
+					// 图集所属用户信息
+					User user = (User) this.photoService.getObjectById(
+							User.class, ps.getUserid() + "");
+					User u = new User();
+					u.setId(user.getId());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					ps.setUser(u);
+					result.add(ps);
+				}
+
+				// 图集排名
+				List photoSetList = photoService.queryCycleRanking(filterMap);
+				List photoSetResult = new ArrayList();
+				for (int i = 0; i < photoSetList.size(); i++) {
+					RankPictureSet ps = (RankPictureSet) photoSetList.get(i);
+					// 图集所有图片
+					// List<Photo>
+					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
+					// ps.setPhotoList(pList);
+					// 验证当前用户是否已赞
+					int count = this.photoService.isPraisedPictureSet(
+							currentUserId, ps.getPictureSetId() + "");
+					if (count > 0) {// 已赞
+						ps.setIsUserPraised("1");
+					} else {// 未赞
+						ps.setIsUserPraised("0");
+					}
+					// 图集评论数
+					int comments = photoService.queryCommentByPictureSetId(ps
+							.getId());
+					ps.setComments(comments);
+					// 图集所属用户信息
+					User user = (User) this.photoService.getObjectById(
+							User.class, ps.getUserid() + "");
+					User u = new User();
+					u.setId(user.getId());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					ps.setUser(u);
+					photoSetResult.add(ps);
+				}
+				// 用户排名
+				List userlist = photoService.queryUserCycleRanking(filterMap);
+
+				out.print("{\"state\":0,\"result\":{\"psRank\":"
+						+ JSON.toJSONString(photoSetResult, true) + ",\"psList\":"
+						+ JSON.toJSONString(result, true) + ",\"userRank\":"
+						+ JSON.toJSONString(userlist, true) + "}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
