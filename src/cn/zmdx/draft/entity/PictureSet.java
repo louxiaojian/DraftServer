@@ -24,6 +24,7 @@ public class PictureSet {
 	private User user;//图集所属用户
 	private String isUserPraised;//用户是否点赞
 	private List<User> praiseUserList;
+	private int orderId;//排序主键
 	
 	public int getId() {
 		return id;
@@ -138,6 +139,12 @@ public class PictureSet {
 	}
 	public void setPraiseUserList(List<User> praiseUserList) {
 		this.praiseUserList = praiseUserList;
+	}
+	public int getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 	
 }

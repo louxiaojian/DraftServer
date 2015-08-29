@@ -20,8 +20,11 @@ public class User {
 	private int orgId;//用户权限，0普通用户，1管理员
 	private Date validateDate;//真人验证审批时间
 	private int report;
+	private String thirdParty;//登录平台
+	private String uid;
 	private String fileid;//头像图片 万象fileid
 	private String isAttention;//是否已关注，0已关注，1未关注
+	private String cookie;
 	
 	//选秀排名所用
 	private int praise;
@@ -145,6 +148,24 @@ public class User {
 	}
 	public void setIsAttention(String isAttention) {
 		this.isAttention = isAttention;
+	}
+	public String getUid() {
+		return uid;
+	}
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+	public String getThirdParty() {
+		return thirdParty;
+	}
+	public void setThirdParty(String thirdParty) {
+		this.thirdParty = thirdParty;
+	}
+	public String getCookie() {
+		return cookie;
+	}
+	public void setCookie(String cookie) {
+		this.cookie = cookie;
 	}
 	
 }

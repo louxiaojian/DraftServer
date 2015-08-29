@@ -51,7 +51,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 		String reqURI = httpRequest.getRequestURI();
 		String reqContextPath = httpRequest.getContextPath();
 
-		User user = (User) session.getAttribute("user");
+//		User user = (User) session.getAttribute("user");
 		// 如果需要验证
 		if (ignore != null && ignore.equalsIgnoreCase("false")) {
 			if (ignoreList != null && ignoreList.length > 0

@@ -73,4 +73,13 @@ public interface UserDao extends BaseDao{
 	 * @return
 	 */
 	public List queryFans(Map<String, String> filterMap);
+	/**
+	 * 验证第三方用户信息是否存在
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-29 时间：下午4:24:50
+	 * @param userId
+	 * @param thirdParty
+	 * @return
+	 */
+	public User validateThirdPartyUser(String userId, String thirdParty);
 }

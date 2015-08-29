@@ -90,6 +90,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void register(User newUser, Captcha captcha) {
 		this.userDao.saveEntity(newUser);
+		newUser.setUid(String.valueOf(newUser.getId()));
+		this.userDao.updateEntity(newUser);
 		captcha.setStatus("2");//验证码已用
 		this.userDao.updateEntity(captcha);
 	}
@@ -104,5 +106,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void updateObject(Object object) {
 		this.userDao.updateEntity(object);
+	}
+
+	@Override
+	public User validateThirdPartyUser(String userId, String thirdParty) {
+		return this.userDao.validateThirdPartyUser(userId,thirdParty);
 	}
 }

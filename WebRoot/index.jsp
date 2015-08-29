@@ -19,11 +19,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
   </head>
   <body>
-    <form action="photo!uploadPhoto.action?userId=8&type=1&themeCycleId=1&themeTitle=201507001&descs=asdfyhh" id="pageFrom" name="" method="post" enctype="multipart/form-data">
-		<br /><s:debug></s:debug>
+    <form action="photo_uploadPhoto.action?userId=15&type=1&themeCycleId=3" id="pageFrom" name="" method="post" enctype="multipart/form-data">
 		<fieldset class="fieldsetStyle">
 			<legend>
-				<font size="3">基本信息</font>
+				<font size="3">选秀上传</font>
 			</legend>
 			<div class="fieldsetContent">
 				<table width="100%" border="0" cellspacing="0" cellpadding="0"
@@ -50,6 +49,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 		</fieldset>
 	</form>
+	<!-- 
 	<form action="user!register.action" method="post">
 		<table>
 			<tr><td>用户名：<input name="loginname" type="text" /></td></tr>
@@ -64,14 +64,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
-	</form>
-	<form action="photo!uploadPhoto.action?userId=1" method="post" enctype="multipart/form-data">
+	</form> -->
+	<form action="photo_uploadPhoto.action?userId=15&type=0" method="post" enctype="multipart/form-data">
 		<table>
+		<tr><th>个人图集</th></tr>
 			<tr><td><input type="file" id="image"
+							name="image" value="" onchange="uploadImg()" /><input type="file" id="image"
+							name="image" value="" onchange="uploadImg()" /><input type="file" id="image"
 							name="image" value="" onchange="uploadImg()" /></td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
 	</form>
-	<s:debug></s:debug>
   </body>
 </html>

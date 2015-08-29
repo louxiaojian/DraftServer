@@ -33,18 +33,19 @@ public class PhotoServicImpl implements PhotoService {
 		PictureSet ps=(PictureSet)filterMap.get("pictureSet");
 		for(int i=0;i<(Integer)filterMap.get("count");i++){
 			Photo photo =(Photo)filterMap.get("photo"+i);
-			photo.setPictureSetId(ps.getId());
-			this.photoDao.saveEntity(photo);
 			if(i==0){
 				ps.setCoverUrl(photo.getPhotoUrl());
 			}
+			this.photoDao.saveEntity(ps);
+			photo.setPictureSetId(ps.getId());
+			this.photoDao.saveEntity(photo);
 			if(filterMap.get("cyclePhoto")!=null){
 				CyclePhotoSet cyclePhoto=(CyclePhotoSet)filterMap.get("cyclePhoto");
 				cyclePhoto.setPhotoSetId(ps.getId());
 				this.photoDao.saveEntity(cyclePhoto);
 			}
 		}
-		this.photoDao.saveEntity(ps);
+		this.photoDao.updateEntity(ps);
 	}
 
 	@Override

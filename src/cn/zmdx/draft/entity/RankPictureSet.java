@@ -24,6 +24,7 @@ public class RankPictureSet {
 	private int comments;
 	private User user;//图集所属用户
 	private String isUserPraised;//用户是否点赞
+	private int orderId;//排序主键
 	
 	public int getId() {
 		return id;
@@ -138,5 +139,11 @@ public class RankPictureSet {
 	}
 	public void setIsUserPraised(String isUserPraised) {
 		this.isUserPraised = isUserPraised;
+	}
+	public int getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 }

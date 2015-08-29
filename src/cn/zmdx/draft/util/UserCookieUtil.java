@@ -23,7 +23,7 @@ public class UserCookieUtil {
 	 * @param user
 	 * @param response
 	 */
-	public static void saveCookie(User user, HttpServletResponse response) {
+	public static Cookie saveCookie(User user, HttpServletResponse response) {
 		// cookie的有效期至（到哪一天）
 		long validTime = System.currentTimeMillis() + (cookieMaxAge*1000);
 		// MD5加密用户详细信息
@@ -41,6 +41,35 @@ public class UserCookieUtil {
 		cookie.setMaxAge(60 * 60);
 		cookie.setPath("/");
 		response.addCookie(cookie);
+		return cookie;
+	}
+	
+	/**
+	 * 保存cookie到response
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-24 时间：下午12:03:37
+	 * @param user
+	 * @param response
+	 */
+	public static Cookie saveCookie(User user, HttpServletResponse response,Long expiresIn) {
+		// cookie的有效期至（到哪一天）
+//		long validTime = System.currentTimeMillis() + (cookieMaxAge*1000);
+		// MD5加密用户详细信息
+		Sha1 sha1=new Sha1();
+		String sha1CookieValue = sha1.Digest("qwer1234"+user.getLoginname() + ":"
+				+ user.getPassword() + ":" + user.getIsvalidate() + ":"
+				+ user.getFlag()+"/.,mnb");
+		// 被保存的完整的Cookie值
+		String cookieValue = user.getLoginname() + ":" + expiresIn + ":"
+				+ sha1CookieValue;
+		// 对Cookie的值进行BASE64编码
+		String cookieValueBase64 = new String(Base64.encode(cookieValue
+				.getBytes()));
+		Cookie cookie = new Cookie(cookieKey, cookieValueBase64);
+		cookie.setMaxAge(60 * 60);
+		cookie.setPath("/");
+		response.addCookie(cookie);
+		return cookie;
 	}
 
 	/**
