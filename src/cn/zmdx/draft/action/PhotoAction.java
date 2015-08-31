@@ -1315,11 +1315,10 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("themeCycleId", themeCycleId);
 				filterMap.put("lastid", lastid);
 				filterMap.put("limit", limit);
-
+				
 				// 选秀最新图集
 				List<PictureSet> list = photoService
 						.queryDraftPhotosWall(filterMap);
-
 				List result = new ArrayList();
 				for (int i = 0; i < list.size(); i++) {
 					PictureSet ps = list.get(i);
@@ -1349,7 +1348,6 @@ public class PhotoAction extends ActionSupport {
 					ps.setUser(u);
 					result.add(ps);
 				}
-
 				// 图集排名
 				List photoSetList = photoService.queryCycleRanking(filterMap);
 				List photoSetResult = new ArrayList();
@@ -1383,7 +1381,6 @@ public class PhotoAction extends ActionSupport {
 				}
 				// 用户排名
 				List userlist = photoService.queryUserCycleRanking(filterMap);
-
 				out.print("{\"state\":0,\"result\":{\"psRank\":"
 						+ JSON.toJSONString(photoSetResult, true)
 						+ ",\"psList\":" + JSON.toJSONString(result, true)
