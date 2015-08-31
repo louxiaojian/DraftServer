@@ -134,7 +134,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
 	@Override
 	public User validateThirdPartyUser(String userId, String thirdParty) {
-		List list=this.template.find("from Users where uid=? and third_party=?",new String []{userId,thirdParty});
+		List list=this.template.find("from User where uid=? and third_party=?",new String []{userId,thirdParty});
 		if(list.size()>0){
 			return (User)list.get(0);
 		}else{

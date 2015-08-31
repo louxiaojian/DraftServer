@@ -18,6 +18,7 @@
 		<property name="votes" column="votes" />
 		<property name="coverUrl" column="coverUrl" />
 		<property name="themeCycleId" column="theme_cycle_id" />	
+		<property name="rank" column="rank" />	
 	</class>
 	
 </hibernate-mapping>

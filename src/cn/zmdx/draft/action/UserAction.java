@@ -860,7 +860,7 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
 			}else{//先注册该用户
-				if("".equals(thirdParty)){//新浪微博
+				if("weibo".equals(thirdParty)){//新浪微博登录
 					Users users=new Users(access_token);
 					WeiboUser wbUser= users.showUserById(userId);
 					User newUser=new User();
@@ -883,6 +883,7 @@ public class UserAction extends ActionSupport {
 					//设置默认头像
 					newUser.setHeadPortrait(wbUser.getAvatarLarge());
 					newUser.setThirdParty(thirdParty);
+					newUser.setUid(userId);
 					this.userService.saveUser(newUser);
 					
 					Cookie cookie=UserCookieUtil.saveCookie(newUser,
@@ -891,6 +892,8 @@ public class UserAction extends ActionSupport {
 					user2.setCookie(cookie.getValue());
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(user2) + "}}");
+				}else if("weixin".equals(thirdParty)){//微信登录
+					
 				}
 			}
 		} catch (Exception e) {

@@ -137,4 +137,20 @@ public interface PhotoDao extends BaseDao {
 	 */
 	public List queryPraiseUsers(Map<String, String> praiseFilterMap);
 
+	/**
+	 * 执行sql语句
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-31 时间：下午5:30:59
+	 * @param sql
+	 */
+	public void executeSql(String sql);
+	/**
+	 * 删除操作记录
+	 * @author louxiaojian
+	 * @date： 日期：2015-8-31 时间：下午5:43:40
+	 * @param userId
+	 * @param pictureSetId
+	 * @return 
+	 */
+	public int deleteOperationRecords(int userId,int pictureSetId);
 }

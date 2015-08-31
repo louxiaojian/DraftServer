@@ -1,5 +1,6 @@
 package cn.zmdx.draft.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -114,30 +115,49 @@ public class PhotoServicImpl implements PhotoService {
 			}
 		}
 		PictureSet ps=(PictureSet)this.photoDao.getEntity(PictureSet.class,Integer.parseInt(pictureSetId));
-		//操作类型：0：赞，1：踩，2：举报，3：投票
-		if(operationType==0){
-			ps.setPraise(ps.getPraise()+1);
-		}else if(operationType==1){
-			ps.setTread(ps.getTread()+1);
-		}else if(operationType==2){
-			ps.setReport(ps.getReport()+1);
-		}else if(operationType==3){
-			ps.setVotes(ps.getVotes()+1);
+		if(!String.valueOf(ps.getUserid()).equals(userid)){
+			//操作类型：0：赞，1：踩，2：举报，3：投票，4取消赞
+			if(operationType==0){
+				ps.setPraise(ps.getPraise()+1);
+				long time=new Date().getTime()-ps.getUploadDate().getTime();
+			    long hour=time/(24*60*60*1000);
+				double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
+				ps.setRank(rank);
+			}else if(operationType==1){
+				ps.setTread(ps.getTread()+1);
+			}else if(operationType==2){
+				ps.setReport(ps.getReport()+1);
+			}else if(operationType==3){
+				ps.setVotes(ps.getVotes()+1);
+			}else if(operationType==4){
+				ps.setPraise(ps.getPraise()-1);
+				long time=new Date().getTime()-ps.getUploadDate().getTime();
+			    long hour=time/(24*60*60*1000);
+				double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
+				ps.setRank(rank);
+				int count=this.photoDao.deleteOperationRecords(Integer.parseInt(userid), Integer.parseInt(pictureSetId));
+				if(count<1){
+					return "failed";
+				}
+			}
+			this.photoDao.updateEntity(ps);
+			if(operationType!=4){
+				OperationRecords or =new OperationRecords();
+				if(operationType==2){//举报图集
+					or.setType(0);
+				}else{//其他操作
+					or.setType(2);
+				}
+				or.setDatetime(new Date());
+				or.setOperationType(operationType);
+				or.setPictureSetId(Integer.parseInt(pictureSetId));
+				or.setInformerId(Integer.parseInt(userid));
+				this.photoDao.saveEntity(or);
+			}
+			return "success";
+		}else {
+			return "failed";
 		}
-		this.photoDao.updateEntity(ps);
-		OperationRecords or =new OperationRecords();
-		if(operationType==2){//举报图集
-			or.setType(0);
-		}else{//其他操作
-			or.setType(2);
-		}
-		or.setDatetime(new Date());
-		or.setOperationType(operationType);
-		or.setPictureSetId(Integer.parseInt(pictureSetId));
-		or.setInformerId(Integer.parseInt(userid));
-		this.photoDao.saveEntity(or);
-		return "success";
-		
 	}
 
 	@Override

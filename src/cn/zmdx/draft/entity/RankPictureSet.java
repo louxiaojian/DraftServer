@@ -25,6 +25,7 @@ public class RankPictureSet {
 	private User user;//图集所属用户
 	private String isUserPraised;//用户是否点赞
 	private int orderId;//排序主键
+	private double rank;
 	
 	public int getId() {
 		return id;
@@ -145,5 +146,11 @@ public class RankPictureSet {
 	}
 	public void setOrderId(int orderId) {
 		this.orderId = orderId;
+	}
+	public double getRank() {
+		return rank;
+	}
+	public void setRank(double rank) {
+		this.rank = rank;
 	}
 }

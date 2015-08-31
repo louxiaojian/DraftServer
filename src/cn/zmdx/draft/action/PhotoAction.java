@@ -185,7 +185,7 @@ public class PhotoAction extends ActionSupport {
 					RankPictureSet ps = (RankPictureSet) list.get(i);
 					// 验证当前用户是否已赞
 					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getPictureSetId() + "");
+							currentUserId, ps.getId() + "");
 					if (count > 0) {// 已赞
 						ps.setIsUserPraised("1");
 					} else {// 未赞
@@ -358,6 +358,7 @@ public class PhotoAction extends ActionSupport {
 					ps.setUserid(Integer.parseInt(userid));
 					ps.setUploadDate(new Date());
 					ps.setStatus("1");
+					ps.setRank(0);
 					if ("1".equals(type)) {
 						ps.setThemeCycleId(Integer.parseInt(themeCycleId));
 					} else {
@@ -522,9 +523,49 @@ public class PhotoAction extends ActionSupport {
 					String result = photoService.OperationPictureSet(userid,
 							pictureSetId, 0);
 					if ("failed".equals(result)) {// 已操作
-						out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
-					} else {
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
+					}
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 取消点赞
+	 * 
+	 * @author louxiaojian
+	 * @date： 日期：2015-7-9 时间：上午10:46:21
+	 */
+	public void cancelPraisePhoto() {
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		try {
+			out = ServletActionContext.getResponse().getWriter();
+			String userid = request.getParameter("currentUserId");
+			String pictureSetId = request.getParameter("pictureSetId");
+			if (userid == null || "".equals(userid)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				if (pictureSetId == null || "".equals(pictureSetId)) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
+				} else {
+					String result = photoService.OperationPictureSet(userid,
+							pictureSetId, 4);
+					if ("failed".equals(result)) {// 已操作
+						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
@@ -562,9 +603,9 @@ public class PhotoAction extends ActionSupport {
 					String result = photoService.OperationPictureSet(userid,
 							pictureSetId, 1);
 					if ("failed".equals(result)) {// 已操作过
-						out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
-					} else {
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
@@ -602,9 +643,9 @@ public class PhotoAction extends ActionSupport {
 					String result = photoService.OperationPictureSet(userid,
 							pictureSetId, 2);
 					if ("failed".equals(result)) {// 已操作过
-						out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
-					} else {
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
@@ -679,9 +720,9 @@ public class PhotoAction extends ActionSupport {
 					String result = photoService.OperationPictureSet(userid,
 							pictureSetId, 3);
 					if ("failed".equals(result)) {// 已操作过
-						out.print("{\"state\":1,\"result\":{\"state\":\"0\"}}");
-					} else {
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
