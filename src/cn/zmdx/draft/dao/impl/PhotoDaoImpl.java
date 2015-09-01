@@ -200,8 +200,12 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				.setResultTransformer(Transformers.aliasToBean(Photo.class));
 		query.setInteger(0,
 				Integer.parseInt(filterMap.get("themeCycleId").toString()));
-		query.setInteger(1,
-				Integer.parseInt(filterMap.get("userId").toString()));
+		if(filterMap.get("userId")!=null&&!"".equals(filterMap.get("userId"))){
+			query.setInteger(1,
+					Integer.parseInt(filterMap.get("userId").toString()));
+		}else{
+			query.setInteger(1,0);
+		}
 		return query.list();
 	}
 
