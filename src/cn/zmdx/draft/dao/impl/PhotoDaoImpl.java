@@ -54,7 +54,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and id < :lastid");
 			}
 			if (!filterMap.get("currentUserId").equals(filterMap.get("userid"))) {
-				sql.append(" and status =1 and report<50 ");// 非本人只能看审核通过并且举报未限制的
+				sql.append(" and status =1 ");// 非本人只能看审核通过并且举报未限制的 and report<50
 			}
 			sql.append(" order by uploadDate desc limit :limit");
 		}

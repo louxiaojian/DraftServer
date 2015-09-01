@@ -42,7 +42,8 @@ public class PhotoAction extends ActionSupport {
 	public static final int APP_ID_V2 = 10002468;
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
-	public static final String BUCKET = "headpic"; // 空间名
+	public static final String HEADPICBUCKET = "headpic"; // 空间名
+	public static final String ALBUMBUCKET = "album"; // 空间名
 
 	public PhotoService getPhotoService() {
 		return photoService;
@@ -336,7 +337,7 @@ public class PhotoAction extends ActionSupport {
 		int errorcount = 0;
 		String[] fileids = new String[9];
 		PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2,
-				BUCKET);
+				ALBUMBUCKET);
 		try {
 			out = ServletActionContext.getResponse().getWriter();
 			String type = request.getParameter("type");// 分类，0:个人，1:秀场
@@ -468,7 +469,7 @@ public class PhotoAction extends ActionSupport {
 				if (files != null && files[0] != null) {
 					// 上传至万象空间
 					PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2,
-							SECRET_KEY_V2, BUCKET);
+							SECRET_KEY_V2, HEADPICBUCKET);
 					UploadResult result = new UploadResult();
 					int ret = pc.Upload(files[0], result);
 					if (ret != 0) {
@@ -996,7 +997,7 @@ public class PhotoAction extends ActionSupport {
 		try {
 			out = response.getWriter();
 			String pictureSetId = request.getParameter("pictureSetId");
-			String content = request.getParameter("content");
+			String content = StringUtil.encodingUrl(request.getParameter("content"));
 			// 敏感词过滤
 			SensitivewordFilter sf = new SensitivewordFilter();
 			content = sf.replaceSensitiveWord(content, 1, "*");

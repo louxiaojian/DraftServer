@@ -109,11 +109,11 @@ public class PhotoServicImpl implements PhotoService {
 	public String OperationPictureSet(String userid, String pictureSetId,
 			int operationType) {
 		List list=this.photoDao.queryPhotoByPictureSetId(userid,pictureSetId,operationType);
-		if(operationType!=2){
+//		if(operationType!=2){
 			if(list.size()>0){
 				return "failed";
 			}
-		}
+//		} 
 		PictureSet ps=(PictureSet)this.photoDao.getEntity(PictureSet.class,Integer.parseInt(pictureSetId));
 		if(!String.valueOf(ps.getUserid()).equals(userid)){
 			//操作类型：0：赞，1：踩，2：举报，3：投票，4取消赞

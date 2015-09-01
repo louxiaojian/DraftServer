@@ -23,6 +23,7 @@ import cn.zmdx.draft.entity.UserAttentionFans;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Sha1;
+import cn.zmdx.draft.util.StringUtil;
 import cn.zmdx.draft.util.UserCookieUtil;
 import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
@@ -58,7 +59,7 @@ public class UserAction extends ActionSupport {
 	public static final int APP_ID_V2 = 10002468;
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
-	public static final String BUCKET = "headpic"; // 空间名
+	public static final String HEADPICBUCKET = "headpic"; // 空间名
 
 	public UserServiceImpl getUserService() {
 		return userService;
@@ -153,11 +154,6 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -212,11 +208,6 @@ public class UserAction extends ActionSupport {
 					}
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -265,11 +256,6 @@ public class UserAction extends ActionSupport {
 					}
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -296,11 +282,6 @@ public class UserAction extends ActionSupport {
 			// String loginname=request.getParameter("loginname");
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
 			out.print("{\"state\":0}");
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -331,20 +312,23 @@ public class UserAction extends ActionSupport {
 				User user = this.userService.getById(Integer.parseInt(id));
 				if(user!=null){
 					PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2,
-							SECRET_KEY_V2, BUCKET);
+							SECRET_KEY_V2, HEADPICBUCKET);
 					UploadResult result = new UploadResult();
 					int ret = pc.Upload(getImage(), result);
 					if (ret != 0) {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 					} else {
-						// 删除原有头像图片
-						if (!"".equals(user.getFileid())
-								&& user.getFileid() != null) {
-							ret = pc.Delete(user.getFileid());
+						if(!"http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0".equals(user.getHeadPortrait())){
+							// 删除原有头像图片
+							if (!"".equals(user.getFileid())
+									&& user.getFileid() != null) {
+								ret = pc.Delete(user.getFileid());
+							}
 						}
 						user.setHeadPortrait(result.download_url);
+						user.setFileid(result.fileid);
 						this.userService.updateUser(user);
-						out.print("{\"state\":0,\"result\":\"{\"url\":"
+						out.print("{\"state\":0,\"result\":{\"url\":\""
 								+ result.download_url + "\"}}");
 					}
 				}else{
@@ -376,13 +360,13 @@ public class UserAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request = ServletActionContext.getRequest();
 			String id = request.getParameter("currentUserId");
-			String username = request.getParameter("username");// 昵称
-			String address = request.getParameter("address");// 地址
+			String username = StringUtil.encodingUrl(request.getParameter("username"));// 昵称
+			String address = StringUtil.encodingUrl(request.getParameter("address"));// 地址
 			String telephone = request.getParameter("telephone");// 联系电话
 			String name = request.getParameter("name");// 真实姓名
 			String ageStr = request.getParameter("age");// 年龄
-			String gender = request.getParameter("gender");// 年龄
-			String introduction = request.getParameter("introduction");// 个人介绍
+			String gender = request.getParameter("gender");// 性别
+			String introduction = StringUtil.encodingUrl(request.getParameter("introduction"));// 个人介绍
 			int age = 0;
 			if (!"".equals(ageStr) && ageStr != null) {
 				age = Integer.parseInt(ageStr);
@@ -392,13 +376,27 @@ public class UserAction extends ActionSupport {
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
 				if(user!=null){
-					user.setUsername(username);
-					user.setAddress(address);
-					user.setTelephone(telephone);
-					user.setName(name);
-					user.setAge(age);
-					user.setGender(Integer.parseInt(gender));
-					user.setIntroduction(introduction);
+					if(!"".equals(username)&&username!=null){
+						user.setUsername(username);
+					}
+					if(!"".equals(address)&&address!=null){
+						user.setAddress(address);
+					}
+					if(!"".equals(telephone)&&telephone!=null){
+						user.setTelephone(telephone);
+					}
+					if(!"".equals(name)&&name!=null){
+						user.setName(name);
+					}
+					if(age!=0){
+						user.setAge(age);
+					}
+					if(!"".equals(gender)&&gender!=null){
+						user.setGender(Integer.parseInt(gender));
+					}
+					if(!"".equals(introduction)&&introduction!=null){
+						user.setIntroduction(introduction);
+					}
 					this.userService.updateUser(user);
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
@@ -406,11 +404,6 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -455,11 +448,6 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -538,11 +526,6 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -590,11 +573,6 @@ public class UserAction extends ActionSupport {
 					}
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -637,11 +615,6 @@ public class UserAction extends ActionSupport {
 					}
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -680,11 +653,6 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":0}");
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -820,12 +788,7 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 				}
 			}
-		} catch (IOException ie) {
-			out.print("{\"state\":\"2\",\"errorCode\":\"" + ie.getMessage()
-					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(ie);
-			ie.printStackTrace();
-		} catch (Exception e) {
+		}catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
