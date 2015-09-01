@@ -1310,93 +1310,101 @@ public class PhotoAction extends ActionSupport {
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
-			if ("".equals(themeCycleId) || themeCycleId == null) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
+			if ("".equals(currentUserId) || currentUserId == null) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {
-				Map<String, String> filterMap = new HashMap();
-				filterMap.put("themeCycleId", themeCycleId);
-				filterMap.put("lastid", lastid);
-				filterMap.put("limit", limit);
-				Map<String, Object> vfilterMap = new HashMap<String, Object>();
-				vfilterMap.put("themeCycleId", themeCycleId);
-				vfilterMap.put("userId", currentUserId);
-				List<?> vlist = photoService.validateIsAttend(vfilterMap);
-				String isvalidate = "0";
-				if (vlist != null && vlist.size() > 0) {// 参与过
-					isvalidate = "1";
-				} else {// 未参与
-					isvalidate = "0";
-				}
-				// 选秀最新图集
-				List<PictureSet> list = photoService
-						.queryDraftPhotosWall(filterMap);
-				List result = new ArrayList();
-				for (int i = 0; i < list.size(); i++) {
-					PictureSet ps = list.get(i);
-					// 图集所有照片
-					// List<Photo>
-					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
-					// ps.setPhotoList(pList);
-					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
+				if ("".equals(themeCycleId) || themeCycleId == null) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
+				} else {
+					Map<String, String> filterMap = new HashMap();
+					filterMap.put("themeCycleId", themeCycleId);
+					filterMap.put("lastid", lastid);
+					filterMap.put("limit", limit);
+					Map<String, Object> vfilterMap = new HashMap<String, Object>();
+					vfilterMap.put("themeCycleId", themeCycleId);
+					vfilterMap.put("userId", currentUserId);
+					List<?> vlist = photoService.validateIsAttend(vfilterMap);
+					String isvalidate = "0";
+					if (vlist != null && vlist.size() > 0) {// 参与过
+						isvalidate = "1";
+					} else {// 未参与
+						isvalidate = "0";
 					}
-					// 图集评论数
-					int comments = photoService.queryCommentByPictureSetId(ps
-							.getId());
-					ps.setComments(comments);
-					// 图集所属用户信息
-					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
-					User u = new User();
-					u.setId(user.getId());
-					u.setHeadPortrait(user.getHeadPortrait());
-					u.setUsername(user.getUsername());
-					ps.setUser(u);
-					result.add(ps);
-				}
-				// 图集排名
-				List photoSetList = photoService.queryCycleRanking(filterMap);
-				List photoSetResult = new ArrayList();
-				for (int i = 0; i < photoSetList.size(); i++) {
-					RankPictureSet ps = (RankPictureSet) photoSetList.get(i);
-					// 图集所有图片
-					// List<Photo>
-					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
-					// ps.setPhotoList(pList);
-					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getPictureSetId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
+					// 选秀最新图集
+					List<PictureSet> list = photoService
+							.queryDraftPhotosWall(filterMap);
+					List result = new ArrayList();
+					for (int i = 0; i < list.size(); i++) {
+						PictureSet ps = list.get(i);
+						// 图集所有照片
+						// List<Photo>
+						// pList=photoService.queryPhotoByPictureSetId(ps.getId());
+						// ps.setPhotoList(pList);
+						// 验证当前用户是否已赞
+						int count = this.photoService.isPraisedPictureSet(
+								currentUserId, ps.getId() + "");
+						if (count > 0) {// 已赞
+							ps.setIsUserPraised("1");
+						} else {// 未赞
+							ps.setIsUserPraised("0");
+						}
+						// 图集评论数
+						int comments = photoService
+								.queryCommentByPictureSetId(ps.getId());
+						ps.setComments(comments);
+						// 图集所属用户信息
+						User user = (User) this.photoService.getObjectById(
+								User.class, ps.getUserid() + "");
+						User u = new User();
+						u.setId(user.getId());
+						u.setHeadPortrait(user.getHeadPortrait());
+						u.setUsername(user.getUsername());
+						ps.setUser(u);
+						result.add(ps);
 					}
-					// 图集评论数
-					int comments = photoService.queryCommentByPictureSetId(ps
-							.getId());
-					ps.setComments(comments);
-					// 图集所属用户信息
-					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
-					User u = new User();
-					u.setId(user.getId());
-					u.setHeadPortrait(user.getHeadPortrait());
-					u.setUsername(user.getUsername());
-					ps.setUser(u);
-					photoSetResult.add(ps);
+					// 图集排名
+					List photoSetList = photoService
+							.queryCycleRanking(filterMap);
+					List photoSetResult = new ArrayList();
+					for (int i = 0; i < photoSetList.size(); i++) {
+						RankPictureSet ps = (RankPictureSet) photoSetList
+								.get(i);
+						// 图集所有图片
+						// List<Photo>
+						// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
+						// ps.setPhotoList(pList);
+						// 验证当前用户是否已赞
+						int count = this.photoService.isPraisedPictureSet(
+								currentUserId, ps.getPictureSetId() + "");
+						if (count > 0) {// 已赞
+							ps.setIsUserPraised("1");
+						} else {// 未赞
+							ps.setIsUserPraised("0");
+						}
+						// 图集评论数
+						int comments = photoService
+								.queryCommentByPictureSetId(ps.getId());
+						ps.setComments(comments);
+						// 图集所属用户信息
+						User user = (User) this.photoService.getObjectById(
+								User.class, ps.getUserid() + "");
+						User u = new User();
+						u.setId(user.getId());
+						u.setHeadPortrait(user.getHeadPortrait());
+						u.setUsername(user.getUsername());
+						ps.setUser(u);
+						photoSetResult.add(ps);
+					}
+					// 用户排名
+					List userlist = photoService
+							.queryUserCycleRanking(filterMap);
+					out.print("{\"state\":0,\"result\":{\"psRank\":"
+							+ JSON.toJSONString(photoSetResult, true)
+							+ ",\"psList\":" + JSON.toJSONString(result, true)
+							+ ",\"userRank\":"
+							+ JSON.toJSONString(userlist, true)
+							+ ",\"isvalidate\":\"" + isvalidate + "\"}}");
 				}
-				// 用户排名
-				List userlist = photoService.queryUserCycleRanking(filterMap);
-				out.print("{\"state\":0,\"result\":{\"psRank\":"
-						+ JSON.toJSONString(photoSetResult, true)
-						+ ",\"psList\":" + JSON.toJSONString(result, true)
-						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
-						+ ",\"isvalidate\":\"" + isvalidate + "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
