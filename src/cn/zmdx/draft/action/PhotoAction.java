@@ -966,9 +966,9 @@ public class PhotoAction extends ActionSupport {
 						filterMap.put("userId", userId);
 						List<?> list = photoService.validateIsAttend(filterMap);
 						if (list != null && list.size() > 0) {// 参与过
-							out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
-						} else {// 未参与
 							out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+						} else {// 未参与
+							out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 						}
 					}
 				}
@@ -997,7 +997,8 @@ public class PhotoAction extends ActionSupport {
 		try {
 			out = response.getWriter();
 			String pictureSetId = request.getParameter("pictureSetId");
-			String content = StringUtil.encodingUrl(request.getParameter("content"));
+			String content = StringUtil.encodingUrl(request
+					.getParameter("content"));
 			// 敏感词过滤
 			SensitivewordFilter sf = new SensitivewordFilter();
 			content = sf.replaceSensitiveWord(content, 1, "*");
@@ -1316,7 +1317,16 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("themeCycleId", themeCycleId);
 				filterMap.put("lastid", lastid);
 				filterMap.put("limit", limit);
-				
+				Map<String, Object> vfilterMap = new HashMap<String, Object>();
+				vfilterMap.put("themeCycleId", themeCycleId);
+				vfilterMap.put("userId", currentUserId);
+				List<?> vlist = photoService.validateIsAttend(vfilterMap);
+				String isvalidate = "0";
+				if (vlist != null && vlist.size() > 0) {// 参与过
+					isvalidate = "1";
+				} else {// 未参与
+					isvalidate = "0";
+				}
 				// 选秀最新图集
 				List<PictureSet> list = photoService
 						.queryDraftPhotosWall(filterMap);
@@ -1386,7 +1396,7 @@ public class PhotoAction extends ActionSupport {
 						+ JSON.toJSONString(photoSetResult, true)
 						+ ",\"psList\":" + JSON.toJSONString(result, true)
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
-						+ "}}");
+						+ ",\"isvalidate\":\"" + isvalidate + "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1398,119 +1408,62 @@ public class PhotoAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 测试上传数据
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-28 时间：下午2:39:15
 	 */
 	/**
-	public void testUpload(){
-		HttpServletRequest request = ServletActionContext.getRequest();
-		HttpServletResponse response = ServletActionContext.getResponse();
-		response.setContentType("text/json; charset=utf-8");
-		PrintWriter out = null;
-		try {
-			out = response.getWriter();
-			String urlString="/Users/fanpengcheng/Downloads/pic/";
-			PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2,
-					BUCKET);
-			for (int i = 1; i <= 24; i++) {
-				Map<String, Object> filterMap = new HashMap();// 创建图集
-				String type =String.valueOf((int) (Math.round(Math.random())));
-				int userid=(int) (Math.round(Math.random() * 15 ))+1;
-				int themeCycleId=(int) (Math.round(Math.random() * 10 ))+1;
-				PictureSet ps = new PictureSet();
-				ps.setType(String.valueOf((int) (Math.round(Math.random()))));
-				ps.setDescs(i+"数据"+i+"测试"+i);
-				ps.setUserid(userid);//随机用户id
-				ps.setUploadDate(new Date());
-				ps.setStatus("1");
-				ps.setPraise((int) (Math.round(Math.random() * 80 )));
-				if ("1".equals(type)) {
-					ps.setThemeCycleId(themeCycleId);
-				} else {
-					ps.setThemeCycleId(0);
-				}
-				filterMap.put("pictureSet", ps);
-				int errorcount = 0;
-				String[] fileids = new String[9];
-				int len=0;
-				for (int j = 4; j <= 5; j++) {//图片编号  变化
-					File file =new File(urlString+i+"-"+j+".jpg");
-					if(file.exists()){
-						len++;
-						UploadResult result = new UploadResult();
-						Date starttime=new Date();
-						int ret = pc.Upload(file, result);
-						Date endtime=new Date();
-						System.out.println("上传用时："+(endtime.getTime()-starttime.getTime())+"毫秒");
-//						int ret=0;
-//						if (i > 8) {
-//							break;
-//						}
-						// int ret=1;
-						if (ret != 0) {
-							errorcount++;
-							break;
-						} else {
-							Photo photo = new Photo();
-							photo.setPhotoUrl(result.download_url);
-							photo.setUploadDate(new Date());
-							photo.setUserid(userid);
-							photo.setType(0);// 图集
-							photo.setFileid(result.fileid);
-							filterMap.put("photo" + (j-4), photo);
-							fileids[j-4] = result.fileid;
-						}
-					}
-				}
-				if (errorcount == 0) {
-					filterMap.put("count", len);
-					if ("1".equals(type)) {// 选秀
-						Cycle cycle = (Cycle) this.photoService
-								.getObjectById(Cycle.class, String.valueOf(themeCycleId));
-						if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
-							// 删除本次所有上传照片
-							for (int ii = 0; ii < fileids.length; ii++) {
-								if (fileids[ii] != null
-										&& !"".equals(fileids[ii])) {
-									int code = pc.Delete(fileids[ii]);
-									System.out.println("删除code：" + code);
-								}
-							}
-//							out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
-						} else {
-							// 图片选秀信息
-							CyclePhotoSet cyclePhoto = new CyclePhotoSet();
-							cyclePhoto.setThemeCycleId(themeCycleId);
-//							cyclePhoto.setThemeTitle(themeTitle);
-							filterMap.put("cyclePhoto", cyclePhoto);
-							photoService.uploadPhoto(filterMap);
-//							out.print("{\"state\":0}");
-						}
-					} else {
-						photoService.uploadPhoto(filterMap);
-//						out.print("{\"state\":0}");
-					}
-				} else {// 失败删除本次所有上传照片
-					for (int ii = 0; ii < fileids.length; ii++) {
-						if (fileids[ii] != null && !"".equals(fileids[ii])) {
-							int code = pc.Delete(fileids[ii]);
-							System.out.println("删除code：" + code);
-						}
-					}
-//					out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
-				}
-			}
-			out.print("{\"state\":0}");
-		} catch (IOException e) {
-			e.printStackTrace();
-			out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
-		}finally{
-			out.flush();
-			out.close();
-		}
-	}
-	*/
+	 * public void testUpload(){ HttpServletRequest request =
+	 * ServletActionContext.getRequest(); HttpServletResponse response =
+	 * ServletActionContext.getResponse();
+	 * response.setContentType("text/json; charset=utf-8"); PrintWriter out =
+	 * null; try { out = response.getWriter(); String
+	 * urlString="/Users/fanpengcheng/Downloads/pic/"; PicCloud pc = new
+	 * PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2, BUCKET); for (int i = 1;
+	 * i <= 24; i++) { Map<String, Object> filterMap = new HashMap();// 创建图集
+	 * String type =String.valueOf((int) (Math.round(Math.random()))); int
+	 * userid=(int) (Math.round(Math.random() * 15 ))+1; int themeCycleId=(int)
+	 * (Math.round(Math.random() * 10 ))+1; PictureSet ps = new PictureSet();
+	 * ps.setType(String.valueOf((int) (Math.round(Math.random()))));
+	 * ps.setDescs(i+"数据"+i+"测试"+i); ps.setUserid(userid);//随机用户id
+	 * ps.setUploadDate(new Date()); ps.setStatus("1"); ps.setPraise((int)
+	 * (Math.round(Math.random() * 80 ))); if ("1".equals(type)) {
+	 * ps.setThemeCycleId(themeCycleId); } else { ps.setThemeCycleId(0); }
+	 * filterMap.put("pictureSet", ps); int errorcount = 0; String[] fileids =
+	 * new String[9]; int len=0; for (int j = 4; j <= 5; j++) {//图片编号 变化 File
+	 * file =new File(urlString+i+"-"+j+".jpg"); if(file.exists()){ len++;
+	 * UploadResult result = new UploadResult(); Date starttime=new Date(); int
+	 * ret = pc.Upload(file, result); Date endtime=new Date();
+	 * System.out.println("上传用时："+(endtime.getTime()-starttime.getTime())+"毫秒");
+	 * // int ret=0; // if (i > 8) { // break; // } // int ret=1; if (ret != 0)
+	 * { errorcount++; break; } else { Photo photo = new Photo();
+	 * photo.setPhotoUrl(result.download_url); photo.setUploadDate(new Date());
+	 * photo.setUserid(userid); photo.setType(0);// 图集
+	 * photo.setFileid(result.fileid); filterMap.put("photo" + (j-4), photo);
+	 * fileids[j-4] = result.fileid; } } } if (errorcount == 0) {
+	 * filterMap.put("count", len); if ("1".equals(type)) {// 选秀 Cycle cycle =
+	 * (Cycle) this.photoService .getObjectById(Cycle.class,
+	 * String.valueOf(themeCycleId)); if (!"1".equals(cycle.getStatus())) {//
+	 * 选秀非进行中的状态 // 删除本次所有上传照片 for (int ii = 0; ii < fileids.length; ii++) { if
+	 * (fileids[ii] != null && !"".equals(fileids[ii])) { int code =
+	 * pc.Delete(fileids[ii]); System.out.println("删除code：" + code); } } //
+	 * out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}"); } else {
+	 * // 图片选秀信息 CyclePhotoSet cyclePhoto = new CyclePhotoSet();
+	 * cyclePhoto.setThemeCycleId(themeCycleId); //
+	 * cyclePhoto.setThemeTitle(themeTitle); filterMap.put("cyclePhoto",
+	 * cyclePhoto); photoService.uploadPhoto(filterMap); //
+	 * out.print("{\"state\":0}"); } } else {
+	 * photoService.uploadPhoto(filterMap); // out.print("{\"state\":0}"); } }
+	 * else {// 失败删除本次所有上传照片 for (int ii = 0; ii < fileids.length; ii++) { if
+	 * (fileids[ii] != null && !"".equals(fileids[ii])) { int code =
+	 * pc.Delete(fileids[ii]); System.out.println("删除code：" + code); } } //
+	 * out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}"); } }
+	 * out.print("{\"state\":0}"); } catch (IOException e) {
+	 * e.printStackTrace();
+	 * out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}"); }finally{
+	 * out.flush(); out.close(); } }
+	 */
 }

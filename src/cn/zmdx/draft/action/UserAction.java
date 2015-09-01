@@ -134,9 +134,9 @@ public class UserAction extends ActionSupport {
 								newUser.setAge(0);
 								newUser.setRegistrationDate(new Date());
 								newUser.setOrgId(0);
-								//设置默认头像
+								// 设置默认头像
 								newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
-								newUser.setThirdParty("vshow");//默认本产品
+								newUser.setThirdParty("vshow");// 默认本产品
 								this.userService.register(newUser, captcha);
 								out.print("{\"state\":0}");
 							} else {// 用户名已存在
@@ -144,7 +144,7 @@ public class UserAction extends ActionSupport {
 							}
 						} else {// 验证码失效
 							captcha.setStatus("1");
-//							this.userService.updateObject(captcha);
+							// this.userService.updateObject(captcha);
 							out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 						}
 					} else {// 验证码错误
@@ -245,9 +245,9 @@ public class UserAction extends ActionSupport {
 					Sha1 sha1 = new Sha1();
 					pwd = sha1.Digest(pwd);
 					if (user.getPassword().equals(pwd)) {
-						Cookie cookie=UserCookieUtil.saveCookie(user,
+						Cookie cookie = UserCookieUtil.saveCookie(user,
 								ServletActionContext.getResponse());
-						User user2=UserUtil.getUser(user);
+						User user2 = UserUtil.getUser(user);
 						user2.setCookie(cookie.getValue());
 						out.print("{\"state\":0,\"result\":{\"user\":"
 								+ JSON.toJSONString(user2) + "}}");
@@ -310,7 +310,7 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
-				if(user!=null){
+				if (user != null) {
 					PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2,
 							SECRET_KEY_V2, HEADPICBUCKET);
 					UploadResult result = new UploadResult();
@@ -318,7 +318,8 @@ public class UserAction extends ActionSupport {
 					if (ret != 0) {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 					} else {
-						if(!"http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0".equals(user.getHeadPortrait())){
+						if (!"http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0"
+								.equals(user.getHeadPortrait())) {
 							// 删除原有头像图片
 							if (!"".equals(user.getFileid())
 									&& user.getFileid() != null) {
@@ -328,10 +329,10 @@ public class UserAction extends ActionSupport {
 						user.setHeadPortrait(result.download_url);
 						user.setFileid(result.fileid);
 						this.userService.updateUser(user);
-						out.print("{\"state\":0,\"result\":{\"url\":\""
-								+ result.download_url + "\"}}");
+						out.print("{\"state\":0,\"result\":{\"user\":"
+								+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
 					}
-				}else{
+				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
@@ -360,13 +361,16 @@ public class UserAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request = ServletActionContext.getRequest();
 			String id = request.getParameter("currentUserId");
-			String username = StringUtil.encodingUrl(request.getParameter("username"));// 昵称
-			String address = StringUtil.encodingUrl(request.getParameter("address"));// 地址
+			String username = StringUtil.encodingUrl(request
+					.getParameter("username"));// 昵称
+			String address = StringUtil.encodingUrl(request
+					.getParameter("address"));// 地址
 			String telephone = request.getParameter("telephone");// 联系电话
 			String name = request.getParameter("name");// 真实姓名
 			String ageStr = request.getParameter("age");// 年龄
 			String gender = request.getParameter("gender");// 性别
-			String introduction = StringUtil.encodingUrl(request.getParameter("introduction"));// 个人介绍
+			String introduction = StringUtil.encodingUrl(request
+					.getParameter("introduction"));// 个人介绍
 			int age = 0;
 			if (!"".equals(ageStr) && ageStr != null) {
 				age = Integer.parseInt(ageStr);
@@ -375,32 +379,32 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
-				if(user!=null){
-					if(!"".equals(username)&&username!=null){
+				if (user != null) {
+					if (!"".equals(username) && username != null) {
 						user.setUsername(username);
 					}
-					if(!"".equals(address)&&address!=null){
+					if (!"".equals(address) && address != null) {
 						user.setAddress(address);
 					}
-					if(!"".equals(telephone)&&telephone!=null){
+					if (!"".equals(telephone) && telephone != null) {
 						user.setTelephone(telephone);
 					}
-					if(!"".equals(name)&&name!=null){
+					if (!"".equals(name) && name != null) {
 						user.setName(name);
 					}
-					if(age!=0){
+					if (age != 0) {
 						user.setAge(age);
 					}
-					if(!"".equals(gender)&&gender!=null){
+					if (!"".equals(gender) && gender != null) {
 						user.setGender(Integer.parseInt(gender));
 					}
-					if(!"".equals(introduction)&&introduction!=null){
+					if (!"".equals(introduction) && introduction != null) {
 						user.setIntroduction(introduction);
 					}
 					this.userService.updateUser(user);
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
-				}else{
+				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
@@ -479,7 +483,7 @@ public class UserAction extends ActionSupport {
 			filterMap.put("userid", userId);
 			filterMap.put("currentUserId", currentUserId);
 			filterMap.put("limit", "20");
-			if (userId == null || "".equals(userId)||user==null) {
+			if (userId == null || "".equals(userId) || user == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				// 验证是否已经关注
@@ -770,8 +774,8 @@ public class UserAction extends ActionSupport {
 								user.setPassword(pwd);
 								this.userService.resetPassword(user, captcha);
 								out.print("{\"state\":0,\"result\":{\"user\":"
-										+ JSON.toJSONString(UserUtil.getUser(user))
-										+ "}}");
+										+ JSON.toJSONString(UserUtil
+												.getUser(user)) + "}}");
 							} else {// 用户名不存在
 								out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 							}
@@ -788,7 +792,7 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 				}
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
@@ -798,9 +802,10 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 第三方登录
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-8-29 时间：下午4:21:44
 	 */
@@ -811,27 +816,28 @@ public class UserAction extends ActionSupport {
 		try {
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request = ServletActionContext.getRequest();
-			String access_token = request.getParameter("token");//token
-			String thirdParty = request.getParameter("thirdParty");//登录平台
-			String userId = request.getParameter("userId");//第三方uid
-			String expiresIn = request.getParameter("expiresIn");//过期时间
-			//验证是否已注册
-			User user=this.userService.validateThirdPartyUser(userId,thirdParty);
-			if(user!=null){//已存在用户信息
+			String access_token = request.getParameter("token");// token
+			String thirdParty = request.getParameter("thirdParty");// 登录平台
+			String userId = request.getParameter("userId");// 第三方uid
+			String expiresIn = request.getParameter("expiresIn");// 过期时间
+			// 验证是否已注册
+			User user = this.userService.validateThirdPartyUser(userId,
+					thirdParty);
+			if (user != null) {// 已存在用户信息
 				UserCookieUtil.saveCookie(user,
 						ServletActionContext.getResponse());
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
-			}else{//先注册该用户
-				if("weibo".equals(thirdParty)){//新浪微博登录
-					Users users=new Users(access_token);
-					WeiboUser wbUser= users.showUserById(userId);
-					User newUser=new User();
-					if("m".equals(wbUser.getGender())){//男
+			} else {// 先注册该用户
+				if ("weibo".equals(thirdParty)) {// 新浪微博登录
+					Users users = new Users(access_token);
+					WeiboUser wbUser = users.showUserById(userId);
+					User newUser = new User();
+					if ("m".equals(wbUser.getGender())) {// 男
 						newUser.setGender(1);
-					}else if("f".equals(wbUser.getGender())){//女
+					} else if ("f".equals(wbUser.getGender())) {// 女
 						newUser.setGender(2);
-					}else{//未知
+					} else {// 未知
 						newUser.setGender(0);
 					}
 					newUser.setIntroduction(wbUser.getDescription());
@@ -843,20 +849,21 @@ public class UserAction extends ActionSupport {
 					newUser.setAge(0);
 					newUser.setRegistrationDate(new Date());
 					newUser.setOrgId(0);
-					//设置默认头像
+					// 设置默认头像
 					newUser.setHeadPortrait(wbUser.getAvatarLarge());
 					newUser.setThirdParty(thirdParty);
 					newUser.setUid(userId);
 					this.userService.saveUser(newUser);
-					
-					Cookie cookie=UserCookieUtil.saveCookie(newUser,
-							ServletActionContext.getResponse(),Long.parseLong(expiresIn));
-					User user2=UserUtil.getUser(newUser);
+
+					Cookie cookie = UserCookieUtil.saveCookie(newUser,
+							ServletActionContext.getResponse(),
+							Long.parseLong(expiresIn));
+					User user2 = UserUtil.getUser(newUser);
 					user2.setCookie(cookie.getValue());
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(user2) + "}}");
-				}else if("weixin".equals(thirdParty)){//微信登录
-					
+				} else if ("weixin".equals(thirdParty)) {// 微信登录
+
 				}
 			}
 		} catch (Exception e) {
@@ -869,5 +876,5 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 }

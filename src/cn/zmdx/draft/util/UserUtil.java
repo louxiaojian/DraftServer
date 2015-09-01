@@ -22,6 +22,7 @@ public class UserUtil {
 		newUser.setTelephone(user.getTelephone());
 		newUser.setLoginname(user.getLoginname());
 		newUser.setGender(user.getGender());
+		newUser.setIsvalidate(user.getIsvalidate());
 		return newUser;
 	}
 }
