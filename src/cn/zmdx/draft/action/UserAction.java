@@ -316,6 +316,7 @@ public class UserAction extends ActionSupport {
 					UploadResult result = new UploadResult();
 					int ret = pc.Upload(getImage(), result);
 					if (ret != 0) {
+						System.out.println(pc.GetError());
 						out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 					} else {
 						if (!"http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0"

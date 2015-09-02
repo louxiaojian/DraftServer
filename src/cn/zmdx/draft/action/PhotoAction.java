@@ -375,6 +375,7 @@ public class PhotoAction extends ActionSupport {
 						}
 						// int ret=1;
 						if (ret != 0) {
+							System.out.println(pc.GetError());
 							errorcount++;
 							break;
 						} else {
@@ -473,6 +474,7 @@ public class PhotoAction extends ActionSupport {
 					UploadResult result = new UploadResult();
 					int ret = pc.Upload(files[0], result);
 					if (ret != 0) {
+						System.out.println(pc.GetError());
 						out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 					} else {
 						// 图片链接
