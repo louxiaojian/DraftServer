@@ -433,9 +433,14 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& praiseFilterMap.get("pictureSetId") != null) {
 				sql.append(" and picture_set_id=:pictureSetId ");
 			}
+			if (!"".equals(praiseFilterMap.get("lastId"))
+					&& praiseFilterMap.get("lastId") != null) {
+				sql.append(" and u.id<:lastId ");
+			}
+			sql.append(" order by u.id desc ");
 			if (!"".equals(praiseFilterMap.get("limit"))
 					&& praiseFilterMap.get("limit") != null) {
-				sql.append(" order by datetime desc limit :limit");
+				sql.append(" limit :limit");
 			}
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
@@ -445,6 +450,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				&& praiseFilterMap.get("pictureSetId") != null) {
 			query.setInteger("pictureSetId",
 					Integer.parseInt(praiseFilterMap.get("pictureSetId")));
+		}
+		if (!"".equals(praiseFilterMap.get("lastId"))
+				&& praiseFilterMap.get("lastId") != null) {
+			query.setInteger("lastId",
+					Integer.parseInt(praiseFilterMap.get("lastId")));
 		}
 		if (!"".equals(praiseFilterMap.get("limit"))
 				&& praiseFilterMap.get("limit") != null) {

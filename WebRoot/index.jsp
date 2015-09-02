@@ -19,7 +19,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
   </head>
   <body>
-    <form action="photo_uploadPhoto.action?currentUserId=15&type=1&themeCycleId=4" id="pageFrom" name="" method="post" enctype="multipart/form-data">
+    <form action="photo_realityVerification.action?currentUserId=5&type=1&themeCycleId=4" id="pageFrom" name="" method="post" enctype="multipart/form-data">
 		<fieldset class="fieldsetStyle">
 			<legend>
 				<font size="3">选秀上传</font>

@@ -1413,6 +1413,57 @@ public class PhotoAction extends ActionSupport {
 	}
 
 	/**
+	 * 加载图集点赞人员列表
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-2 时间：下午3:17:17
+	 */
+	public void loadPraiseUserList(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		try {
+			out = ServletActionContext.getResponse().getWriter();
+			// 图集id
+			String id = request.getParameter("pictureSetId");
+			String limit = request.getParameter("limit");
+			String lastId = request.getParameter("lastId");
+			
+			if (id == null || "".equals(id)) {
+				out.print("{\"state\":1,\"errorMsg\":\"请选择图集\"}");
+			} else {
+				if(limit!=null&&!"".equals(limit)){
+					limit="20";
+				}
+				// 加载图集点赞人
+				Map<String, String> praiseFilterMap = new HashMap();
+				praiseFilterMap.put("pictureSetId", id);
+				praiseFilterMap.put("limit", limit);
+				praiseFilterMap.put("lastId", lastId);
+				List praiseList = this.photoService
+						.queryPraiseUsers(praiseFilterMap);
+				out.print("{\"state\":0,\"result\":{\"praiseUsers\":"
+						+ JSON.toJSONString(praiseList, true) + "}}");
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	public String loadThemeCycle(){
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String themeCycleId=request.getParameter("themeCycleId");
+		Cycle cycle =(Cycle)this.photoService.getObjectById(Cycle.class, themeCycleId);
+		request.setAttribute("cycle", cycle);
+		return "toLoadThemeCycle";
+	}
+	
+	/**
 	 * 测试上传数据
 	 * 
 	 * @author louxiaojian

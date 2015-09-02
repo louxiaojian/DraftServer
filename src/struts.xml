@@ -21,6 +21,7 @@
 		<action name="photo_*" method="{1}" class="cn.zmdx.draft.action.PhotoAction">
 			<result name="success">index.jsp</result>
 			<result name="input">index.jsp</result>
+			<result name="toLoadThemeCycle">/data/loadThemeCycle.jsp</result>
 		</action>
 		<action name="user_*" method="{1}" class="cn.zmdx.draft.action.UserAction">
 			<result name="success">index.jsp</result>
