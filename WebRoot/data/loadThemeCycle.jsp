@@ -36,7 +36,7 @@
 			<div id="img-content">
 				<div class="rich_media_content_day" id="js_content" style="word-wrap: break-word;word-break:break-all;">
 					<p style="margin-top: 12px;">
-						<img alt="" src="${cycle.bgUrl}" height="100px">
+						<img alt="" src="${cycle.bgUrl}">
 						<img alt="" src="${cycle.detailImageUrl}">
 						<span
 							style="max-width: 100%; word-wrap: break-word !important; box-sizing: border-box !important;padding-top: 100px;">${cycle.descs}</span>

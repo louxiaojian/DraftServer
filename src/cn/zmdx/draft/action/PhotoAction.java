@@ -412,11 +412,11 @@ public class PhotoAction extends ActionSupport {
 								cyclePhoto.setThemeTitle(themeTitle);
 								filterMap.put("cyclePhoto", cyclePhoto);
 								photoService.uploadPhoto(filterMap);
-								out.print("{\"state\":\"result\":{\"state\":0}}");
+								out.print("{\"state\":0,\"result\":{\"state\":0}}");
 							}
 						} else {
 							photoService.uploadPhoto(filterMap);
-							out.print("{\"state\":\"result\":{\"state\":0}}");
+							out.print("{\"state\":0,\"result\":{\"state\":0}}");
 						}
 					} else {// 失败删除本次所有上传照片
 						for (int i = 0; i < fileids.length; i++) {
@@ -486,7 +486,7 @@ public class PhotoAction extends ActionSupport {
 						photo.setType(1);// 图集
 						photo.setFileid(result.fileid);
 						this.photoService.realityVerification(photo, userId);
-						out.print("{\"state\":\"result\":{\"state\":0}}");
+						out.print("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
@@ -686,7 +686,7 @@ public class PhotoAction extends ActionSupport {
 
 				photoService.updateObject(ps);
 
-				out.print("{\"state\":\"result\":{\"state\":0}}");
+				out.print("{\"state\":0,\"result\":{\"state\":0}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1151,7 +1151,7 @@ public class PhotoAction extends ActionSupport {
 					filterMap.put("currentUserId", currentUserId);
 					filterMap.put("beingInformerId", beingInformerId);
 					photoService.reportUser(filterMap);
-					out.print("{\"state\":\"result\":{\"state\":0}}");
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
 				}
 			}
 		} catch (Exception e) {
@@ -1235,6 +1235,7 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			// 图集id
 			String id = request.getParameter("pictureSetId");
+			String currentUserId = request.getParameter("currentUserId");
 
 			if (id == null || "".equals(id)) {
 				out.print("{\"state\":1,\"errorMsg\":\"请选择图集\"}");
@@ -1246,6 +1247,14 @@ public class PhotoAction extends ActionSupport {
 					List pList = photoService.queryPhotoByPictureSetId(ps
 							.getId());
 					ps.setPhotoList(pList);
+					//验证是否已点赞
+					int count = this.photoService.isPraisedPictureSet(
+							currentUserId, ps.getId() + "");
+					if (count > 0) {// 已赞
+						ps.setIsUserPraised("1");
+					} else {// 未赞
+						ps.setIsUserPraised("0");
+					}
 					// 加载图集点赞人
 					Map<String, String> praiseFilterMap = new HashMap();
 					praiseFilterMap.put("pictureSetId", id);
@@ -1399,7 +1408,7 @@ public class PhotoAction extends ActionSupport {
 						+ JSON.toJSONString(photoSetResult, true)
 						+ ",\"psList\":" + JSON.toJSONString(result, true)
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
-						+ ",\"isvalidate\":\"" + isvalidate + "\"}}");
+						+ ",\"isUserAttented\":\"" + 1 + "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()

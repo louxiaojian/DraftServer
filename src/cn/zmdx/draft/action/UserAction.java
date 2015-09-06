@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+import org.json.JSONObject;
 
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.PictureSet;
@@ -29,6 +30,9 @@ import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
 import cn.zmdx.draft.weibo.Users;
 import cn.zmdx.draft.weibo.model.WeiboUser;
+import cn.zmdx.draft.weixin.api.UserAPI;
+import cn.zmdx.draft.weixin.entity.WeiXinUser;
+import cn.zmdx.draft.weixin.util.JsonUtil;
 
 import com.alibaba.fastjson.JSON;
 import com.bcloud.msg.http.HttpSender;
@@ -138,7 +142,7 @@ public class UserAction extends ActionSupport {
 								newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
 								newUser.setThirdParty("vshow");// 默认本产品
 								this.userService.register(newUser, captcha);
-								out.print("{\"state\":\"result\":{\"state\":0}}");
+								out.print("{\"state\":0,\"result\":{\"state\":0}}");
 							} else {// 用户名已存在
 								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
 							}
@@ -281,7 +285,7 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			// String loginname=request.getParameter("loginname");
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
-			out.print("{\"state\":\"result\":{\"state\":0}}");
+			out.print("{\"state\":0,\"result\":{\"state\":0}}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -445,7 +449,7 @@ public class UserAction extends ActionSupport {
 					if (oldPassowrd.equals(user.getPassword())) {
 						user.setPassword(sha1.Digest(newPassowrd));
 						this.userService.updateUser(user);
-						out.print("{\"state\":\"result\":{\"state\":0}}");
+						out.print("{\"state\":0,\"result\":{\"state\":0}}");
 					} else {// 原密码错误
 						out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
 					}
@@ -574,7 +578,7 @@ public class UserAction extends ActionSupport {
 						uaf.setFansUserId(Integer.parseInt(fansUserId));
 						uaf.setAttentionTime(new Date());
 						this.userService.saveObject(uaf);
-						out.print("{\"state\":\"result\":{\"state\":0}}");
+						out.print("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				}
 			}
@@ -614,9 +618,9 @@ public class UserAction extends ActionSupport {
 					UserAttentionFans u = this.userService.isAttention(
 							fansUserId, attentionUserId);
 					if (u != null) {// 已关注
-						out.print("{\"state\":\"result\":{\"state\":1}}");
+						out.print("{\"state\":0,\"result\":{\"state\":1}}");
 					} else {// 未关注
-						out.print("{\"state\":\"result\":{\"state\":0}}");
+						out.print("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				}
 			}
@@ -655,7 +659,7 @@ public class UserAction extends ActionSupport {
 					// 取消关注
 					this.userService.cancelAttention(fansUserId,
 							attentionUserId);
-					out.print("{\"state\":\"result\":{\"state\":0}}");
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
 				}
 			}
 		} catch (Exception e) {
@@ -864,7 +868,35 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(user2) + "}}");
 				} else if ("weixin".equals(thirdParty)) {// 微信登录
-
+//					String url="https://api.weixin.qq.com/cgi-bin/user/info";
+//					String param="access_token="+access_token+"&openid="+userId+"&lang=zh_CN";
+//					String result=UserAPI.sendPost(url, param);
+//					JSONObject jo= new JSONObject(result);
+//					System.out.println(jo.get("errcode"));
+//					WeiXinUser weixinUser=UserAPI.userInfo(access_token, userId);
+//					User newUser = new User();
+//					newUser.setUsername(weixinUser.getNickname());
+//					newUser.setHeadPortrait(weixinUser.getHeadimgurl());
+//					newUser.setGender(weixinUser.getSex());
+//					newUser.setIntroduction("");
+//					newUser.setLoginname("");
+//					newUser.setPassword("");
+//					newUser.setFlag("1");
+//					newUser.setIsvalidate("0");
+//					newUser.setAge(0);
+//					newUser.setRegistrationDate(new Date());
+//					newUser.setOrgId(0);
+//					newUser.setThirdParty(thirdParty);
+//					newUser.setUid(userId);
+//					this.userService.saveUser(newUser);
+//
+//					Cookie cookie = UserCookieUtil.saveCookie(newUser,
+//							ServletActionContext.getResponse(),
+//							Long.parseLong(expiresIn));
+//					User user2 = UserUtil.getUser(newUser);
+//					user2.setCookie(cookie.getValue());
+//					out.print("{\"state\":0,\"result\":{\"user\":"
+//							+ JSON.toJSONString(user2) + "}}");
 				}
 			}
 		} catch (Exception e) {
@@ -878,4 +910,5 @@ public class UserAction extends ActionSupport {
 		}
 	}
 
+	
 }
