@@ -412,11 +412,11 @@ public class PhotoAction extends ActionSupport {
 								cyclePhoto.setThemeTitle(themeTitle);
 								filterMap.put("cyclePhoto", cyclePhoto);
 								photoService.uploadPhoto(filterMap);
-								out.print("{\"state\":0}");
+								out.print("{\"state\":\"result\":{\"state\":0}}");
 							}
 						} else {
 							photoService.uploadPhoto(filterMap);
-							out.print("{\"state\":0}");
+							out.print("{\"state\":\"result\":{\"state\":0}}");
 						}
 					} else {// 失败删除本次所有上传照片
 						for (int i = 0; i < fileids.length; i++) {
@@ -486,7 +486,7 @@ public class PhotoAction extends ActionSupport {
 						photo.setType(1);// 图集
 						photo.setFileid(result.fileid);
 						this.photoService.realityVerification(photo, userId);
-						out.print("{\"state\":0}");
+						out.print("{\"state\":\"result\":{\"state\":0}}");
 					}
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
@@ -686,7 +686,7 @@ public class PhotoAction extends ActionSupport {
 
 				photoService.updateObject(ps);
 
-				out.print("{\"state\":0}");
+				out.print("{\"state\":\"result\":{\"state\":0}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1151,7 +1151,7 @@ public class PhotoAction extends ActionSupport {
 					filterMap.put("currentUserId", currentUserId);
 					filterMap.put("beingInformerId", beingInformerId);
 					photoService.reportUser(filterMap);
-					out.print("{\"state\":0}");
+					out.print("{\"state\":\"result\":{\"state\":0}}");
 				}
 			}
 		} catch (Exception e) {

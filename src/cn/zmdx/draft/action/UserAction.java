@@ -138,7 +138,7 @@ public class UserAction extends ActionSupport {
 								newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
 								newUser.setThirdParty("vshow");// 默认本产品
 								this.userService.register(newUser, captcha);
-								out.print("{\"state\":0}");
+								out.print("{\"state\":\"result\":{\"state\":0}}");
 							} else {// 用户名已存在
 								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
 							}
@@ -281,7 +281,7 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			// String loginname=request.getParameter("loginname");
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
-			out.print("{\"state\":0}");
+			out.print("{\"state\":\"result\":{\"state\":0}}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -445,7 +445,7 @@ public class UserAction extends ActionSupport {
 					if (oldPassowrd.equals(user.getPassword())) {
 						user.setPassword(sha1.Digest(newPassowrd));
 						this.userService.updateUser(user);
-						out.print("{\"state\":0}");
+						out.print("{\"state\":\"result\":{\"state\":0}}");
 					} else {// 原密码错误
 						out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
 					}
@@ -574,7 +574,7 @@ public class UserAction extends ActionSupport {
 						uaf.setFansUserId(Integer.parseInt(fansUserId));
 						uaf.setAttentionTime(new Date());
 						this.userService.saveObject(uaf);
-						out.print("{\"state\":0}");
+						out.print("{\"state\":\"result\":{\"state\":0}}");
 					}
 				}
 			}
@@ -614,9 +614,9 @@ public class UserAction extends ActionSupport {
 					UserAttentionFans u = this.userService.isAttention(
 							fansUserId, attentionUserId);
 					if (u != null) {// 已关注
-						out.print("{\"state\":0}");
+						out.print("{\"state\":\"result\":{\"state\":1}}");
 					} else {// 未关注
-						out.print("{\"state\":1,\"errorMsg\":\"未关注\"}");
+						out.print("{\"state\":\"result\":{\"state\":0}}");
 					}
 				}
 			}
@@ -652,10 +652,10 @@ public class UserAction extends ActionSupport {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				} else {
-					// 是否关注过
+					// 取消关注
 					this.userService.cancelAttention(fansUserId,
 							attentionUserId);
-					out.print("{\"state\":0}");
+					out.print("{\"state\":\"result\":{\"state\":0}}");
 				}
 			}
 		} catch (Exception e) {

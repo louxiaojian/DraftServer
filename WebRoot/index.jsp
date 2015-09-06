@@ -74,6 +74,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							name="image" value="" onchange="uploadImg()" /></td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
+  <s:debug></s:debug>
 	</form>
   </body>
 </html>
