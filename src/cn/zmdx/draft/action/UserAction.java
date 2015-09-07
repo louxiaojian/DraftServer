@@ -8,15 +8,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
-import org.json.JSONObject;
-
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.User;
@@ -30,10 +26,8 @@ import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
 import cn.zmdx.draft.weibo.Users;
 import cn.zmdx.draft.weibo.model.WeiboUser;
-import cn.zmdx.draft.weixin.api.UserAPI;
+import cn.zmdx.draft.weixin.api.SnsAPI;
 import cn.zmdx.draft.weixin.entity.WeiXinUser;
-import cn.zmdx.draft.weixin.util.JsonUtil;
-
 import com.alibaba.fastjson.JSON;
 import com.bcloud.msg.http.HttpSender;
 import com.opensymphony.xwork2.ActionSupport;
@@ -854,8 +848,12 @@ public class UserAction extends ActionSupport {
 					newUser.setAge(0);
 					newUser.setRegistrationDate(new Date());
 					newUser.setOrgId(0);
-					// 设置默认头像
-					newUser.setHeadPortrait(wbUser.getAvatarLarge());
+					if(!"".equals(wbUser.getAvatarLarge())&&wbUser.getAvatarLarge()!=null){
+						// 设置默认头像
+						newUser.setHeadPortrait(wbUser.getAvatarLarge());
+					}else{
+						newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
+					}
 					newUser.setThirdParty(thirdParty);
 					newUser.setUid(userId);
 					this.userService.saveUser(newUser);
@@ -868,35 +866,34 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(user2) + "}}");
 				} else if ("weixin".equals(thirdParty)) {// 微信登录
-//					String url="https://api.weixin.qq.com/cgi-bin/user/info";
-//					String param="access_token="+access_token+"&openid="+userId+"&lang=zh_CN";
-//					String result=UserAPI.sendPost(url, param);
-//					JSONObject jo= new JSONObject(result);
-//					System.out.println(jo.get("errcode"));
-//					WeiXinUser weixinUser=UserAPI.userInfo(access_token, userId);
-//					User newUser = new User();
-//					newUser.setUsername(weixinUser.getNickname());
-//					newUser.setHeadPortrait(weixinUser.getHeadimgurl());
-//					newUser.setGender(weixinUser.getSex());
-//					newUser.setIntroduction("");
-//					newUser.setLoginname("");
-//					newUser.setPassword("");
-//					newUser.setFlag("1");
-//					newUser.setIsvalidate("0");
-//					newUser.setAge(0);
-//					newUser.setRegistrationDate(new Date());
-//					newUser.setOrgId(0);
-//					newUser.setThirdParty(thirdParty);
-//					newUser.setUid(userId);
-//					this.userService.saveUser(newUser);
-//
-//					Cookie cookie = UserCookieUtil.saveCookie(newUser,
-//							ServletActionContext.getResponse(),
-//							Long.parseLong(expiresIn));
-//					User user2 = UserUtil.getUser(newUser);
-//					user2.setCookie(cookie.getValue());
-//					out.print("{\"state\":0,\"result\":{\"user\":"
-//							+ JSON.toJSONString(user2) + "}}");
+					WeiXinUser weixinUser=SnsAPI.userinfo(access_token, userId,"zh_CN");
+					User newUser = new User();
+					newUser.setUsername(weixinUser.getNickname());
+					if(!"".equals(weixinUser.getHeadimgurl())&&weixinUser.getHeadimgurl()!=null){
+						newUser.setHeadPortrait(weixinUser.getHeadimgurl());
+					}else{
+						newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
+					}
+					newUser.setGender(weixinUser.getSex());
+					newUser.setIntroduction("");
+					newUser.setLoginname("");
+					newUser.setPassword("");
+					newUser.setFlag("1");
+					newUser.setIsvalidate("0");
+					newUser.setAge(0);
+					newUser.setRegistrationDate(new Date());
+					newUser.setOrgId(0);
+					newUser.setThirdParty(thirdParty);
+					newUser.setUid(userId);
+					this.userService.saveUser(newUser);
+
+					Cookie cookie = UserCookieUtil.saveCookie(newUser,
+							ServletActionContext.getResponse(),
+							Long.parseLong(expiresIn));
+					User user2 = UserUtil.getUser(newUser);
+					user2.setCookie(cookie.getValue());
+					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(user2) + "}}");
 				}
 			}
 		} catch (Exception e) {
