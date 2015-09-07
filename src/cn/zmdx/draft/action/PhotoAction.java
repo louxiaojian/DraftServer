@@ -90,6 +90,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			String userid = request.getParameter("userId");
 			String currentUserId = request.getParameter("currentUserId");
+			String width = request.getParameter("w");//缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -101,6 +102,7 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("lastid", lastid);
 				filterMap.put("userid", userid);
 				filterMap.put("currentUserId", currentUserId);
+				filterMap.put("width", width);
 				// List result=new ArrayList();
 				List<PictureSet> list = photoService
 						.queryPersonalPhotos(filterMap);
@@ -159,6 +161,7 @@ public class PhotoAction extends ActionSupport {
 			// 标示，0查询lastModified之后的数据，1查询lastModified之前的数据
 			String category = request.getParameter("category");// 0 新，1 热门
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String width = request.getParameter("w");//缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -170,6 +173,7 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("limit", limit);
 			filterMap.put("lastid", lastid);
 			filterMap.put("category", category);
+			filterMap.put("width", width);
 			List list = null;
 			List result = new ArrayList();
 			if ("1".equals(category)) {// 热门
@@ -265,6 +269,7 @@ public class PhotoAction extends ActionSupport {
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String width = request.getParameter("w");//缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -275,6 +280,7 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("limit", limit);
 				filterMap.put("lastid", lastid);
 				filterMap.put("themeCycleId", themeCycleId);
+				filterMap.put("width", width);
 				List<PictureSet> list = photoService
 						.queryDraftPhotosWall(filterMap);
 
@@ -759,6 +765,7 @@ public class PhotoAction extends ActionSupport {
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeCycleId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String width = request.getParameter("w");//缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -766,6 +773,7 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("themeCycleId", themeCycleId);
 			filterMap.put("lastid", lastid);
 			filterMap.put("limit", limit);
+			filterMap.put("width", width);
 
 			if ("".equals(themeCycleId) || themeCycleId == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
@@ -1318,6 +1326,7 @@ public class PhotoAction extends ActionSupport {
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeCycleId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String width = request.getParameter("w");//缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -1328,6 +1337,7 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("themeCycleId", themeCycleId);
 				filterMap.put("lastid", lastid);
 				filterMap.put("limit", limit);
+				filterMap.put("width", width);
 				// 验证用户是否参加此次主题
 				Map<String, Object> vfilterMap = new HashMap<String, Object>();
 				vfilterMap.put("themeCycleId", themeCycleId);

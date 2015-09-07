@@ -476,12 +476,14 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String userId = request.getParameter("userId");// 要查看的用户
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String width = request.getParameter("w");//缩放宽度
 			User user = userService.getById(Integer.parseInt(userId));
 			// 获取用户图集
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("userid", userId);
 			filterMap.put("currentUserId", currentUserId);
 			filterMap.put("limit", "20");
+			filterMap.put("width", width);
 			if (userId == null || "".equals(userId) || user == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
