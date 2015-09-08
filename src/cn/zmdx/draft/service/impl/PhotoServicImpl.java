@@ -118,11 +118,13 @@ public class PhotoServicImpl implements PhotoService {
 //		if(!String.valueOf(ps.getUserid()).equals(userid)){
 			//操作类型：0：赞，1：踩，2：举报，3：投票，4取消赞
 			if(operationType==0){
-				ps.setPraise(ps.getPraise()+1);
-				long time=new Date().getTime()-ps.getUploadDate().getTime();
-			    long hour=time/(24*60*60*1000);
-				double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
-				ps.setRank(rank);
+				if("0".equals(ps.getType())){//个人
+					ps.setPraise(ps.getPraise()+1);
+					long time=new Date().getTime()-ps.getUploadDate().getTime();
+				    long hour=time/(24*60*60*1000);
+					double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
+					ps.setRank(rank);
+				}
 			}else if(operationType==1){
 				ps.setTread(ps.getTread()+1);
 			}else if(operationType==2){
@@ -130,11 +132,13 @@ public class PhotoServicImpl implements PhotoService {
 			}else if(operationType==3){
 				ps.setVotes(ps.getVotes()+1);
 			}else if(operationType==4){
-				ps.setPraise(ps.getPraise()-1);
-				long time=new Date().getTime()-ps.getUploadDate().getTime();
-			    long hour=time/(24*60*60*1000);
-				double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
-				ps.setRank(rank);
+				if("0".equals(ps.getType())){//个人
+					ps.setPraise(ps.getPraise()-1);
+					long time=new Date().getTime()-ps.getUploadDate().getTime();
+			    	long hour=time/(24*60*60*1000);
+					double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
+					ps.setRank(rank);
+				}
 				int count=this.photoDao.deleteOperationRecords(Integer.parseInt(userid), Integer.parseInt(pictureSetId));
 				if(count<1){
 					return "failed";

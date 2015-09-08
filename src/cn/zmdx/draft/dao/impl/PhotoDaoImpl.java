@@ -134,7 +134,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& filterMap.get("themeCycleId") != null) {
 				sql.append(" and theme_cycle_id=:themeCycleId");
 			}
-			sql.append(" order by rank desc,id desc ");
+			sql.append(" order by parise desc,id desc ");
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -381,7 +381,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& filterMap.get("themeCycleId") != null) {
 				sql.append(" and rps.theme_cycle_id=:themeCycleId");
 			}
-			sql.append(" order by rps.rank desc,rps.id desc ");
+			sql.append(" order by rps.parise desc,rps.id desc ");
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -427,7 +427,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryPraiseUsers(Map<String, String> praiseFilterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction from users u left join operation_records on informer_id=u.id where operation_type=0 ");
+		sql.append("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction from users u left join operation_records o on informer_id=u.id where operation_type=0 ");
 		if (praiseFilterMap != null && !praiseFilterMap.isEmpty()) {
 			if (!"".equals(praiseFilterMap.get("pictureSetId"))
 					&& praiseFilterMap.get("pictureSetId") != null) {
@@ -437,7 +437,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& praiseFilterMap.get("lastId") != null) {
 				sql.append(" and u.id<:lastId ");
 			}
-			sql.append(" order by u.id desc ");
+			sql.append(" order by o.datetime desc ");
 			if (!"".equals(praiseFilterMap.get("limit"))
 					&& praiseFilterMap.get("limit") != null) {
 				sql.append(" limit :limit");
