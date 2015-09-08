@@ -491,9 +491,9 @@ public class UserAction extends ActionSupport {
 				UserAttentionFans u = this.userService.isAttention(
 						currentUserId, userId);
 				if (u != null) {// 已关注
-					user.setIsAttention("0");
-				} else {// 未关注
 					user.setIsAttention("1");
+				} else {// 未关注
+					user.setIsAttention("0");
 				}
 				List photoSet = new ArrayList();
 				List<PictureSet> list = photoService
@@ -831,8 +831,11 @@ public class UserAction extends ActionSupport {
 						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
 			} else {// 先注册该用户
 				if ("weibo".equals(thirdParty)) {// 新浪微博登录
+					logger.error("***********************开始***********************");
 					Users users = new Users(access_token);
+					logger.error("***********************获取Users帮助类***********************");
 					WeiboUser wbUser = users.showUserById(userId);
+					logger.error("***********************获取微博用户对象WeiBoUser***********************");
 					User newUser = new User();
 					if ("m".equals(wbUser.getGender())) {// 男
 						newUser.setGender(1);
@@ -858,15 +861,18 @@ public class UserAction extends ActionSupport {
 					}
 					newUser.setThirdParty(thirdParty);
 					newUser.setUid(userId);
+					logger.error("***********************保存对象到项目中***********************");
 					this.userService.saveUser(newUser);
-
+					logger.error("***********************获取cookie信息***********************");
 					Cookie cookie = UserCookieUtil.saveCookie(newUser,
 							ServletActionContext.getResponse(),
 							Long.parseLong(expiresIn));
 					User user2 = UserUtil.getUser(newUser);
 					user2.setCookie(cookie.getValue());
+					logger.error("***********************返回数据***********************");
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(user2) + "}}");
+					logger.error("***********************结束***********************");
 				} else if ("weixin".equals(thirdParty)) {// 微信登录
 					WeiXinUser weixinUser=SnsAPI.userinfo(access_token, userId,"zh_CN");
 					User newUser = new User();
