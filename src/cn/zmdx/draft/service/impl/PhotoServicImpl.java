@@ -115,7 +115,7 @@ public class PhotoServicImpl implements PhotoService {
 			}
 //		} 
 		PictureSet ps=(PictureSet)this.photoDao.getEntity(PictureSet.class,Integer.parseInt(pictureSetId));
-		if(!String.valueOf(ps.getUserid()).equals(userid)){
+//		if(!String.valueOf(ps.getUserid()).equals(userid)){
 			//操作类型：0：赞，1：踩，2：举报，3：投票，4取消赞
 			if(operationType==0){
 				ps.setPraise(ps.getPraise()+1);
@@ -155,9 +155,9 @@ public class PhotoServicImpl implements PhotoService {
 				this.photoDao.saveEntity(or);
 			}
 			return "success";
-		}else {
-			return "failed";
-		}
+//		}else {
+//			return "failed";
+//		}
 	}
 
 	@Override
