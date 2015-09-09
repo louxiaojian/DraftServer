@@ -409,7 +409,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List discoverPictureSet(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,uploadDate,descs,type,praise,userid,theme_cycle_id as themeCycleId,coverUrl from picture_set where status =1 and type=0 ");
+		sql.append("select id,uploadDate,descs,type,praise,userid,theme_cycle_id as themeCycleId,CONCAT(coverUrl,'?imageView2/0/w/"+filterMap.get("width")+"/h/"+filterMap.get("width")+"') as coverUrl from picture_set where status =1 and type=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			sql.append(" order by rand() limit :limit");
 		}

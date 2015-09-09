@@ -1188,11 +1188,13 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			// 查询数据数量
 			String limit = request.getParameter("limit");
+			String width = request.getParameter("w");//缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("limit", limit);
+			filterMap.put("width", width);
 			List list = photoService.discoverPictureSet(filterMap);
 
 			List result = new ArrayList();
