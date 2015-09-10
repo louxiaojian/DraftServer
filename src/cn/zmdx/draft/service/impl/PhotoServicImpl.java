@@ -37,6 +37,7 @@ public class PhotoServicImpl implements PhotoService {
 			if(i==0){
 				ps.setCoverUrl(photo.getPhotoUrl());
 			}
+			ps.setPhotoCount((Integer)filterMap.get("count"));
 			this.photoDao.saveEntity(ps);
 			photo.setPictureSetId(ps.getId());
 			this.photoDao.saveEntity(photo);
