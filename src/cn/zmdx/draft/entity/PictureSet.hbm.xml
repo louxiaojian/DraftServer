@@ -19,6 +19,7 @@
 		<property name="coverUrl" column="coverUrl" />
 		<property name="themeCycleId" column="theme_cycle_id" />	
 		<property name="rank" column="rank" />	
+		<property name="photoCount" column="photoCount" />	
 	</class>
 	
 </hibernate-mapping>

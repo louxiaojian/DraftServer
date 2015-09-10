@@ -1268,7 +1268,7 @@ public class PhotoAction extends ActionSupport {
 					// 加载图集点赞人
 					Map<String, String> praiseFilterMap = new HashMap();
 					praiseFilterMap.put("pictureSetId", id);
-					praiseFilterMap.put("limit", "3");
+					praiseFilterMap.put("limit", "7");
 					List praiseList = this.photoService
 							.queryPraiseUsers(praiseFilterMap);
 					// 图集所属用户
@@ -1476,6 +1476,48 @@ public class PhotoAction extends ActionSupport {
 			out.close();
 		}
 	}
+	
+	/**
+	 * 删除图集
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-10 时间：下午5:34:20
+	 */
+	public void deletePictureSet(){
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		try {
+			out = ServletActionContext.getResponse().getWriter();
+			// 图集id
+			String pictureSetIds = request.getParameter("pictureSetIds");
+			String userId = request.getParameter("userId");
+			String currentUserId = request.getParameter("currentUserId");
+			
+			if (currentUserId == null || "".equals(currentUserId)) {
+				out.print("{\"state\":1,\"errorMsg\":\"请先登录\"}");
+			} else {
+				if(!currentUserId.equals(userId)){
+					out.print("{\"state\":1,\"errorMsg\":\"不能删除他人的图集\"}");
+				}else{
+					// 加载图集点赞人
+					Map<String, String> filterMap = new HashMap();
+					filterMap.put("pictureSetIds", pictureSetIds);
+					this.photoService.deletePictureSet(filterMap);
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
 	public String loadThemeCycle(){
 		HttpServletRequest request = ServletActionContext.getRequest();
 		String themeCycleId=request.getParameter("themeCycleId");

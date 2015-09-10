@@ -188,4 +188,12 @@ public interface PhotoService {
 	 * @param pictureSetId
 	 */
 	public int isPraisedPictureSet(String currentUserId,String pictureSetId);
+	/**
+	 * 删除图集
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-10 时间：下午5:43:11
+	 * @param filterMap
+	 * @return
+	 */
+	public void deletePictureSet(Map<String, String> filterMap);
 }

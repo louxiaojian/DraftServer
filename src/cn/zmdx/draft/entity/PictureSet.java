@@ -26,6 +26,7 @@ public class PictureSet {
 	private List<User> praiseUserList;
 	private int orderId;//排序主键
 	private double rank;
+	private int photoCount;//图集图片数
 	
 	public int getId() {
 		return id;
@@ -152,6 +153,12 @@ public class PictureSet {
 	}
 	public void setRank(double rank) {
 		this.rank = rank;
+	}
+	public int getPhotoCount() {
+		return photoCount;
+	}
+	public void setPhotoCount(int photoCount) {
+		this.photoCount = photoCount;
 	}
 	
 }

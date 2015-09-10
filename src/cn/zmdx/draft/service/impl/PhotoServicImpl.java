@@ -217,5 +217,22 @@ public class PhotoServicImpl implements PhotoService {
 		List list=this.photoDao.queryPhotoByPictureSetId(currentUserId,pictureSetId,0);
 		return list.size();
 	}
+
+	@Override
+	public void deletePictureSet(Map<String, String> filterMap) {
+		String ids=filterMap.get("pictureSetIds");
+		//删除图集所有评论
+		this.photoDao.executeSql("DELETE from comment where picture_set_id in ("+ids+")");
+		//删除图集点赞记录
+		this.photoDao.executeSql("DELETE from operation_records where picture_set_id in ("+ids+")");
+		//删除图集所有照片
+		this.photoDao.executeSql("DELETE from photo where picture_set_id in ("+ids+")");
+		//删除选秀记录
+		this.photoDao.executeSql("DELETE from cycle_photo_set where photo_set_id in ("+ids+")");
+		//删除图集
+		this.photoDao.executeSql("DELETE from picture_set where id in ("+ids+")");
+		//删除排名
+		this.photoDao.executeSql("DELETE from rank_picture_set where picture_set_id in ("+ids+")");
+	}
 	
 }
