@@ -112,4 +112,9 @@ public class UserServiceImpl implements UserService {
 	public User validateThirdPartyUser(String userId, String thirdParty) {
 		return this.userDao.validateThirdPartyUser(userId,thirdParty);
 	}
+
+	@Override
+	public int nickNameUsed(String username,int id) {
+		return this.userDao.nickNameUsed(username,id);
+	}
 }

@@ -1006,6 +1006,7 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = response.getWriter();
+			request.setCharacterEncoding("utf-8");
 			String pictureSetId = request.getParameter("pictureSetId");
 			String content = StringUtil.encodingUrl(request
 					.getParameter("content"));

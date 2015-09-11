@@ -56,15 +56,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<tr><td>密码：<input name="pwd" type="password" /></td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
-	</form>
-	<form action="photo!comment.action?userId=5&pictureSetId=1" method="post">
+	</form> -->
+	<a href="photo_replyComment.action?currentUserId=20&pictureSetId=133&content="+encodeuri(encodeuri('就看见啊回复技能'))>asdf</a>
+	<form action="photo_replyComment.action?currentUserId=20&pictureSetId=133" method="post">
 		<table>
 			<tr><td>评论：
 			<textarea rows="6" cols="30" name="content"></textarea>
 			</td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
-	</form> -->
+	</form>
 	<form action="user_uploadPhoto.action?currentUserId=22&type=0" method="post" enctype="multipart/form-data">
 		<table>
 		<tr><th>个人图集</th></tr>

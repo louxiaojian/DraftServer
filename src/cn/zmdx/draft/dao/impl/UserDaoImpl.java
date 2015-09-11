@@ -142,4 +142,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		}
 	}
 
+	@Override
+	public int nickNameUsed(String username,int id) {
+		List list=this.template.find("from User where username=? and id!=?",new Object[]{username,id});
+		return list.size();
+	}
+
 }

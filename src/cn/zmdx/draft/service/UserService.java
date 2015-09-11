@@ -145,4 +145,13 @@ public interface UserService {
 	 * @return
 	 */
 	public User validateThirdPartyUser(String userId, String thirdParty);
+
+	/**
+	 * 验证用户昵称是否被占用
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-11 时间：上午11:08:36
+	 * @param username
+	 * @return
+	 */
+	public int nickNameUsed(String username,int id);
 }

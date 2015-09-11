@@ -400,9 +400,20 @@ public class UserAction extends ActionSupport {
 					if (!"".equals(introduction) && introduction != null) {
 						user.setIntroduction(introduction);
 					}
-					this.userService.updateUser(user);
-					out.print("{\"state\":0,\"result\":{\"user\":"
-							+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
+					if (!"".equals(username) && username != null) {
+						int count=this.userService.nickNameUsed(username,Integer.parseInt(id));
+						if(count>0){
+							out.print("{\"state\":1,\"errorMsg\":\"昵称已被占用\"}");
+						}else{
+							this.userService.updateUser(user);
+							out.print("{\"state\":0,\"result\":{\"user\":"
+									+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
+						}
+					}else{
+						this.userService.updateUser(user);
+						out.print("{\"state\":0,\"result\":{\"user\":"
+								+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
+					}
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
