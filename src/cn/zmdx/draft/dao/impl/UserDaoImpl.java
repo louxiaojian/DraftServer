@@ -45,11 +45,13 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
 	@Override
 	public void saveEntity(Object obj) {
+		this.getSession().createSQLQuery("set NAMES utf8mb4").executeUpdate();
 		this.template.save(obj);
 	}
 
 	@Override
 	public void updateEntity(Object obj) {
+		this.getSession().createSQLQuery("set NAMES utf8mb4").executeUpdate();
 		this.getHibernateTemplate().update(obj);
 	}
 

@@ -359,6 +359,7 @@ public class UserAction extends ActionSupport {
 		try {
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request = ServletActionContext.getRequest();
+			request.setCharacterEncoding("utf-8");
 			String id = request.getParameter("currentUserId");
 			String username = StringUtil.encodingUrl(request
 					.getParameter("username"));// 昵称
@@ -400,20 +401,20 @@ public class UserAction extends ActionSupport {
 					if (!"".equals(introduction) && introduction != null) {
 						user.setIntroduction(introduction);
 					}
-					if (!"".equals(username) && username != null) {
-						int count=this.userService.nickNameUsed(username,Integer.parseInt(id));
-						if(count>0){
-							out.print("{\"state\":1,\"errorMsg\":\"昵称已被占用\"}");
-						}else{
-							this.userService.updateUser(user);
-							out.print("{\"state\":0,\"result\":{\"user\":"
-									+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
-						}
-					}else{
+//					if (!"".equals(username) && username != null) {
+//						int count=this.userService.nickNameUsed(username,Integer.parseInt(id));
+//						if(count>0){
+//							out.print("{\"state\":1,\"errorMsg\":\"昵称已被占用\"}");
+//						}else{
+//							this.userService.updateUser(user);
+//							out.print("{\"state\":0,\"result\":{\"user\":"
+//									+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
+////						}
+//					}else{
 						this.userService.updateUser(user);
 						out.print("{\"state\":0,\"result\":{\"user\":"
 								+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
-					}
+//					}
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
@@ -828,6 +829,7 @@ public class UserAction extends ActionSupport {
 		try {
 			out = ServletActionContext.getResponse().getWriter();
 			HttpServletRequest request = ServletActionContext.getRequest();
+			request.setCharacterEncoding("utf-8");
 			String access_token = request.getParameter("token");// token
 			String thirdParty = request.getParameter("thirdParty");// 登录平台
 			String userId = request.getParameter("userId");// 第三方uid
