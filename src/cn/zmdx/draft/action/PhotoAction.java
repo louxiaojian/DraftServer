@@ -1421,7 +1421,7 @@ public class PhotoAction extends ActionSupport {
 						+ JSON.toJSONString(photoSetResult, true)
 						+ ",\"psList\":" + JSON.toJSONString(result, true)
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
-						+ ",\"isUserAttented\":\"" + 1 + "\"}}");
+						+ ",\"isUserAttented\":\"" + isvalidate + "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
