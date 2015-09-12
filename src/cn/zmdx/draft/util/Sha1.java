@@ -300,11 +300,11 @@ public class Sha1 {
 		public static void main(String[] args) {
 			Sha1 sha1 = new Sha1();
 			// 0805949359741CE14FE90402B25E2E023F449748
-			System.out.println(sha1.Digest("1","UTF-8"));
+//			System.out.println(sha1.Digest("1","UTF-8"));
 			// 24E384109C1FE06E363DB1FF6C8F8DDBF18C45EA
-			System.out.println(sha1.Digest("1"));
+			System.out.println(sha1.Digest("123456"));
 			
 			// 24e384109c1fe06e363db1ff6c8f8ddbf18c45ea
-			System.out.println(Sha1.SHA1Digest("我们"));
+//			System.out.println(Sha1.SHA1Digest("我们"));
 		}
 }
