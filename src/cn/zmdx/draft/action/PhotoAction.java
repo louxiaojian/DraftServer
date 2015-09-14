@@ -1498,15 +1498,11 @@ public class PhotoAction extends ActionSupport {
 			if (currentUserId == null || "".equals(currentUserId)) {
 				out.print("{\"state\":1,\"errorMsg\":\"请先登录\"}");
 			} else {
-				if(!currentUserId.equals(userId)){
-					out.print("{\"state\":1,\"errorMsg\":\"不能删除他人的图集\"}");
-				}else{
-					// 加载图集点赞人
-					Map<String, String> filterMap = new HashMap();
-					filterMap.put("pictureSetIds", pictureSetIds);
-					this.photoService.deletePictureSet(filterMap);
-					out.print("{\"state\":0,\"result\":{\"state\":0}}");
-				}
+				// 加载图集点赞人
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("pictureSetIds", pictureSetIds);
+				this.photoService.deletePictureSet(filterMap);
+				out.print("{\"state\":0,\"result\":{\"state\":0}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
