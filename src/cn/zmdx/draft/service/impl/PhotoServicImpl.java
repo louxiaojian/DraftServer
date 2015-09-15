@@ -12,8 +12,13 @@ import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.PhotoService;
+import cn.zmdx.draft.util.picCloud.PicCloud;
 
 public class PhotoServicImpl implements PhotoService {
+	public static final int APP_ID_V2 = 10002468;
+	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
+	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
+	public static final String ALBUMBUCKET = "album"; // 空间名
 	private PhotoDao photoDao;
 	public PhotoServicImpl(PhotoDao photoDao){
 		this.photoDao=photoDao;
@@ -222,6 +227,14 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public void deletePictureSet(Map<String, String> filterMap) {
 		String ids=filterMap.get("pictureSetIds");
+		//删除图片源文件
+		List fileidList=this.photoDao.queryPhotoByPictureSetIds(ids);
+		PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2,
+				ALBUMBUCKET);
+		for (int i = 0; i < fileidList.size(); i++) {
+			Photo photo=(Photo)fileidList.get(i);
+			pc.Delete(photo.getFileid());
+		}
 		//删除图集所有评论
 		this.photoDao.executeSql("DELETE from comment where picture_set_id in ("+ids+")");
 		//删除图集点赞记录

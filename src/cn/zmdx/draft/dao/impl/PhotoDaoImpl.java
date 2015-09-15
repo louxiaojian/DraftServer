@@ -479,4 +479,15 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		return query.executeUpdate();
 	}
 
+	@Override
+	public List queryPhotoByPictureSetIds(String pictureSetIds) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select fileid from photo where picture_set_id in (?) ");
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Photo.class));
+		query.setString(0, pictureSetIds);
+		return query.list();
+	}
+
 }

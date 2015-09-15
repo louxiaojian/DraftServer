@@ -153,4 +153,11 @@ public interface PhotoDao extends BaseDao {
 	 * @return 
 	 */
 	public int deleteOperationRecords(int userId,int pictureSetId);
+	/**
+	 * 根据id获取图片
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-15 时间：下午3:36:40
+	 * @return
+	 */
+	public List queryPhotoByPictureSetIds(String pictureSetIds);
 }
