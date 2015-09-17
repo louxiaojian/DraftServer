@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -90,7 +88,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			String userid = request.getParameter("userId");
 			String currentUserId = request.getParameter("currentUserId");
-			String width = request.getParameter("w");//缩放宽度
+			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -161,7 +159,7 @@ public class PhotoAction extends ActionSupport {
 			// 标示，0查询lastModified之后的数据，1查询lastModified之前的数据
 			String category = request.getParameter("category");// 0 新，1 热门
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
-			String width = request.getParameter("w");//缩放宽度
+			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -269,7 +267,7 @@ public class PhotoAction extends ActionSupport {
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
-			String width = request.getParameter("w");//缩放宽度
+			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -765,7 +763,7 @@ public class PhotoAction extends ActionSupport {
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeCycleId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
-			String width = request.getParameter("w");//缩放宽度
+			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -1258,7 +1256,7 @@ public class PhotoAction extends ActionSupport {
 					List pList = photoService.queryPhotoByPictureSetId(ps
 							.getId());
 					ps.setPhotoList(pList);
-					//验证是否已点赞
+					// 验证是否已点赞
 					int count = this.photoService.isPraisedPictureSet(
 							currentUserId, ps.getId() + "");
 					if (count > 0) {// 已赞
@@ -1329,7 +1327,7 @@ public class PhotoAction extends ActionSupport {
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeCycleId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
-			String width = request.getParameter("w");//缩放宽度
+			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -1436,10 +1434,11 @@ public class PhotoAction extends ActionSupport {
 
 	/**
 	 * 加载图集点赞人员列表
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-9-2 时间：下午3:17:17
 	 */
-	public void loadPraiseUserList(){
+	public void loadPraiseUserList() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
 		HttpServletRequest request = ServletActionContext.getRequest();
@@ -1450,12 +1449,12 @@ public class PhotoAction extends ActionSupport {
 			String id = request.getParameter("pictureSetId");
 			String limit = request.getParameter("limit");
 			String lastId = request.getParameter("lastId");
-			
+
 			if (id == null || "".equals(id)) {
 				out.print("{\"state\":1,\"errorMsg\":\"请选择图集\"}");
 			} else {
-				if(limit!=null&&!"".equals(limit)){
-					limit="20";
+				if (limit != null && !"".equals(limit)) {
+					limit = "20";
 				}
 				// 加载图集点赞人
 				Map<String, String> praiseFilterMap = new HashMap();
@@ -1477,13 +1476,14 @@ public class PhotoAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 删除图集
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-9-10 时间：下午5:34:20
 	 */
-	public void deletePictureSet(){
+	public void deletePictureSet() {
 		ServletActionContext.getResponse().setContentType(
 				"text/json; charset=utf-8");
 		HttpServletRequest request = ServletActionContext.getRequest();
@@ -1494,7 +1494,7 @@ public class PhotoAction extends ActionSupport {
 			String pictureSetIds = request.getParameter("pictureSetIds");
 			String userId = request.getParameter("userId");
 			String currentUserId = request.getParameter("currentUserId");
-			
+
 			if (currentUserId == null || "".equals(currentUserId)) {
 				out.print("{\"state\":1,\"errorMsg\":\"请先登录\"}");
 			} else {
@@ -1514,15 +1514,16 @@ public class PhotoAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
-	public String loadThemeCycle(){
+
+	public String loadThemeCycle() {
 		HttpServletRequest request = ServletActionContext.getRequest();
-		String themeCycleId=request.getParameter("themeCycleId");
-		Cycle cycle =(Cycle)this.photoService.getObjectById(Cycle.class, themeCycleId);
+		String themeCycleId = request.getParameter("themeCycleId");
+		Cycle cycle = (Cycle) this.photoService.getObjectById(Cycle.class,
+				themeCycleId);
 		request.setAttribute("cycle", cycle);
 		return "toLoadThemeCycle";
 	}
-	
+
 	/**
 	 * 测试上传数据
 	 * 
