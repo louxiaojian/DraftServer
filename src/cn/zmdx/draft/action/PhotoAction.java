@@ -528,7 +528,7 @@ public class PhotoAction extends ActionSupport {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 				} else {
 					String result = photoService.OperationPictureSet(userid,
-							pictureSetId, 0);
+							pictureSetId, 7);
 					if ("failed".equals(result)) {// 已操作
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
@@ -1031,7 +1031,7 @@ public class PhotoAction extends ActionSupport {
 						comment.setPictureSetId(Integer.parseInt(pictureSetId));
 						comment.setUserId(Integer.parseInt(userId));
 						comment.setDatetime(new Date());
-						this.photoService.saveEntity(comment);
+						this.photoService.saveComment(comment);
 						out.print("{\"state\":0,\"result\":{\"commentId\":"
 								+ comment.getId() + "}}");
 					}
@@ -1187,7 +1187,7 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			// 查询数据数量
 			String limit = request.getParameter("limit");
-			String width = request.getParameter("w");//缩放宽度
+			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -1524,6 +1524,121 @@ public class PhotoAction extends ActionSupport {
 		return "toLoadThemeCycle";
 	}
 
+	/**
+	 * 加载通知
+	 * 
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午2:48:50
+	 */
+	public void loadNotify() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户id
+			String lastId = request.getParameter("lastId");
+			String limit = request.getParameter("limit");
+			if (currentUserId == null || "".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				if ("".equals(limit) || limit == null) {
+					limit = "10";
+				}
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("currentUserId", currentUserId);
+				filterMap.put("lastId", lastId);
+				filterMap.put("limit", limit);
+				List list = this.photoService.queryNotify(filterMap);
+				out.print("{\"state\":0,\"result\":{\"notifyList\":"
+						+ JSON.toJSONString(list, true) + "}}");
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 将通知改为已读状态
+	 * 
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午4:11:43
+	 */
+	public void readNotify() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户id
+			if (currentUserId == null || "".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("currentUserId", currentUserId);
+				int count = this.photoService.readNotify(filterMap);
+				if (count > 0) {
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+				} else {
+					out.print("{\"state\":0,\"result\":{\"state\":1}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 删除评论
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午8:50:42
+	 */
+	public void deleteComment() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户id
+			String id = request.getParameter("id");// 当前用户id
+			if (currentUserId == null || "".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("currentUserId", currentUserId);
+				filterMap.put("id", id);
+				int count = this.photoService.deleteComment(filterMap);
+				if (count > 0) {
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+				} else {
+					out.print("{\"state\":0,\"result\":{\"state\":1}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
 	/**
 	 * 测试上传数据
 	 * 

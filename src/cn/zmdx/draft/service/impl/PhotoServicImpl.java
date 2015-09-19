@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.zmdx.draft.dao.PhotoDao;
+import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.CyclePhotoSet;
 import cn.zmdx.draft.entity.OperationRecords;
 import cn.zmdx.draft.entity.Photo;
@@ -122,8 +123,8 @@ public class PhotoServicImpl implements PhotoService {
 //		} 
 		PictureSet ps=(PictureSet)this.photoDao.getEntity(PictureSet.class,Integer.parseInt(pictureSetId));
 //		if(!String.valueOf(ps.getUserid()).equals(userid)){
-			//操作类型：0：赞，1：踩，2：举报，3：投票，4取消赞
-			if(operationType==0){
+			//操作类型：7：赞，1：踩，2：举报，3：投票，4取消赞
+			if(operationType==7){
 				if("0".equals(ps.getType())){//个人
 					ps.setPraise(ps.getPraise()+1);
 					long time=new Date().getTime()-ps.getUploadDate().getTime();
@@ -162,6 +163,7 @@ public class PhotoServicImpl implements PhotoService {
 				or.setOperationType(operationType);
 				or.setPictureSetId(Integer.parseInt(pictureSetId));
 				or.setInformerId(Integer.parseInt(userid));
+				or.setIsRead("0");//未读
 				this.photoDao.saveEntity(or);
 			}
 			return "success";
@@ -192,6 +194,7 @@ public class PhotoServicImpl implements PhotoService {
 		or.setBeingInformerId(Integer.parseInt(filterMap.get("beingInformerId")));//被举报人id
 		or.setType(1);
 		or.setDatetime(new Date());
+		or.setIsRead("0");//未读
 		User user=(User)this.photoDao.getEntity(User.class, Integer.parseInt(filterMap.get("beingInformerId")));
 		user.setReport(user.getReport()+1);
 		this.photoDao.updateEntity(user);
@@ -247,6 +250,35 @@ public class PhotoServicImpl implements PhotoService {
 		this.photoDao.executeSql("DELETE from picture_set where id in ("+ids+")");
 		//删除排名
 		this.photoDao.executeSql("DELETE from rank_picture_set where picture_set_id in ("+ids+")");
+	}
+
+	@Override
+	public void saveComment(Comment comment) {
+		this.photoDao.saveEntity(comment);
+		OperationRecords or =new OperationRecords();
+		or.setOperationType(4);//评论
+		or.setInformerId(comment.getUserId());//评论人id
+		or.setBeingInformerId(comment.getParentUserId());//回复人id
+		or.setPictureSetId(comment.getPictureSetId());//评论图集id
+		or.setType(2);
+		or.setDatetime(new Date());
+		or.setIsRead("0");//未读
+		this.photoDao.saveEntity(or);
+	}
+
+	@Override
+	public List queryNotify(Map<String, String> filterMap) {
+		return this.photoDao.queryNotify(filterMap);
+	}
+
+	@Override
+	public int readNotify(Map<String, String> filterMap) {
+		return this.photoDao.readNotify(filterMap);
+	}
+
+	@Override
+	public int deleteComment(Map<String, String> filterMap) {
+		return this.photoDao.deleteComment(filterMap);
 	}
 	
 }

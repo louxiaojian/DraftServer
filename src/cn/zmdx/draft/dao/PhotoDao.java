@@ -160,4 +160,28 @@ public interface PhotoDao extends BaseDao {
 	 * @return
 	 */
 	public List queryPhotoByPictureSetIds(String pictureSetIds);
+	/**
+	 * 加载通知
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午2:52:52
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryNotify(Map<String, String> filterMap);
+	/**
+	 * 将通知改为已读状态
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午4:32:23
+	 * @param filterMap
+	 * @return
+	 */
+	public int readNotify(Map<String, String> filterMap);
+	/**
+	 * 删除评论
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午8:40:59
+	 * @param id
+	 * @return
+	 */
+	public int deleteComment(Map<String, String> filterMap);
 }

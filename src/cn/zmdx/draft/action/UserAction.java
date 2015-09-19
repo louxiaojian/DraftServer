@@ -8,12 +8,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+
 import cn.zmdx.draft.entity.Captcha;
+import cn.zmdx.draft.entity.Notify;
 import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.entity.UserAttentionFans;
@@ -28,6 +32,7 @@ import cn.zmdx.draft.weibo.Users;
 import cn.zmdx.draft.weibo.model.WeiboUser;
 import cn.zmdx.draft.weixin.api.SnsAPI;
 import cn.zmdx.draft.weixin.entity.WeiXinUser;
+
 import com.alibaba.fastjson.JSON;
 import com.bcloud.msg.http.HttpSender;
 import com.opensymphony.xwork2.ActionSupport;
@@ -401,20 +406,21 @@ public class UserAction extends ActionSupport {
 					if (!"".equals(introduction) && introduction != null) {
 						user.setIntroduction(introduction);
 					}
-//					if (!"".equals(username) && username != null) {
-//						int count=this.userService.nickNameUsed(username,Integer.parseInt(id));
-//						if(count>0){
-//							out.print("{\"state\":1,\"errorMsg\":\"昵称已被占用\"}");
-//						}else{
-//							this.userService.updateUser(user);
-//							out.print("{\"state\":0,\"result\":{\"user\":"
-//									+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
-////						}
-//					}else{
-						this.userService.updateUser(user);
-						out.print("{\"state\":0,\"result\":{\"user\":"
-								+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
-//					}
+					// if (!"".equals(username) && username != null) {
+					// int
+					// count=this.userService.nickNameUsed(username,Integer.parseInt(id));
+					// if(count>0){
+					// out.print("{\"state\":1,\"errorMsg\":\"昵称已被占用\"}");
+					// }else{
+					// this.userService.updateUser(user);
+					// out.print("{\"state\":0,\"result\":{\"user\":"
+					// + JSON.toJSON(UserUtil.getUser(user)) + "}}");
+					// // }
+					// }else{
+					this.userService.updateUser(user);
+					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
+					// }
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
@@ -488,14 +494,8 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String userId = request.getParameter("userId");// 要查看的用户
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
-			String width = request.getParameter("w");//缩放宽度
+			String width = request.getParameter("w");// 缩放宽度
 			User user = userService.getById(Integer.parseInt(userId));
-			// 获取用户图集
-			Map<String, String> filterMap = new HashMap();
-			filterMap.put("userid", userId);
-			filterMap.put("currentUserId", currentUserId);
-			filterMap.put("limit", "20");
-			filterMap.put("width", width);
 			if (userId == null || "".equals(userId) || user == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
@@ -507,6 +507,12 @@ public class UserAction extends ActionSupport {
 				} else {// 未关注
 					user.setIsAttention("0");
 				}
+				// 获取用户图集
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("userid", userId);
+				filterMap.put("currentUserId", currentUserId);
+				filterMap.put("limit", "20");
+				filterMap.put("width", width);
 				List photoSet = new ArrayList();
 				List<PictureSet> list = photoService
 						.queryPersonalPhotos(filterMap);
@@ -529,6 +535,23 @@ public class UserAction extends ActionSupport {
 					filterMap2.put("attentionUserId", userId);
 				}
 				List fansList = userService.queryFans(filterMap2);
+				List notifyList = null;
+				int isRead=1;
+				if(currentUserId.equals(userId)){
+					// 通知
+					Map<String, String> notifyFilterMap = new HashMap();
+					notifyFilterMap.put("currentUserId", currentUserId);
+					notifyFilterMap.put("limit", "10");
+					notifyList = this.photoService
+							.queryNotify(notifyFilterMap);
+					for (int i = 0; i < notifyList.size(); i++) {
+						Notify notify=(Notify)notifyList.get(i);
+						if("0".equals(notify.getIsRead())){
+							isRead=0;
+							break;
+						}
+					}
+				}
 				if (user != null) {
 					User newUser = UserUtil.getUser(user);
 					newUser.setIsAttention(user.getIsAttention());
@@ -538,7 +561,9 @@ public class UserAction extends ActionSupport {
 							+ ",\"attentionUserList\":"
 							+ JSON.toJSONString(attentionList, true)
 							+ ",\"fansUserList\":"
-							+ JSON.toJSONString(fansList, true) + "}}");
+							+ JSON.toJSONString(fansList, true)
+							+ ",\"notifyList\":"
+							+ JSON.toJSONString(notifyList, true) + ",\"isRead\":"+isRead+"}}");
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
@@ -866,10 +891,11 @@ public class UserAction extends ActionSupport {
 					newUser.setAge(0);
 					newUser.setRegistrationDate(new Date());
 					newUser.setOrgId(0);
-					if(!"".equals(wbUser.getAvatarLarge())&&wbUser.getAvatarLarge()!=null){
+					if (!"".equals(wbUser.getAvatarLarge())
+							&& wbUser.getAvatarLarge() != null) {
 						// 设置默认头像
 						newUser.setHeadPortrait(wbUser.getAvatarLarge());
-					}else{
+					} else {
 						newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
 					}
 					newUser.setThirdParty(thirdParty);
@@ -887,12 +913,14 @@ public class UserAction extends ActionSupport {
 							+ JSON.toJSONString(user2) + "}}");
 					logger.error("***********************结束***********************");
 				} else if ("weixin".equals(thirdParty)) {// 微信登录
-					WeiXinUser weixinUser=SnsAPI.userinfo(access_token, userId,"zh_CN");
+					WeiXinUser weixinUser = SnsAPI.userinfo(access_token,
+							userId, "zh_CN");
 					User newUser = new User();
 					newUser.setUsername(weixinUser.getNickname());
-					if(!"".equals(weixinUser.getHeadimgurl())&&weixinUser.getHeadimgurl()!=null){
+					if (!"".equals(weixinUser.getHeadimgurl())
+							&& weixinUser.getHeadimgurl() != null) {
 						newUser.setHeadPortrait(weixinUser.getHeadimgurl());
-					}else{
+					} else {
 						newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
 					}
 					newUser.setGender(weixinUser.getSex());
@@ -928,5 +956,4 @@ public class UserAction extends ActionSupport {
 		}
 	}
 
-	
 }

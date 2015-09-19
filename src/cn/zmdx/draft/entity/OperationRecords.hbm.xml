@@ -11,6 +11,7 @@
 		<property name="beingInformerId" column="being_informer_id"/>
 		<property name="type" column="type"/>
 		<property name="datetime" column="datetime"/>
+		<property name="isRead" column="isRead"/>
 	</class>
 	
 </hibernate-mapping>

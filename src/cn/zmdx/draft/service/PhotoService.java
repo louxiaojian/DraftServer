@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.Photo;
 
 public interface PhotoService {
@@ -196,4 +197,35 @@ public interface PhotoService {
 	 * @return
 	 */
 	public void deletePictureSet(Map<String, String> filterMap);
+	/**
+	 * 发表评论
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午2:31:17
+	 * @param comment
+	 */
+	public void saveComment(Comment comment);
+	/**
+	 * 加载通知
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午2:51:36
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryNotify(Map<String, String> filterMap);
+	/**
+	 * 将通知改为已读状态
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午4:31:35
+	 * @param filterMap
+	 * @return
+	 */
+	public int readNotify(Map<String, String> filterMap);
+	/**
+	 * 删除评论
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-19 时间：下午8:40:08
+	 * @param filterMap
+	 * @return
+	 */
+	public int deleteComment(Map<String, String> filterMap);
 }
