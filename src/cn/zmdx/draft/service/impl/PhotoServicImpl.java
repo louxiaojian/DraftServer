@@ -258,7 +258,9 @@ public class PhotoServicImpl implements PhotoService {
 		OperationRecords or =new OperationRecords();
 		or.setOperationType(4);//评论
 		or.setInformerId(comment.getUserId());//评论人id
-		or.setBeingInformerId(comment.getParentUserId());//回复人id
+		if(comment.getParentUserId()!=null&&!"".equals(comment.getParentUserId())){
+			or.setBeingInformerId(comment.getParentUserId());//回复人id
+		}
 		or.setPictureSetId(comment.getPictureSetId());//评论图集id
 		or.setType(2);
 		or.setDatetime(new Date());
