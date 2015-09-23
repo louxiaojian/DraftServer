@@ -117,4 +117,9 @@ public class UserServiceImpl implements UserService {
 	public int nickNameUsed(String username,int id) {
 		return this.userDao.nickNameUsed(username,id);
 	}
+
+	@Override
+	public List automaticPrompt(Map<String, String> filterMap) {
+		return this.userDao.automaticPrompt(filterMap);
+	}
 }

@@ -150,4 +150,20 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		return list.size();
 	}
 
+	@Override
+	public List automaticPrompt(Map<String, String> filterMap) {
+		StringBuffer sql=new StringBuffer("select id,username from users where 1=1 ");
+		if(filterMap!=null&&!filterMap.isEmpty()){
+			if(!"".equals(filterMap.get("nickName"))&&filterMap.get("nickName")!=null){
+				sql.append(" and username like ?");
+			}
+		}
+		sql.append(" limit 5");
+		Query query = getSession().createSQLQuery(sql.toString()).setResultTransformer(Transformers.aliasToBean(User.class));
+		if(!"".equals(filterMap.get("nickName"))&&filterMap.get("nickName")!=null){
+			query.setString(0, filterMap.get("nickName")+"%");
+		}
+		return query.list();
+	}
+
 }

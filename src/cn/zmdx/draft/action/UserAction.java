@@ -956,4 +956,39 @@ public class UserAction extends ActionSupport {
 		}
 	}
 
+	/**
+	 * @ 自动提示加载人员
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-22 时间：下午4:58:11
+	 * @throws IOException
+	 */
+	public void automaticPrompt() throws IOException {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = response.getWriter();
+		try {
+			String attentionUserId = request.getParameter("currentUserId");
+			String nickName = StringUtil.encodingUrl(request.getParameter("nickName"));//用户昵称
+			if (attentionUserId == null || "".equals(attentionUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				if (nickName != null && !"".equals(nickName)) {
+					filterMap.put("nickName", nickName);
+				}
+				List list = userService.automaticPrompt(filterMap);
+				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(list, true) + "}}");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e);
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
 }

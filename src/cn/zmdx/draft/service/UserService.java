@@ -154,4 +154,13 @@ public interface UserService {
 	 * @return
 	 */
 	public int nickNameUsed(String username,int id);
+
+	/**
+	 * @ 自动提示加载人员
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-22 时间：下午5:01:45
+	 * @param filterMap
+	 * @return
+	 */
+	public List automaticPrompt(Map<String, String> filterMap);
 }

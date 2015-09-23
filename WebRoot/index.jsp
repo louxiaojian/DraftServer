@@ -58,10 +58,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		</table>
 	</form> -->
 	<a href="photo_replyComment.action?currentUserId=20&pictureSetId=133&content="+encodeuri(encodeuri('就看见啊回复技能'))>asdf</a>
-	<form action="photo_replyComment.action?currentUserId=20&pictureSetId=133" method="post">
+	<form action="user_automaticPrompt.action?currentUserId=20&pictureSetId=133" method="post">
 		<table>
 			<tr><td>评论：
-			<textarea rows="6" cols="30" name="content"></textarea>
+			<textarea rows="6" cols="30" name="nickName"></textarea>
 			</td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
