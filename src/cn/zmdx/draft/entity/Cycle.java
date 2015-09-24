@@ -13,6 +13,9 @@ public class Cycle {
 	private String descs;//主题描述
 	private String tag;//标签图片路径
 	private String detailImageUrl;//描述图片
+	private String role;//主题规则
+	private String awardSetting;//奖项设置
+	private String isNeedValidate;//是否需要真人验证，0：需要，1：不需要
 	
 	public int getId() {
 		return id;
@@ -67,5 +70,23 @@ public class Cycle {
 	}
 	public void setDetailImageUrl(String detailImageUrl) {
 		this.detailImageUrl = detailImageUrl;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
+	public String getAwardSetting() {
+		return awardSetting;
+	}
+	public void setAwardSetting(String awardSetting) {
+		this.awardSetting = awardSetting;
+	}
+	public String getIsNeedValidate() {
+		return isNeedValidate;
+	}
+	public void setIsNeedValidate(String isNeedValidate) {
+		this.isNeedValidate = isNeedValidate;
 	}
 }

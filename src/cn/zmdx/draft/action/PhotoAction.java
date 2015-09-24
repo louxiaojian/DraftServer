@@ -355,84 +355,93 @@ public class PhotoAction extends ActionSupport {
 			if (userid == null || "".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {
-				if (getImage() != null && getImage().length > 0) {
-					// 创建图集
-					PictureSet ps = new PictureSet();
-					ps.setType(type);
-					ps.setDescs(descs);
-					ps.setUserid(Integer.parseInt(userid));
-					ps.setUploadDate(new Date());
-					ps.setStatus("1");
-					ps.setRank(0);
-					if ("1".equals(type)) {
-						ps.setThemeCycleId(Integer.parseInt(themeCycleId));
-					} else {
-						ps.setThemeCycleId(Integer.parseInt("0"));
-					}
-					filterMap.put("pictureSet", ps);
-
-					for (int i = 0; i < files.length; i++) {
-						UploadResult result = new UploadResult();
-						int ret = pc.Upload(files[i], result);
-						if (i > 8) {
-							break;
-						}
-						// int ret=1;
-						if (ret != 0) {
-							System.out.println(pc.GetError());
-							errorcount++;
-							break;
+				User user = (User) this.photoService.getObjectById(User.class,
+						userid);
+				Cycle cycle = (Cycle) this.photoService.getObjectById(
+						Cycle.class, themeCycleId);
+				if ("1".equals(cycle.getIsNeedValidate())
+						||"1".equals(user.getIsvalidate()))  {// 不需要真人验证、或者已经通过真人验证
+					if (getImage() != null && getImage().length > 0) {
+						// 创建图集
+						PictureSet ps = new PictureSet();
+						ps.setType(type);
+						ps.setDescs(descs);
+						ps.setUserid(Integer.parseInt(userid));
+						ps.setUploadDate(new Date());
+						ps.setStatus("1");
+						ps.setRank(0);
+						if ("1".equals(type)) {
+							ps.setThemeCycleId(Integer.parseInt(themeCycleId));
 						} else {
-							Photo photo = new Photo();
-							photo.setPhotoUrl(result.download_url);
-							photo.setUploadDate(new Date());
-							photo.setUserid(Integer.parseInt(userid));
-							photo.setType(0);// 图集
-							photo.setFileid(result.fileid);
-							filterMap.put("photo" + i, photo);
-							fileids[i] = result.fileid;
+							ps.setThemeCycleId(Integer.parseInt("0"));
 						}
-					}
-					if (errorcount == 0) {
-						filterMap.put("count", files.length);
-						if ("1".equals(type)) {// 选秀
-							Cycle cycle = (Cycle) this.photoService
-									.getObjectById(Cycle.class, themeCycleId);
-							if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
-								// 删除本次所有上传照片
-								for (int i = 0; i < fileids.length; i++) {
-									if (fileids[i] != null
-											&& !"".equals(fileids[i])) {
-										int code = pc.Delete(fileids[i]);
-										System.out.println("删除code：" + code);
-									}
-								}
-								out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
+						filterMap.put("pictureSet", ps);
+
+						for (int i = 0; i < files.length; i++) {
+							UploadResult result = new UploadResult();
+							int ret = pc.Upload(files[i], result);
+							if (i > 8) {
+								break;
+							}
+							// int ret=1;
+							if (ret != 0) {
+								System.out.println(pc.GetError());
+								errorcount++;
+								break;
 							} else {
-								// 图片选秀信息
-								CyclePhotoSet cyclePhoto = new CyclePhotoSet();
-								cyclePhoto.setThemeCycleId(Integer
-										.parseInt(themeCycleId));
-								cyclePhoto.setThemeTitle(themeTitle);
-								filterMap.put("cyclePhoto", cyclePhoto);
+								Photo photo = new Photo();
+								photo.setPhotoUrl(result.download_url);
+								photo.setUploadDate(new Date());
+								photo.setUserid(Integer.parseInt(userid));
+								photo.setType(0);// 图集
+								photo.setFileid(result.fileid);
+								filterMap.put("photo" + i, photo);
+								fileids[i] = result.fileid;
+							}
+						}
+						if (errorcount == 0) {
+							filterMap.put("count", files.length);
+							if ("1".equals(type)) {// 选秀
+								if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
+									// 删除本次所有上传照片
+									for (int i = 0; i < fileids.length; i++) {
+										if (fileids[i] != null
+												&& !"".equals(fileids[i])) {
+											int code = pc.Delete(fileids[i]);
+											System.out
+													.println("删除code：" + code);
+										}
+									}
+									out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
+								} else {
+									// 图片选秀信息
+									CyclePhotoSet cyclePhoto = new CyclePhotoSet();
+									cyclePhoto.setThemeCycleId(Integer
+											.parseInt(themeCycleId));
+									cyclePhoto.setThemeTitle(themeTitle);
+									filterMap.put("cyclePhoto", cyclePhoto);
+									photoService.uploadPhoto(filterMap);
+									out.print("{\"state\":0,\"result\":{\"state\":0}}");
+								}
+							} else {
 								photoService.uploadPhoto(filterMap);
 								out.print("{\"state\":0,\"result\":{\"state\":0}}");
 							}
-						} else {
-							photoService.uploadPhoto(filterMap);
-							out.print("{\"state\":0,\"result\":{\"state\":0}}");
-						}
-					} else {// 失败删除本次所有上传照片
-						for (int i = 0; i < fileids.length; i++) {
-							if (fileids[i] != null && !"".equals(fileids[i])) {
-								int code = pc.Delete(fileids[i]);
-								System.out.println("删除code：" + code);
+						} else {// 失败删除本次所有上传照片
+							for (int i = 0; i < fileids.length; i++) {
+								if (fileids[i] != null
+										&& !"".equals(fileids[i])) {
+									int code = pc.Delete(fileids[i]);
+									System.out.println("删除code：" + code);
+								}
 							}
+							out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 						}
-						out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
+					} else {
+						out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
 					}
-				} else {
-					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
+				}else{
+					out.print("{\"state\":\"1\",\"errorMsg\":\"未通过真人验证\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -1604,6 +1613,7 @@ public class PhotoAction extends ActionSupport {
 
 	/**
 	 * 删除评论
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-9-19 时间：下午8:50:42
 	 */

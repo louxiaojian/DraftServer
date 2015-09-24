@@ -13,6 +13,9 @@
 		<property name="descs" column="descs" />
 		<property name="tag" column="tag_url" />
 		<property name="detailImageUrl" column="detail_image_url" />
+		<property name="role" column="role" />
+		<property name="awardSetting" column="award_setting" />
+		<property name="isNeedValidate" column="isNeedValidate" />
 	</class>
 	
 </hibernate-mapping>
