@@ -312,9 +312,13 @@ public class PhotoAction extends ActionSupport {
 					result.add(ps);
 
 				}
-
+				//用户当前主题剩余票数
+				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+				surplusVotesFilterMap.put("userId", currentUserId);
+				surplusVotesFilterMap.put("themeId", themeCycleId);
+				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
-						+ JSON.toJSONString(result, true) + "}}");
+						+ JSON.toJSONString(result, true) + ",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -829,8 +833,13 @@ public class PhotoAction extends ActionSupport {
 				// ps.setUser(u);
 				// result.add(ps);
 				// }
+				//用户当前主题剩余票数
+				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+				surplusVotesFilterMap.put("userId", currentUserId);
+				surplusVotesFilterMap.put("themeId", themeCycleId);
+				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
-						+ JSON.toJSONString(result, true) + "}}");
+						+ JSON.toJSONString(result, true) + ",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -862,6 +871,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			// 选秀主题周期id
 			String themeCycleId = request.getParameter("themeCycleId");
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
@@ -882,8 +892,13 @@ public class PhotoAction extends ActionSupport {
 				// ps.setPhotoList(pList);
 				// result.add(ps);
 				// }
+				//用户当前主题剩余票数
+				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+				surplusVotesFilterMap.put("userId", currentUserId);
+				surplusVotesFilterMap.put("themeId", themeCycleId);
+				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(list, true) + "}}");
+						+ JSON.toJSONString(list, true) + ",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1424,11 +1439,17 @@ public class PhotoAction extends ActionSupport {
 				}
 				// 用户排名
 				List userlist = photoService.queryUserCycleRanking(filterMap);
+				
+				//用户当前主题剩余票数
+				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+				surplusVotesFilterMap.put("userId", currentUserId);
+				surplusVotesFilterMap.put("themeId", themeCycleId);
+				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"psRank\":"
 						+ JSON.toJSONString(photoSetResult, true)
 						+ ",\"psList\":" + JSON.toJSONString(result, true)
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
-						+ ",\"isUserAttented\":\"" + isvalidate + "\"}}");
+						+ ",\"isUserAttented\":\"" + isvalidate + "\",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()

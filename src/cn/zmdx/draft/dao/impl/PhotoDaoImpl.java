@@ -1,6 +1,8 @@
 package cn.zmdx.draft.dao.impl;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Query;
@@ -137,7 +139,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,rank,photoCount from rank_picture_set where status =1 and type=1 ");
+				+ "') as coverUrl,rank,photoCount,votes from rank_picture_set where status =1 and type=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -148,7 +150,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& filterMap.get("themeCycleId") != null) {
 				sql.append(" and theme_cycle_id=:themeCycleId");
 			}
-			sql.append(" order by praise desc,orderId desc ");
+			sql.append(" order by votes desc,orderId desc ");
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -269,7 +271,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,photoCount from picture_set where status =1 and type=1 ");
+				+ "') as coverUrl,photoCount,votes from picture_set where status =1 and type=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -404,7 +406,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& filterMap.get("themeCycleId") != null) {
 				sql.append(" and rps.theme_cycle_id=:themeCycleId");
 			}
-			sql.append(" order by rps.praise desc,rps.id desc ");
+			sql.append(" order by rps.votes desc,rps.id desc ");
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -586,6 +588,38 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		query.setInteger("id", Integer.parseInt(filterMap.get("id")));
 		query.setInteger("userId", Integer.parseInt(filterMap.get("currentUserId")));
 		return query.executeUpdate();
+	}
+
+	@Override
+	public int queryUserSurplusVote(Map<String, String> surplusVotesFilterMap) {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		Date date=new Date();
+		StringBuffer sql=new StringBuffer("select ors.id,ors.informer_id from operation_records ors left join picture_set ps on ps.id=ors.picture_set_id where ors.operation_type=3 ");
+		sql.append("and ors.datetime like '%"+sdf.format(date)+"%'");
+		if(surplusVotesFilterMap!=null&&!surplusVotesFilterMap.isEmpty()){
+			if (!"".equals(surplusVotesFilterMap.get("userId"))
+					&& surplusVotesFilterMap.get("userId") != null) {
+				sql.append("  and ors.informer_id=:userId");
+			}
+			if (!"".equals(surplusVotesFilterMap.get("themeId"))
+					&& surplusVotesFilterMap.get("themeId") != null) {
+				sql.append(" and ps.theme_cycle_id=:themeId");
+			}
+		}
+		Query query=getSession().createSQLQuery(sql.toString());
+		if(surplusVotesFilterMap!=null&&!surplusVotesFilterMap.isEmpty()){
+			if (!"".equals(surplusVotesFilterMap.get("userId"))
+					&& surplusVotesFilterMap.get("userId") != null) {
+				query.setInteger("userId",
+						Integer.parseInt(surplusVotesFilterMap.get("userId")));
+			}
+			if (!"".equals(surplusVotesFilterMap.get("themeId"))
+					&& surplusVotesFilterMap.get("themeId") != null) {
+				query.setInteger("themeId",
+						Integer.parseInt(surplusVotesFilterMap.get("themeId")));
+			}
+		}
+		return query.list().size();
 	}
 
 }

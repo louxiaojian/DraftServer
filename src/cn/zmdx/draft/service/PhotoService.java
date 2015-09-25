@@ -228,4 +228,12 @@ public interface PhotoService {
 	 * @return
 	 */
 	public int deleteComment(Map<String, String> filterMap);
+	/**
+	 * 用户当前主题剩余票数
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-25 时间：下午3:48:37
+	 * @param surplusVotesFilterMap
+	 * @return
+	 */
+	public int queryUserSurplusVote(Map<String, String> surplusVotesFilterMap);
 }

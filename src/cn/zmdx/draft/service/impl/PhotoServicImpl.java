@@ -1,7 +1,7 @@
 package cn.zmdx.draft.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -116,11 +116,11 @@ public class PhotoServicImpl implements PhotoService {
 	public String OperationPictureSet(String userid, String pictureSetId,
 			int operationType) {
 		List list=this.photoDao.queryPhotoByPictureSetId(userid,pictureSetId,operationType);
-//		if(operationType!=2){
+		if(operationType!=3){
 			if(list.size()>0){
 				return "failed";
 			}
-//		} 
+		} 
 		PictureSet ps=(PictureSet)this.photoDao.getEntity(PictureSet.class,Integer.parseInt(pictureSetId));
 //		if(!String.valueOf(ps.getUserid()).equals(userid)){
 			//操作类型：7：赞，1：踩，2：举报，3：投票，4取消赞
@@ -136,8 +136,16 @@ public class PhotoServicImpl implements PhotoService {
 				ps.setTread(ps.getTread()+1);
 			}else if(operationType==2){
 				ps.setReport(ps.getReport()+1);
-			}else if(operationType==3){
-				ps.setVotes(ps.getVotes()+1);
+			}else if(operationType==3){//投票
+				Map<String, String> surplusVotesFilterMap=new HashMap<String, String>();
+				surplusVotesFilterMap.put("userId", userid);
+				surplusVotesFilterMap.put("themeId", String.valueOf(ps.getThemeCycleId()));
+				int votes=this.photoDao.queryUserSurplusVote(surplusVotesFilterMap);
+				if(votes>=3){
+					return "failed";
+				}else{
+					ps.setVotes(ps.getVotes()+1);
+				}
 			}else if(operationType==4){
 				if("0".equals(ps.getType())){//个人
 					ps.setPraise(ps.getPraise()-1);
@@ -281,6 +289,11 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public int deleteComment(Map<String, String> filterMap) {
 		return this.photoDao.deleteComment(filterMap);
+	}
+
+	@Override
+	public int queryUserSurplusVote(Map<String, String> surplusVotesFilterMap) {
+		return this.photoDao.queryUserSurplusVote(surplusVotesFilterMap);
 	}
 	
 }
