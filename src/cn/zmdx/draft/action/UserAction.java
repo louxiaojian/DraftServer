@@ -188,7 +188,7 @@ public class UserAction extends ActionSupport {
 				// 验证该手机号今日是否能获取
 				int count = this.userService
 						.qualificationByTelephone(telephone);
-				if (count > 30) {
+				if (count > 9) {//每天最多获取10条验证码
 					out.print("{\"state\":1,\"errorMsg\":\"今日已无发送资格\"}");
 				} else {
 					String code = String
@@ -610,7 +610,7 @@ public class UserAction extends ActionSupport {
 								.parseInt(attentionUserId));
 						uaf.setFansUserId(Integer.parseInt(fansUserId));
 						uaf.setAttentionTime(new Date());
-						this.userService.saveObject(uaf);
+						this.userService.attentionUser(uaf);
 						out.print("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				}

@@ -163,4 +163,12 @@ public interface UserService {
 	 * @return
 	 */
 	public List automaticPrompt(Map<String, String> filterMap);
+
+	/**
+	 * 关注用户
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-28 时间：下午12:04:15
+	 * @param uaf
+	 */
+	public void attentionUser(UserAttentionFans uaf);
 }

@@ -737,12 +737,17 @@ public class PhotoAction extends ActionSupport {
 				if ("".equals(pictureSetId) || pictureSetId == null) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 				} else {
-					String result = photoService.OperationPictureSet(userid,
-							pictureSetId, 3);
-					if ("failed".equals(result)) {// 已操作过
-						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+					PictureSet ps=(PictureSet)this.photoService.getObjectById(PictureSet.class,pictureSetId);
+					Map<String, String> surplusVotesFilterMap=new HashMap<String, String>();
+					surplusVotesFilterMap.put("userId", userid);
+					surplusVotesFilterMap.put("themeId", String.valueOf(ps.getThemeCycleId()));
+					int votes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
+					if(votes>=3){
+						out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
 					} else {
-						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
+						String result = photoService.OperationPictureSet(userid,
+								pictureSetId, 3);
+						out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""+(3-votes-1)+"\"}}");
 					}
 				}
 			}

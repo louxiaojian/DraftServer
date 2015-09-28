@@ -137,15 +137,7 @@ public class PhotoServicImpl implements PhotoService {
 			}else if(operationType==2){
 				ps.setReport(ps.getReport()+1);
 			}else if(operationType==3){//投票
-				Map<String, String> surplusVotesFilterMap=new HashMap<String, String>();
-				surplusVotesFilterMap.put("userId", userid);
-				surplusVotesFilterMap.put("themeId", String.valueOf(ps.getThemeCycleId()));
-				int votes=this.photoDao.queryUserSurplusVote(surplusVotesFilterMap);
-				if(votes>=3){
-					return "failed";
-				}else{
-					ps.setVotes(ps.getVotes()+1);
-				}
+				ps.setVotes(ps.getVotes()+1);
 			}else if(operationType==4){
 				if("0".equals(ps.getType())){//个人
 					ps.setPraise(ps.getPraise()-1);

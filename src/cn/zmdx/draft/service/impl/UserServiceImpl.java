@@ -6,6 +6,7 @@ import java.util.Map;
 
 import cn.zmdx.draft.dao.UserDao;
 import cn.zmdx.draft.entity.Captcha;
+import cn.zmdx.draft.entity.OperationRecords;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.entity.UserAttentionFans;
 import cn.zmdx.draft.service.UserService;
@@ -121,5 +122,17 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List automaticPrompt(Map<String, String> filterMap) {
 		return this.userDao.automaticPrompt(filterMap);
+	}
+
+	@Override
+	public void attentionUser(UserAttentionFans uaf) {
+		OperationRecords or =new OperationRecords();
+		or.setDatetime(new Date());
+		or.setOperationType(8);
+		or.setInformerId(uaf.getFansUserId());
+		or.setBeingInformerId(uaf.getAttentionUserId());
+		or.setIsRead("0");//未读
+		this.userDao.saveEntity(or);
+		this.userDao.saveEntity(uaf);
 	}
 }
