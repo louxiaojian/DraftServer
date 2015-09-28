@@ -312,13 +312,15 @@ public class PhotoAction extends ActionSupport {
 					result.add(ps);
 
 				}
-				//用户当前主题剩余票数
-				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+				// 用户当前主题剩余票数
+				Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
 				surplusVotesFilterMap.put("userId", currentUserId);
 				surplusVotesFilterMap.put("themeId", themeCycleId);
-				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
+				int surplusVotes = this.photoService
+						.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
-						+ JSON.toJSONString(result, true) + ",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
+						+ JSON.toJSONString(result, true)
+						+ ",\"surplusVotes\":\"" + (3 - surplusVotes) + "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -361,10 +363,90 @@ public class PhotoAction extends ActionSupport {
 			} else {
 				User user = (User) this.photoService.getObjectById(User.class,
 						userid);
-				Cycle cycle = (Cycle) this.photoService.getObjectById(
-						Cycle.class, themeCycleId);
-				if ("1".equals(cycle.getIsNeedValidate())
-						||"1".equals(user.getIsvalidate()))  {// 不需要真人验证、或者已经通过真人验证
+				if (themeCycleId != null && !"".equals(themeCycleId)) {
+					Cycle cycle = (Cycle) this.photoService.getObjectById(
+							Cycle.class, themeCycleId);
+					if ("1".equals(cycle.getIsNeedValidate())
+							|| "1".equals(user.getIsvalidate())) {// 不需要真人验证、或者已经通过真人验证
+						if (getImage() != null && getImage().length > 0) {
+							// 创建图集
+							PictureSet ps = new PictureSet();
+							ps.setType(type);
+							ps.setDescs(descs);
+							ps.setUserid(Integer.parseInt(userid));
+							ps.setUploadDate(new Date());
+							ps.setStatus("1");
+							ps.setRank(0);
+							if ("1".equals(type)) {
+								ps.setThemeCycleId(Integer
+										.parseInt(themeCycleId));
+							} else {
+								ps.setThemeCycleId(Integer.parseInt("0"));
+							}
+							filterMap.put("pictureSet", ps);
+
+							for (int i = 0; i < files.length; i++) {
+								UploadResult result = new UploadResult();
+								int ret = pc.Upload(files[i], result);
+								if (i > 8) {
+									break;
+								}
+								// int ret=1;
+								if (ret != 0) {
+									System.out.println(pc.GetError());
+									errorcount++;
+									break;
+								} else {
+									Photo photo = new Photo();
+									photo.setPhotoUrl(result.download_url);
+									photo.setUploadDate(new Date());
+									photo.setUserid(Integer.parseInt(userid));
+									photo.setType(0);// 图集
+									photo.setFileid(result.fileid);
+									filterMap.put("photo" + i, photo);
+									fileids[i] = result.fileid;
+								}
+							}
+							if (errorcount == 0) {
+								filterMap.put("count", files.length);
+								if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
+									// 删除本次所有上传照片
+									for (int i = 0; i < fileids.length; i++) {
+										if (fileids[i] != null
+												&& !"".equals(fileids[i])) {
+											int code = pc.Delete(fileids[i]);
+											System.out
+													.println("删除code：" + code);
+										}
+									}
+									out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
+								} else {
+									// 图片选秀信息
+									CyclePhotoSet cyclePhoto = new CyclePhotoSet();
+									cyclePhoto.setThemeCycleId(Integer
+											.parseInt(themeCycleId));
+									cyclePhoto.setThemeTitle(themeTitle);
+									filterMap.put("cyclePhoto", cyclePhoto);
+									photoService.uploadPhoto(filterMap);
+									out.print("{\"state\":0,\"result\":{\"state\":0}}");
+								}
+							} else {// 失败删除本次所有上传照片
+								for (int i = 0; i < fileids.length; i++) {
+									if (fileids[i] != null
+											&& !"".equals(fileids[i])) {
+										int code = pc.Delete(fileids[i]);
+										System.out.println("删除code：" + code);
+									}
+								}
+								out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
+							}
+						} else {
+							out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
+						}
+					} else {
+						out.print("{\"state\":\"1\",\"errorMsg\":\"未通过真人验证\"}");
+					}
+				} else {
 					if (getImage() != null && getImage().length > 0) {
 						// 创建图集
 						PictureSet ps = new PictureSet();
@@ -405,32 +487,8 @@ public class PhotoAction extends ActionSupport {
 						}
 						if (errorcount == 0) {
 							filterMap.put("count", files.length);
-							if ("1".equals(type)) {// 选秀
-								if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
-									// 删除本次所有上传照片
-									for (int i = 0; i < fileids.length; i++) {
-										if (fileids[i] != null
-												&& !"".equals(fileids[i])) {
-											int code = pc.Delete(fileids[i]);
-											System.out
-													.println("删除code：" + code);
-										}
-									}
-									out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
-								} else {
-									// 图片选秀信息
-									CyclePhotoSet cyclePhoto = new CyclePhotoSet();
-									cyclePhoto.setThemeCycleId(Integer
-											.parseInt(themeCycleId));
-									cyclePhoto.setThemeTitle(themeTitle);
-									filterMap.put("cyclePhoto", cyclePhoto);
-									photoService.uploadPhoto(filterMap);
-									out.print("{\"state\":0,\"result\":{\"state\":0}}");
-								}
-							} else {
-								photoService.uploadPhoto(filterMap);
-								out.print("{\"state\":0,\"result\":{\"state\":0}}");
-							}
+							photoService.uploadPhoto(filterMap);
+							out.print("{\"state\":0,\"result\":{\"state\":0}}");
 						} else {// 失败删除本次所有上传照片
 							for (int i = 0; i < fileids.length; i++) {
 								if (fileids[i] != null
@@ -444,9 +502,8 @@ public class PhotoAction extends ActionSupport {
 					} else {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
 					}
-				}else{
-					out.print("{\"state\":\"1\",\"errorMsg\":\"未通过真人验证\"}");
 				}
+
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -737,17 +794,21 @@ public class PhotoAction extends ActionSupport {
 				if ("".equals(pictureSetId) || pictureSetId == null) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 				} else {
-					PictureSet ps=(PictureSet)this.photoService.getObjectById(PictureSet.class,pictureSetId);
-					Map<String, String> surplusVotesFilterMap=new HashMap<String, String>();
+					PictureSet ps = (PictureSet) this.photoService
+							.getObjectById(PictureSet.class, pictureSetId);
+					Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
 					surplusVotesFilterMap.put("userId", userid);
-					surplusVotesFilterMap.put("themeId", String.valueOf(ps.getThemeCycleId()));
-					int votes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
-					if(votes>=3){
+					surplusVotesFilterMap.put("themeId",
+							String.valueOf(ps.getThemeCycleId()));
+					int votes = this.photoService
+							.queryUserSurplusVote(surplusVotesFilterMap);
+					if (votes >= 3) {
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
 					} else {
-						String result = photoService.OperationPictureSet(userid,
-								pictureSetId, 3);
-						out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""+(3-votes-1)+"\"}}");
+						String result = photoService.OperationPictureSet(
+								userid, pictureSetId, 3);
+						out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
+								+ (3 - votes - 1) + "\"}}");
 					}
 				}
 			}
@@ -838,13 +899,15 @@ public class PhotoAction extends ActionSupport {
 				// ps.setUser(u);
 				// result.add(ps);
 				// }
-				//用户当前主题剩余票数
-				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+				// 用户当前主题剩余票数
+				Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
 				surplusVotesFilterMap.put("userId", currentUserId);
 				surplusVotesFilterMap.put("themeId", themeCycleId);
-				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
+				int surplusVotes = this.photoService
+						.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
-						+ JSON.toJSONString(result, true) + ",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
+						+ JSON.toJSONString(result, true)
+						+ ",\"surplusVotes\":\"" + (3 - surplusVotes) + "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -897,13 +960,15 @@ public class PhotoAction extends ActionSupport {
 				// ps.setPhotoList(pList);
 				// result.add(ps);
 				// }
-				//用户当前主题剩余票数
-				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+				// 用户当前主题剩余票数
+				Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
 				surplusVotesFilterMap.put("userId", currentUserId);
 				surplusVotesFilterMap.put("themeId", themeCycleId);
-				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
+				int surplusVotes = this.photoService
+						.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(list, true) + ",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
+						+ JSON.toJSONString(list, true)
+						+ ",\"surplusVotes\":\"" + (3 - surplusVotes) + "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1444,17 +1509,20 @@ public class PhotoAction extends ActionSupport {
 				}
 				// 用户排名
 				List userlist = photoService.queryUserCycleRanking(filterMap);
-				
-				//用户当前主题剩余票数
-				Map<String,String> surplusVotesFilterMap=new HashMap<String, String>();
+
+				// 用户当前主题剩余票数
+				Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
 				surplusVotesFilterMap.put("userId", currentUserId);
 				surplusVotesFilterMap.put("themeId", themeCycleId);
-				int surplusVotes=this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
+				int surplusVotes = this.photoService
+						.queryUserSurplusVote(surplusVotesFilterMap);
 				out.print("{\"state\":0,\"result\":{\"psRank\":"
 						+ JSON.toJSONString(photoSetResult, true)
 						+ ",\"psList\":" + JSON.toJSONString(result, true)
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
-						+ ",\"isUserAttented\":\"" + isvalidate + "\",\"surplusVotes\":\""+(3-surplusVotes)+"\"}}");
+						+ ",\"isUserAttented\":\"" + isvalidate
+						+ "\",\"surplusVotes\":\"" + (3 - surplusVotes)
+						+ "\"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
