@@ -1743,6 +1743,37 @@ public class PhotoAction extends ActionSupport {
 			out.close();
 		}
 	}
+	
+	/**
+	 * 加载图集信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-9-29 时间：上午11:31:20
+	 * @return
+	 */
+	public String loadPictureSet() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String pictureSetId = request.getParameter("pictureSetId");
+		String code = request.getParameter("code");
+	
+		PictureSet pictureSet =null;
+		List pList =new ArrayList();
+		if(pictureSetId!=null&&!"".equals(pictureSetId)){
+			pictureSet = (PictureSet) this.photoService.getObjectById(PictureSet.class,
+					pictureSetId);
+			if(pictureSet!=null){
+				// 图集所属用户
+				User user = (User) this.photoService.getObjectById(
+						User.class, String.valueOf(pictureSet.getUserid()));
+				pictureSet.setUser(UserUtil.getUser(user));
+				// 图集所有图片
+				pList = photoService.queryPhotoByPictureSetId(pictureSet.getId());
+			}
+		}
+		request.setAttribute("pictureSet", pictureSet);
+		request.setAttribute("photos", pList);
+		request.setAttribute("code", code);
+		return "toLoadPictureSet";
+	}
 	/**
 	 * 测试上传数据
 	 * 

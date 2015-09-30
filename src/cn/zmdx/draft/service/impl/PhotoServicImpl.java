@@ -223,7 +223,7 @@ public class PhotoServicImpl implements PhotoService {
 
 	@Override
 	public int isPraisedPictureSet(String currentUserId,String pictureSetId) {
-		List list=this.photoDao.queryPhotoByPictureSetId(currentUserId,pictureSetId,0);
+		List list=this.photoDao.queryPhotoByPictureSetId(currentUserId,pictureSetId,7);
 		return list.size();
 	}
 
