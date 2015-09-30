@@ -3,6 +3,7 @@ package cn.zmdx.draft.weixin.api;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 
+import cn.zmdx.draft.weixin.bean.SnsToken;
 import cn.zmdx.draft.weixin.client.LocalHttpClient;
 import cn.zmdx.draft.weixin.entity.WeiXinUser;
 
@@ -22,7 +23,7 @@ public class SnsAPI extends BaseAPI {
 	 * @param code
 	 * @return
 	 */
-/**	public static SnsToken oauth2AccessToken(String appid,String secret,String code){
+	public static SnsToken oauth2AccessToken(String appid,String secret,String code){
 		HttpUriRequest httpUriRequest = RequestBuilder.post()
 				.setUri(BASE_URI + "/sns/oauth2/access_token")
 				.addParameter("appid", appid)
@@ -31,7 +32,7 @@ public class SnsAPI extends BaseAPI {
 				.addParameter("grant_type", "authorization_code")
 				.build();
 		return LocalHttpClient.executeJsonResult(httpUriRequest,SnsToken.class);
-	}*/
+	}
 
 	/**
 	 * 通过code换取网页授权access_token (第三方平台开发)

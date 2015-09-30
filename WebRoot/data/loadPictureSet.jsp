@@ -16,6 +16,9 @@
 <link rel="shortcut icon"
 	href="<%=request.getContextPath()%>/data/images/pandoraLogo.ico"
 	type="image/x-icon" />
+<script type="text/javascript"
+	src="<%=request.getContextPath()%>/data/jquery-1.7.2.min.js">
+	</script>
 	<style>
     @media only screen and (min-width: 641px) {
       .am-offcanvas {
@@ -95,6 +98,33 @@
       text-align: center;
     }
   </style>
+  <script type="text/javascript">
+  	function vote_pic(){alert(${currentUser.id}+"-----"+${pictureSet.id});
+  		var params = {"currentUserId": '1',"pictureSetId":'${pictureSet.id}'};  
+		var actionUrl = "<%=request.getContextPath()%>/photo_vote.action";  
+		$.ajax({  
+			  url : actionUrl,  
+		      type : "post", 
+		      data : params,  
+		      dataType : "json",  
+		      cache : false,  
+		      error : function(textStatus, errorThrown) {  
+		      },  
+		      success : function(data, textStatus) {
+		      	if(data.state=='0'){
+		      		alert(data.result);
+		      		if(data.result.state=='0'){
+		      			alert("投票成功，谢谢参与！");
+		      		}else{
+		      			alert("今日票数已用尽！");
+		      		}
+		      	}else{
+		      		alert(data.errorMsg);
+		      	}
+		    }  
+		});
+  	}
+  </script>
 </head>
 <%
 	response.setHeader("Cache-Control","max-age=1800");
@@ -117,13 +147,13 @@
           --%>
           <img src="${pictureSet.user.headPortrait }" alt="" class="am-comment-avatar" width="48" height="48">
           <p style="width: 90%" class="title">${pictureSet.user.username }<br/><fmt:formatDate value="${pictureSet.uploadDate}" pattern="yyyy-MM-dd"/></p>
-          <img src="${pictureSet.user.headPortrait }" alt="" class="am-comment-avatar-right" style="" width="48" height="48" onclick="javascript:alert(111)">
+          <img src="${pictureSet.user.headPortrait }" alt="" class="am-comment-avatar-right" style="" width="48" height="48" onclick="vote_pic()">
           <p>${pictureSet.descs }</p>
           <hr>
           <c:forEach var="photo" items="${photos }">
           	<img src="${photo.photoUrl }" alt="" width="100%">
           </c:forEach>
-          <a href="http://192.168.10.148:8080/draftServer/photo_loadThemeCycle.action?themeCycleId=1">活动规则</a>
+          <c:if test="${themeId!=null }"><a href="http://pandora.hdlocker.com/draftServer/photo_loadThemeCycle.action?themeCycleId=${themeId }">活动规则</a></c:if> 
         </div>
       </div>
     </div>

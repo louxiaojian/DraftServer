@@ -3,6 +3,8 @@ package cn.zmdx.draft.action;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,10 +22,16 @@ import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.RankPictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.service.PhotoService;
+import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.SensitivewordFilter;
 import cn.zmdx.draft.util.StringUtil;
+import cn.zmdx.draft.util.UserCookieUtil;
 import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
+import cn.zmdx.draft.weixin.api.SnsAPI;
+import cn.zmdx.draft.weixin.bean.SnsToken;
+import cn.zmdx.draft.weixin.entity.WeiXinUser;
+
 import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
 import com.qcloud.UploadResult;
@@ -31,6 +39,7 @@ import com.qcloud.UploadResult;
 public class PhotoAction extends ActionSupport {
 	Logger logger = Logger.getLogger(PhotoAction.class);
 	private PhotoService photoService;
+	private UserServiceImpl userService;
 	// 上传文件域
 	private File[] image;
 	// 上传文件类型
@@ -66,6 +75,12 @@ public class PhotoAction extends ActionSupport {
 	}
 	public void setImageFileName(String[] imageFileName) {
 		this.imageFileName = imageFileName;
+	}
+	public UserServiceImpl getUserService() {
+		return userService;
+	}
+	public void setUserService(UserServiceImpl userService) {
+		this.userService = userService;
 	}
 	/**
 	 * 查看个人图集
@@ -1753,8 +1768,48 @@ public class PhotoAction extends ActionSupport {
 	public String loadPictureSet() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		String pictureSetId = request.getParameter("pictureSetId");
+		String themeId = request.getParameter("themeId");
 		String code = request.getParameter("code");
-	
+		logger.error("code****"+code+"****");
+		String secret="9d992669fdd0cadc51110e20571be7e9";
+		String appid="wx81b0d978030f90aa";
+		SnsToken snsToken=SnsAPI.oauth2AccessToken(appid, secret, code);
+		logger.error("Openid****"+snsToken.getOpenid()+"****");
+		// 验证是否已注册
+		User currentUser = this.userService.validateThirdPartyUser(snsToken.getOpenid(),"weixin");
+		if (currentUser != null) {// 已存在用户信息
+			request.setAttribute("currentUser", currentUser);
+		} else {
+			logger.error("Access_token****"+snsToken.getAccess_token()+"****");
+			WeiXinUser weixinUser =new WeiXinUser();
+			weixinUser=SnsAPI.userinfo(snsToken.getAccess_token(),
+					snsToken.getOpenid(), "zh_CN");
+			logger.error("Openid****"+snsToken.getOpenid()+"****");
+			logger.error("weixinUser****"+weixinUser.getNickname()+"****");
+			if(weixinUser.getNickname()!=null&&!"".equals(weixinUser.getNickname())){
+				User newUser = new User();
+				newUser.setUsername(weixinUser.getNickname());
+				if (!"".equals(weixinUser.getHeadimgurl())
+						&& weixinUser.getHeadimgurl() != null) {
+					newUser.setHeadPortrait(weixinUser.getHeadimgurl());
+				} else {
+					newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
+				}
+				newUser.setGender(weixinUser.getSex()==null?0:weixinUser.getSex());
+				newUser.setIntroduction("");
+				newUser.setLoginname("");
+				newUser.setPassword("");
+				newUser.setFlag("1");
+				newUser.setIsvalidate("0");
+				newUser.setAge(0);
+				newUser.setRegistrationDate(new Date());
+				newUser.setOrgId(0);
+				newUser.setThirdParty("weixin");
+				newUser.setUid(snsToken.getOpenid());
+				this.photoService.saveEntity(newUser);
+				request.setAttribute("currentUser", newUser);
+			}
+		}
 		PictureSet pictureSet =null;
 		List pList =new ArrayList();
 		if(pictureSetId!=null&&!"".equals(pictureSetId)){
@@ -1770,8 +1825,10 @@ public class PhotoAction extends ActionSupport {
 			}
 		}
 		request.setAttribute("pictureSet", pictureSet);
+		if(themeId!=null&&!"".equals(themeId)&&!"0".equals(themeId)){
+			request.setAttribute("themeId", themeId);
+		}
 		request.setAttribute("photos", pList);
-		request.setAttribute("code", code);
 		return "toLoadPictureSet";
 	}
 	/**
