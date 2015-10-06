@@ -2491,6 +2491,9 @@ output {
 	margin-right: 10px
 }
 
+	.headerPic{
+		width: 10%;float: left;height: 40px
+	}
 @media only screen and (max-width:640px) {
 	body {
 		word-wrap: break-word;
@@ -3530,15 +3533,18 @@ a.am-badge:focus,a.am-badge:hover {
 }
 
 .am-comment-avatar {
-	margin-top: 1.2rem;
+	margin-top: 0.3rem;
 	float: left;
 	width: 32px;
 	height: 32px;
 	border-radius: 50%;
 	border: 1px solid transparent
 }
+	.headerPic{
+		width: 13%;float: left;height: 40px
+	}
 .am-comment-avatar-right {
-	margin-top: -4.8rem;
+	margin-top: 0rem;
 	float: right;
 	width: 32px;
 	height: 32px;
@@ -3546,11 +3552,38 @@ a.am-badge:focus,a.am-badge:hover {
 	border: 1px solid transparent
 }
 .title {
-    padding-left: 4rem;
+    padding-left: 0.5rem;
     font-size: 1.2rem;
     margin-top: 1rem;
 }
-
+.button:hover {
+    background-color: #d4aa04;
+    -webkit-transition-delay: initial;
+    transition-delay: initial;
+    color: white;
+}
+.descs{
+    	margin-top: 10px;
+    }
+.button {
+        display: inline-block;
+        border: 0;
+       /* margin-top: 70px;
+        padding: 14px 21px; */
+        border-radius: 5px;
+        background-color: #efc10a;
+        /*box-shadow: rgba(255,255,255,0.29) 0 1px 0 0 inset,rgba(0,0,0,0.27) 0 2px 11px 0;*/
+        -webkit-transition: background-color 300ms ease-in;
+        transition: background-color 300ms ease-in;
+        color: white;
+        font-size: 20px;
+        text-align: center;
+        text-decoration: none;
+        width:100px;
+        height:60px;
+        float: right;
+    }
+    
 .am-comment-flip .am-comment-avatar,.am-list>li>.am-badge {
 	float: right
 }
@@ -3560,33 +3593,310 @@ a.am-badge:focus,a.am-badge:hover {
 		width: 48px;
 		height: 48px
 	}
-	
+	.headerPic{
+		width: 10%;float: left;height: 40px
+	}
+	.button {
+        display: inline-block;
+        border: 0;
+       /* margin-top: 70px;
+        padding: 14px 21px;*/
+        border-radius: 5px;
+        background-color: #efc10a;
+        /*box-shadow: rgba(255,255,255,0.29) 0 1px 0 0 inset,rgba(0,0,0,0.27) 0 2px 11px 0;*/
+        -webkit-transition: background-color 300ms ease-in;
+        transition: background-color 300ms ease-in;
+        color: white;
+        font-size: 20px;
+        text-align: center;
+        text-decoration: none;
+        width:100px;
+        height:60px;
+        float: right;
+    }
+    .vote{
+    	line-height:100%;
+    	vertical-align: middle;
+    	padding-top: 23px;
+    }
+.descs{
+    	margin-top: 10px;
+    }
 .am-comment-avatar-right {
-	margin-top: -5rem;
+	margin-top: 0rem;
 	float: right;
 	width: 48px;
 	height: 48px;
 	border-radius: 50%;
 	border: 1px solid transparent
+}
+}
+
+@media only screen and (min-width:300px) {
+	.am-comment-avatar {
+		width: 36px;
+		height: 36px
+	}
+	.headerPic{
+		width: 10%;float: left;height: 40px;
+    margin-top: -2px;
+	}
+.title {
+    padding-left: 1.5rem;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+}
+	.button {
+        display: inline-block;
+        border: 0;
+       /* margin-top: 70px;
+        padding: 14px 21px;*/
+        border-radius: 5px;
+        background-color: #efc10a;
+        /*box-shadow: rgba(255,255,255,0.29) 0 1px 0 0 inset,rgba(0,0,0,0.27) 0 2px 11px 0;*/
+        -webkit-transition: background-color 300ms ease-in;
+        transition: background-color 300ms ease-in;
+        color: white;
+        font-size: 14px;
+        text-align: center;
+        text-decoration: none;
+        width:65px;
+        height:35px;
+        float: right;
+    }
+    .vote{
+    	line-height:100%;
+    	vertical-align: middle;
+    	padding-top: 1px;
+    	font-size: 14px;
+    }
+    .descs{
+    	margin-top: 0px;
+    }
+.am-comment-avatar-right {
+	margin-top: 0rem;
+	float: right;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	border: 1px solid transparent
+}
+.td1{
+	width: 55px;
+	border: 1px;
+	float: left;
+}
+.td2{
+	margin-left:10px;
+	width: 150px;
+	border: 1px;
+	float: left;
+}
+.td3{
+	width: 115px;
+	border: 1px;
+	float: left;
+}
+.bandeLogo{
+	height: 50px;
+	margin-top:-13px;
+	margin-left: 6px;
+}
+.bande1 {
+	font-size: 16px;
+}
+.bande2 {
+	font-size: 10px;
+	margin-top: -25px;
+}
+.bandeDownload{
+	width: 80px;
+	margin-left: -5px;
+	margin-bottom: 14px;
+}
+.bandeClose{
+	width: 18px;
+	margin-left: 1px;
+	margin-bottom: 23px;
+}
+}
+@media only screen and (min-width:350px) {
+.td1{
+	width: 55px;
+	border: 1px;
+	float: left;
+}
+.td2{
+	margin-left:10px;
+	width: 150px;
+	border: 1px;
+	float: left;
+}
+.td3{
+	width: 160px;
+	border: 1px;
+	float: left;
+}
+.bandeLogo{
+	height: 50px;
+	margin-top:-11px;
+	margin-left: 6px;
+}
+.bande1 {
+	font-size: 16px;
+	margin-top: -5px;
+}
+.bande2 {
+	margin-top: -15px;
+	font-size: 10px;
+}
+.bandeDownload{
+	width: 80px;
+	margin-left: 55px;
+	margin-bottom: 10px;
+}
+.bandeClose{
+	width: 18px;
+	margin-left: 0px;
+	margin-bottom: 20px;
+	margin-right: 0px;
+}
+}
+@media only screen and (min-width:400px) {
+.td1{
+	width: 55px;
+	border: 1px;
+	float: left;
+}
+.td2{
+	margin-left:10px;
+	width: 150px;
+	border: 1px;
+	float: left;
+}
+.td3{
+	width: 195px;
+	border: 1px;
+	float: left;
+}
+.bandeLogo{
+	height: 50px;
+	margin-top:-12px;
+	margin-left: 6px;
+}
+.bande1 {
+	font-size: 16px;
+	margin-top: 0px;
+}
+.bande2 {
+	margin-top: -22px;
+	font-size: 10px;
+}
+.bandeDownload{
+	width: 80px;
+	margin-bottom: 10px;
+	margin-left: 80px;
+}
+.bandeClose{
+	width: 18px;
+	margin-right: 0px;
+	margin-bottom: 20px;
+}
+}
+
+@media only screen and (min-width:500px) {
+.bandeLogo{
+	height: 50px;
+	margin-top:-20px;
+	margin-left: 6px;
+}
+.bande1 {
+	font-size: 16px;
+	margin-top: -20px;
+}
+.bande2 {
+	font-size: 10px;
+}
+.bandeDownload{
+	width: 80px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+}
+.bandeClose{
+	width: 18px;
+	margin-left: 8px;
+	margin-bottom: 20px;
 }
 }
 @media only screen and (min-width:641px) {
 	.am-comment-avatar {
 		width: 48px;
-		height: 48px
+		height: 48px;
+		margin-top: 7px;
+	}
+	.headerPic{
+		width: 7%;float: left;height: 40px
 	}
 .title {
-    padding-left: 6rem;
+    padding-left: 1rem;
     margin-top: 0.7rem;
     font-size: 2rem;
 }
 .am-comment-avatar-right {
-	margin-top: -6.4rem;
+	margin-top: 0rem;
 	float: right;
 	width: 48px;
 	height: 48px;
 	border-radius: 50%;
 	border: 1px solid transparent
+}
+	.button {
+        display: inline-block;
+        border: 0;
+       /* margin-top: 70px;
+        padding: 14px 21px;*/
+        border-radius: 5px;
+        background-color: #efc10a;
+        /*box-shadow: rgba(255,255,255,0.29) 0 1px 0 0 inset,rgba(0,0,0,0.27) 0 2px 11px 0;*/
+        -webkit-transition: background-color 300ms ease-in;
+        transition: background-color 300ms ease-in;
+        color: white;
+        font-size: 20px;
+        text-align: center;
+        text-decoration: none;
+        width:90px;
+        height:50px;
+        float: right;
+    }
+    .vote{
+    	line-height:100%;
+    	vertical-align: middle;
+    	padding-top: 24px;
+    }
+.descs{
+    	padding-top: 25px;
+    }
+.bandeLogo{
+	height: 50px;
+	margin-top:-15px;
+	margin-left: 6px;
+}
+.bande1 {
+	font-size: 16px;
+	margin-top: -15px;
+}
+.bande2 {
+	font-size: 10px;
+}
+.bandeDownload{
+	width: 80px;
+	margin-left: 20px;
+	margin-bottom: 5px;
+}
+.bandeClose{
+	width: 18px;
+	margin-left: 8px;
+	margin-bottom: 25px;
 }
 }
 .am-comment-main {
@@ -15273,4 +15583,43 @@ tbody.am-collapse.am-in {
 .am-wechatpay .am-wechatpay-btn {
 	margin-top: 1rem;
 	margin-bottom: 1rem
+}
+.bottomDiv {
+	text-align: left;
+	margin-left: 0px;
+	width: 100%;
+	height: 60px;
+	position: fixed;
+	color: white;
+	text-align: center;
+	background-color: rgba(0, 0, 0, 0.7);
+	left: 0px;
+	bottom: 0px;
+	_position: absolute;
+	z-index: 88888
+}
+
+.div1 {
+	z-index: 55555;
+	background-image: url('images/wait4.gif');
+	background-repeat: inherit;
+	opacity: .3;
+	filter: alpha(opacity = 20);
+	text-align: center;
+	line-height: 40px;
+	font-size: 12px;
+	font-weight: bold;
+	width: 50px;
+	height: 50px;
+	left: 50%;
+	top: 50%;
+	margin-left: -20px !important;
+	margin-top: -40px !important;
+	margin-top: 0;
+	position: fixed !important;
+	position: absolute;
+	_top: expression(eval(document.compatMode &&   document.compatMode ==
+		'CSS1Compat')?  documentElement.scrollTop+(document.documentElement.clientHeight-this.offsetHeight
+		)/2:document.body.scrollTop+(document.body.clientHeight-  this.clientHeight
+		)/2 )
 }

@@ -1826,7 +1826,10 @@ public class PhotoAction extends ActionSupport {
 		}
 		request.setAttribute("pictureSet", pictureSet);
 		if(themeId!=null&&!"".equals(themeId)&&!"0".equals(themeId)){
+			Cycle cycle = (Cycle) this.photoService.getObjectById(Cycle.class,
+					themeId);
 			request.setAttribute("themeId", themeId);
+			request.setAttribute("cycle", cycle);
 		}
 		request.setAttribute("photos", pList);
 		return "toLoadPictureSet";

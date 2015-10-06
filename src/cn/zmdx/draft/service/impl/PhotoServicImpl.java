@@ -131,6 +131,8 @@ public class PhotoServicImpl implements PhotoService {
 				    long hour=time/(24*60*60*1000);
 					double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
 					ps.setRank(rank);
+				}else{
+					ps.setPraise(ps.getPraise()+1);
 				}
 			}else if(operationType==1){
 				ps.setTread(ps.getTread()+1);
