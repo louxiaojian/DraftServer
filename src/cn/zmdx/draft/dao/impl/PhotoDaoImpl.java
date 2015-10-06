@@ -173,7 +173,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryThemes(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate from theme_cycle order by status desc,starttime asc");
+		sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl from theme_cycle order by status desc,starttime asc");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -209,7 +209,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List validateIsAttend(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select p.id from photo p left join cycle_photo_set cp on p.id=cp.photo_set_id  where cp.theme_cycle_id=? and p.userid=? ");
+		sql.append("SELECT ps.id from cycle_photo_set cp LEFT join picture_set ps on cp.photo_set_id =ps.id where cp.theme_cycle_id=? and ps.userid=? ");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
