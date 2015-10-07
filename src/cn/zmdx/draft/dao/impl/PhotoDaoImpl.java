@@ -105,7 +105,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,photoCount from picture_set where status =1 and type=0 ");
+				+ "') as coverUrl,photoCount from picture_set where status =1 ");//个人、选秀图片全部显示在照片墙 and type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -139,7 +139,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,rank,photoCount,votes from rank_picture_set where status =1 and type=1 ");
+				+ "') as coverUrl,rank,photoCount,votes from draft_rank_picture_set where status =1 and type=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -313,7 +313,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,rank,photoCount from rank_picture_set where status =1 and type=0 ");
+				+ "') as coverUrl,rank,photoCount from rank_picture_set where status =1 ");//个人、选秀图片全部显示在照片墙 and type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -395,7 +395,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryUserCycleRanking(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,rps.praise from users u left join rank_picture_set rps on rps.userid=u.id where rps.status =1 and rps.type=1 ");
+		sql.append("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,rps.praise from users u left join draft_rank_picture_set rps on rps.userid=u.id where rps.status =1 and rps.type=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
