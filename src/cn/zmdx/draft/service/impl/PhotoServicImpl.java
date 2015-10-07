@@ -147,6 +147,8 @@ public class PhotoServicImpl implements PhotoService {
 			    	long hour=time/(24*60*60*1000);
 					double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
 					ps.setRank(rank);
+				}else{
+					ps.setPraise(ps.getPraise()-1);
 				}
 				int count=this.photoDao.deleteOperationRecords(Integer.parseInt(userid), Integer.parseInt(pictureSetId));
 				if(count<1){

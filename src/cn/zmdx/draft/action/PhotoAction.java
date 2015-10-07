@@ -1770,44 +1770,48 @@ public class PhotoAction extends ActionSupport {
 		String pictureSetId = request.getParameter("pictureSetId");
 		String themeId = request.getParameter("themeId");
 		String code = request.getParameter("code");
-		logger.error("code****"+code+"****");
-		String secret="9d992669fdd0cadc51110e20571be7e9";
-		String appid="wx81b0d978030f90aa";
-		SnsToken snsToken=SnsAPI.oauth2AccessToken(appid, secret, code);
-		logger.error("Openid****"+snsToken.getOpenid()+"****");
-		// 验证是否已注册
-		User currentUser = this.userService.validateThirdPartyUser(snsToken.getOpenid(),"weixin");
-		if (currentUser != null) {// 已存在用户信息
-			request.setAttribute("currentUser", currentUser);
-		} else {
-			logger.error("Access_token****"+snsToken.getAccess_token()+"****");
-			WeiXinUser weixinUser =new WeiXinUser();
-			weixinUser=SnsAPI.userinfo(snsToken.getAccess_token(),
-					snsToken.getOpenid(), "zh_CN");
+		if (code!=null&&!"".equals(code)) {
+			logger.error("code****"+code+"****");
+			String secret="9d992669fdd0cadc51110e20571be7e9";
+			String appid="wx81b0d978030f90aa";
+			SnsToken snsToken=SnsAPI.oauth2AccessToken(appid, secret, code);
 			logger.error("Openid****"+snsToken.getOpenid()+"****");
-			logger.error("weixinUser****"+weixinUser.getNickname()+"****");
-			if(weixinUser.getNickname()!=null&&!"".equals(weixinUser.getNickname())){
-				User newUser = new User();
-				newUser.setUsername(weixinUser.getNickname());
-				if (!"".equals(weixinUser.getHeadimgurl())
-						&& weixinUser.getHeadimgurl() != null) {
-					newUser.setHeadPortrait(weixinUser.getHeadimgurl());
-				} else {
-					newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
+			// 验证是否已注册
+			User currentUser = this.userService.validateThirdPartyUser(snsToken.getOpenid(),"weixin");
+			if (currentUser != null) {// 已存在用户信息
+				request.setAttribute("currentUser", currentUser);
+				request.getSession().setAttribute("currentUserId", currentUser.getId());
+			} else {
+				logger.error("Access_token****"+snsToken.getAccess_token()+"****");
+				WeiXinUser weixinUser =new WeiXinUser();
+				weixinUser=SnsAPI.userinfo(snsToken.getAccess_token(),
+						snsToken.getOpenid(), "zh_CN");
+				logger.error("Openid****"+snsToken.getOpenid()+"****");
+				logger.error("weixinUser****"+weixinUser.getNickname()+"****");
+				if(weixinUser.getNickname()!=null&&!"".equals(weixinUser.getNickname())){
+					User newUser = new User();
+					newUser.setUsername(weixinUser.getNickname());
+					if (!"".equals(weixinUser.getHeadimgurl())
+							&& weixinUser.getHeadimgurl() != null) {
+						newUser.setHeadPortrait(weixinUser.getHeadimgurl());
+					} else {
+						newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
+					}
+					newUser.setGender(weixinUser.getSex()==null?0:weixinUser.getSex());
+					newUser.setIntroduction("");
+					newUser.setLoginname("");
+					newUser.setPassword("");
+					newUser.setFlag("1");
+					newUser.setIsvalidate("0");
+					newUser.setAge(0);
+					newUser.setRegistrationDate(new Date());
+					newUser.setOrgId(0);
+					newUser.setThirdParty("weixin");
+					newUser.setUid(snsToken.getOpenid());
+					this.photoService.saveEntity(newUser);
+					request.setAttribute("currentUser", newUser);
+					request.getSession().setAttribute("currentUserId", newUser.getId());
 				}
-				newUser.setGender(weixinUser.getSex()==null?0:weixinUser.getSex());
-				newUser.setIntroduction("");
-				newUser.setLoginname("");
-				newUser.setPassword("");
-				newUser.setFlag("1");
-				newUser.setIsvalidate("0");
-				newUser.setAge(0);
-				newUser.setRegistrationDate(new Date());
-				newUser.setOrgId(0);
-				newUser.setThirdParty("weixin");
-				newUser.setUid(snsToken.getOpenid());
-				this.photoService.saveEntity(newUser);
-				request.setAttribute("currentUser", newUser);
 			}
 		}
 		PictureSet pictureSet =null;
@@ -1832,6 +1836,7 @@ public class PhotoAction extends ActionSupport {
 			request.setAttribute("cycle", cycle);
 		}
 		request.setAttribute("photos", pList);
+		request.setAttribute("code", code);
 		return "toLoadPictureSet";
 	}
 	/**

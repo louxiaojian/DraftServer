@@ -523,7 +523,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryNotify(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select o.id as id,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead  from users u left join operation_records o on informer_id=u.id left join picture_set ps on ps.id=o.picture_set_id where operation_type>3 ");
+		sql.append("select o.id as id,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead  from picture_set ps  left join operation_records o on ps.id=o.picture_set_id  left join  users u  on informer_id=u.id  where operation_type>3 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("currentUserId"))
 					&& filterMap.get("currentUserId") != null) {

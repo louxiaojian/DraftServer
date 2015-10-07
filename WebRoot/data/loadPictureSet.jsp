@@ -186,30 +186,36 @@
   <script type="text/javascript">
   	function vote_pic(){
   		//alert(${currentUser.id}+"-----"+${pictureSet.id});
-  		var params = {"currentUserId": '1',"pictureSetId":'${pictureSet.id}'};  
-		var actionUrl = "<%=request.getContextPath()%>/photo_vote.action";  
-		$.ajax({  
-			  url : actionUrl,  
-		      type : "post", 
-		      data : params,  
-		      dataType : "json",  
-		      cache : false,  
-		      error : function(textStatus, errorThrown) {
-		    	  alert("系统错误");
-		      },  
-		      success : function(data, textStatus) {
-		      	if(data.state=='0'){
-		      		if(data.result.state=='0'){
-		      			document.getElementById("vote").innerHTML=document.getElementById("vote").innerHTML*1+1;
-		      			alert("投票成功，您还有"+data.result.surplusVotes+"票");
-		      		}else{
-		      			alert("今日票数已用尽！");
-		      		}
-		      	}else{
-		      		alert(data.errorMsg);
-		      	}
-		    }  
-		});
+  		var currentUserId='<%=request.getSession().getAttribute("currentUserId")%>';
+  		if(('${code}'!=null&&'${code}'!=""&&'${code}'!="null")||(currentUserId!=null&&currentUserId!="null")){
+  			var params = {"currentUserId": currentUserId,"pictureSetId":'${pictureSet.id}'};  
+  			var actionUrl = "<%=request.getContextPath()%>/photo_vote.action";
+  			$.ajax({  
+  				  url : actionUrl,  
+  			      type : "post", 
+  			      data : params,  
+  			      dataType : "json",  
+  			      cache : false,  
+  			      error : function(textStatus, errorThrown) {
+  			    	  alert("系统错误");
+  			      },  
+  			      success : function(data, textStatus) {
+  			      	if(data.state=='0'){
+  			      		if(data.result.state=='0'){
+  			      			document.getElementById("vote").innerHTML=document.getElementById("vote").innerHTML*1+1;
+  			      			alert("投票成功，您还有"+data.result.surplusVotes+"票");
+  			      		}else{
+  			      			alert("今日票数已用尽！");
+  			      		}
+  			      	}else{
+  			      		alert(data.errorMsg);
+  			      	}
+  			    }  
+  			});
+  		}else{
+  	  		var codeUrl= 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx81b0d978030f90aa&redirect_uri='+encodeURIComponent('http://pandora.hdlocker.com/draftServer/photo_loadPictureSet.action?pictureSetId=${pictureSet.id}&themeId=${themeId}')+'&response_type=code&scope=snsapi_userinfo&state='+Math.round(Math.random()*10000000)+'#wechat_redirect';
+  	  		window.location.href=codeUrl;
+  		}
   	}
 	function closeDiv(){
 		document.getElementById("div1").style.display="none"
