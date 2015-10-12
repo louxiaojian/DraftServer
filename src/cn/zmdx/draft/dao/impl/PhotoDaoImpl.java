@@ -283,7 +283,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& filterMap.get("themeCycleId") != null) {
 				sql.append(" and theme_cycle_id=:themeCycleId");
 			}
-			sql.append(" order by uploadDate desc,id desc limit :limit");
+			sql.append(" order by uploadDate desc,id desc");// limit :limit
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -300,10 +300,10 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 			query.setInteger("themeCycleId",
 					Integer.parseInt(filterMap.get("themeCycleId")));
 		}
-		if (!"".equals(filterMap.get("limit"))
-				&& filterMap.get("limit") != null) {
-			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
-		}
+//		if (!"".equals(filterMap.get("limit"))
+//				&& filterMap.get("limit") != null) {
+//			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+//		}
 		return query.list();
 	}
 
