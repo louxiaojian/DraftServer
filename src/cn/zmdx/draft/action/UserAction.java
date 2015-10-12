@@ -320,7 +320,7 @@ public class UserAction extends ActionSupport {
 		try {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			String id = request.getParameter("currentUserId");
-			if (id == null || "".equals(id)) {
+			if (id == null || "".equals(id)|| "null".equals(id)|| "0".equals(id)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
@@ -391,7 +391,7 @@ public class UserAction extends ActionSupport {
 			if (!"".equals(ageStr) && ageStr != null) {
 				age = Integer.parseInt(ageStr);
 			}
-			if (id == null || "".equals(id)) {
+			if (id == null || "".equals(id)|| "null".equals(id)|| "0".equals(id)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
@@ -507,7 +507,7 @@ public class UserAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			User user = userService.getById(Integer.parseInt(userId));
-			if (userId == null || "".equals(userId) || user == null) {
+			if (userId == null || "".equals(userId) || user == null|| "null".equals(userId)|| "0".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				// 验证是否已经关注
@@ -604,8 +604,8 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
 			String attentionUserId = request.getParameter("userId");
-			if (fansUserId == null || "".equals(fansUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
@@ -669,8 +669,8 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
 			String attentionUserId = request.getParameter("userId");
-			if (fansUserId == null || "".equals(fansUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
@@ -711,8 +711,8 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
 			String attentionUserId = request.getParameter("userId");
-			if (fansUserId == null || "".equals(fansUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
@@ -748,8 +748,8 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = response.getWriter();
 		try {
 			String fansUserId = request.getParameter("currentUserId");
-			if (fansUserId == null || "".equals(fansUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				if (fansUserId != null && !"".equals(fansUserId)) {
@@ -784,8 +784,8 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = response.getWriter();
 		try {
 			String attentionUserId = request.getParameter("currentUserId");
-			if (attentionUserId == null || "".equals(attentionUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (attentionUserId == null || "".equals(attentionUserId)|| "null".equals(attentionUserId)|| "0".equals(attentionUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				if (attentionUserId != null && !"".equals(attentionUserId)) {
@@ -1003,8 +1003,8 @@ public class UserAction extends ActionSupport {
 		try {
 			String attentionUserId = request.getParameter("currentUserId");
 			String nickName = StringUtil.encodingUrl(request.getParameter("nickName"));//用户昵称
-			if (attentionUserId == null || "".equals(attentionUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (attentionUserId == null || "".equals(attentionUserId)|| "null".equals(attentionUserId)|| "0".equals(attentionUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				if (nickName != null && !"".equals(nickName)) {

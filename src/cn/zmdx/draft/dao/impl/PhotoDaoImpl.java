@@ -231,7 +231,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	public List queryComment(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
 		// sql.append("select id,content,datetime,parent_user_id as parentUserId ,picture_set_id as pictureSetId,user_id as userId,username,parentusername from (SELECT c.id,content,datetime,parent_user_id,picture_set_id,user_id,u.loginname as username,uu.loginname as parentusername FROM comment c left join users u on c.user_id=u.id left join users uu on uu.id =c.parent_user_id where 1=1 ");
-		sql.append("SELECT c.id as id,c.content,c.datetime,c.parent_user_id as parentUserId,c.picture_set_id as pictureSetId,c.user_id as userId,u.loginname as username,uu.loginname as parentusername FROM comment c left join users u on c.user_id=u.id left join users uu on uu.id =c.parent_user_id where 1=1 ");
+		sql.append("SELECT c.id as id,c.content,c.datetime,c.parent_user_id as parentUserId,c.picture_set_id as pictureSetId,c.user_id as userId,u.loginname as username,uu.loginname as parentusername FROM comment c left join users u on c.user_id=u.id left join users uu on uu.id =c.parent_user_id where 1=1 and c.user_id>0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("pictureSetId"))
 					&& filterMap.get("pictureSetId") != null

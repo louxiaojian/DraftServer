@@ -108,7 +108,7 @@ public class PhotoAction extends ActionSupport {
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
-			if (userid == null || "".equals(userid)) {
+			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"查看的用户不存在\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
@@ -553,8 +553,8 @@ public class PhotoAction extends ActionSupport {
 		try {
 			out = ServletActionContext.getResponse().getWriter();
 			String userId = request.getParameter("currentUserId");
-			if (userId == null || "".equals(userId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (userId == null || "".equals(userId)|| "null".equals(userId)|| "0".equals(userId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				File[] files = getImage();
 				if (files != null && files[0] != null) {
@@ -607,8 +607,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
@@ -647,8 +647,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
@@ -687,8 +687,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
@@ -727,8 +727,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
@@ -805,7 +805,7 @@ public class PhotoAction extends ActionSupport {
 			String pictureSetId = request.getParameter("pictureSetId");
 			User user=(User)this.photoService.getObjectById(User.class, userid);
 			if (("".equals(userid) || userid == null)||user==null) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if ("".equals(pictureSetId) || pictureSetId == null) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
@@ -1079,8 +1079,8 @@ public class PhotoAction extends ActionSupport {
 			// int i =Integer.parseInt("s");
 			String themeCycleId = request.getParameter("themeCycleId");// 周期id
 			String userId = request.getParameter("currentUserId");// 用户id
-			if (userId == null || "".equals(userId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (userId == null || "".equals(userId)|| "null".equals(userId)|| "0".equals(userId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (themeCycleId == null || "".equals(themeCycleId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀主题\"}");
@@ -1137,8 +1137,8 @@ public class PhotoAction extends ActionSupport {
 			if (pictureSetId == null || "".equals(pictureSetId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 			} else {
-				if (userId == null || "".equals(userId)) {
-					out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+				if (userId == null || "".equals(userId)|| "null".equals(userId)|| "0".equals(userId)) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 				} else {
 					if (content == null || "".equals(content)) {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"评论不能为空\"}");
@@ -1270,7 +1270,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String beingInformerId = request.getParameter("userId");// 被举报用户id
 			if (currentUserId == null || "".equals(currentUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (beingInformerId == null || "".equals(beingInformerId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"查看的用户不存在\"}");
@@ -1626,7 +1626,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");
 
 			if (currentUserId == null || "".equals(currentUserId)) {
-				out.print("{\"state\":1,\"errorMsg\":\"请先登录\"}");
+				out.print("{\"state\":1,\"errorMsg\":\"请重新登录\"}");
 			} else {
 				// 加载图集点赞人
 				Map<String, String> filterMap = new HashMap();
@@ -1671,7 +1671,7 @@ public class PhotoAction extends ActionSupport {
 			String lastId = request.getParameter("lastId");
 			String limit = request.getParameter("limit");
 			if (currentUserId == null || "".equals(currentUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if ("".equals(limit) || limit == null) {
 					limit = "10";
@@ -1710,7 +1710,7 @@ public class PhotoAction extends ActionSupport {
 			out = response.getWriter();
 			String currentUserId = request.getParameter("currentUserId");// 当前用户id
 			if (currentUserId == null || "".equals(currentUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("currentUserId", currentUserId);
@@ -1748,7 +1748,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户id
 			String id = request.getParameter("id");// 当前用户id
 			if (currentUserId == null || "".equals(currentUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("currentUserId", currentUserId);
