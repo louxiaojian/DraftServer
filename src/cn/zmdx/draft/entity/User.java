@@ -26,9 +26,11 @@ public class User {
 	private String fileid;//头像图片 万象fileid
 	private String isAttention;//是否已关注，0已关注，1未关注
 	private String cookie;
+	private String alias;//用户登录设备别名
 	
 	//选秀排名所用
-	private int praise;
+	private int praise;//赞
+	private int votes;//投票
 	
 	public int getId() {
 		return id;
@@ -173,6 +175,18 @@ public class User {
 	}
 	public void setValidateUrl(String validateUrl) {
 		this.validateUrl = validateUrl;
+	}
+	public String getAlias() {
+		return alias;
+	}
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+	public int getVotes() {
+		return votes;
+	}
+	public void setVotes(int votes) {
+		this.votes = votes;
 	}
 	
 }

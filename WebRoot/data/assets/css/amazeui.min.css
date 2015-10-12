@@ -351,8 +351,8 @@ blockquote p:last-of-type {
 }
 
 .am-g .am-g {
-	margin-left: -1rem;
-	margin-right: -1rem;
+	/*margin-left: -1rem;
+	margin-right: -1rem;*/
 	width: auto
 }
 
@@ -381,8 +381,8 @@ blockquote p:last-of-type {
 
 [class *=am-u-] {
 	width: 100%;
-	padding-left: 1rem;
-	padding-right: 1rem;
+	/*padding-left: 1rem;
+	padding-right: 1rem;*/ 
 	float: left;
 	position: relative
 }
@@ -3562,6 +3562,12 @@ a.am-badge:focus,a.am-badge:hover {
     transition-delay: initial;
     color: white;
 }
+.button:hover {
+    background-color: #d4aa04;
+    -webkit-transition-delay: initial;
+    transition-delay: initial;
+    color: white;
+}
 .descs{
     	margin-top: 10px;
     }
@@ -3671,7 +3677,9 @@ a.am-badge:focus,a.am-badge:hover {
     	font-size: 14px;
     }
     .descs{
-    	margin-top: 0px;
+    	margin-top: 10px;
+    	font-size:12px;
+        padding-left: 15px;
     }
 .am-comment-avatar-right {
 	margin-top: 0rem;
@@ -3707,7 +3715,7 @@ a.am-badge:focus,a.am-badge:hover {
 }
 .bande2 {
 	font-size: 10px;
-	margin-top: -25px;
+	margin-top: -20px;
 }
 .bandeDownload{
 	width: 80px;
@@ -3789,7 +3797,7 @@ a.am-badge:focus,a.am-badge:hover {
 	margin-top: 0px;
 }
 .bande2 {
-	margin-top: -22px;
+	margin-top: -20px;
 	font-size: 10px;
 }
 .bandeDownload{

@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>图集</title>
+<title>享秀</title>
 <link rel="stylesheet" type="text/css"
 	href="<%=request.getContextPath()%>/data/css.css" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -77,8 +77,7 @@
     }
 
     .my-head {
-      margin-top: 10px;
-      text-align: center;margin-bottom: 10px;
+      text-align: center;/*margin-bottom: 10px;*/
     }
 
     .my-button {
@@ -103,55 +102,66 @@
 <%
 	response.setHeader("Cache-Control","max-age=1800");
 %>
-<body style="background-color: white;color: block;">
-<header class="am-g my-head">
-  <div class="am-u-sm-12 am-article">
-    <h1 class="am-article-title"><c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'>${cycle.themeTitle }</c:if></h1>
-  </div>
-</header>
+<body style="background-color: #f8f8f8;color: block;">
 <div class="am-g am-g-fixed">
   <div class="am-u-md-9 am-u-md-push-3">
     <div class="am-g">
-      <div class="am-u-sm-11 am-u-sm-centered">
-        <div class="am-cf am-article">
-          <div style="width: 100%;height: 40px;">
+<header class="am-g my-head">
+  <div class="am-u-sm-12 am-article" style="padding-left:0px;padding-right: 0px;">
+        <c:if test="${pictureSet!=null }">
+    		<h1 class="am-article-title"><c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'>
+    			<img src="${cycle.webTitleUrl }" alt="" class="" width="100%"></c:if>
+    		</h1>
+        </c:if>
+        <c:if test="${pictureSet==null }">
+    		<h1 class="am-article-title">您所查看的图集不存在</h1>
+        </c:if>
+  </div>
+</header>
+        <c:if test="${pictureSet!=null }">
+        <div class="am-cf am-article" style="width: 100%;background-color: white;margin-left: auto;margin-right: auto;margin-top: -5px;">
+          <div style="width: 91.66666667%;height: 40px;background-color: white;;margin-left: auto;margin-right: auto">
           	<div class="headerPic">
           		<img src="${pictureSet.user.headPortrait }" alt="" class="am-comment-avatar" width="48" height="48">
           	</div>
           	<div style="width: 60%;float: left;height: 40px">
-          		<p style="width: 80%;margin: 0" class="title">${pictureSet.user.username }</p>
-          		<p style="width: 80%;margin: 0" class="title">当前票数：<span id="vote">${pictureSet.votes }</span></p>
+          		<p style="width: 100%;margin: 0;font-weight:bold;" class="title">${fn:substring(pictureSet.user.username, 0, 12) }<c:if test="${fn:length(pictureSet.user.username)>12 }">...</c:if>  </p>
+          		<p style="width: 100%;margin: 0;color: rgba(51, 51, 51, 0.8);" class="title">当前票数：<span id="vote">${pictureSet.votes }</span></p>
           	</div>
           	<div style="width: 25%;float: right;height: 40px">
           	<input type="button" value="为ta投票" class="button" style="border: 0;" onclick="vote_pic()">
           	</div>
+          <div class="headerPic" style="width: 100%;height: auto;margin-bottom: -10px;">
+          	<p class="descs">${pictureSet.descs }</p>
           </div>
-          <p class="descs">${pictureSet.descs }</p>
-          <hr style="margin: 0px;">
-          <p style="text-align: right;margin: 0"><fmt:formatDate value="${pictureSet.uploadDate}" pattern="MM/dd"/></p>
+          </div>
+          </div></c:if>
+      <div class="am-u-sm-11 am-u-sm-centered">
+        <div class="am-cf am-article">
+        <c:if test="${pictureSet!=null }">
+          <p style="text-align: right;margin: 0;font-size: 12px;color: rgba(51, 51, 51, 0.6);"><fmt:formatDate value="${pictureSet.uploadDate}" pattern="MM/dd"/></p>
           <c:forEach var="photo" items="${photos }" varStatus="vs">
           	<c:if test="${vs.count!= fn:length(photos)}">
-	         	<div style="background-color: #E0E0E0;margin: 0px;padding: 0px;">
+	         	<div style="background-color: #white;margin: 0px;padding: 0px;">
 	         	<img src="${photo.photoUrl }" alt="" width="100%" style="padding: 15px 15px 0px 15px;">
 	         	</div>
           	</c:if>
-          </c:forEach>
-          <c:forEach var="photo" items="${photos }" varStatus="vs">
           	<c:if test="${vs.count== fn:length(photos)}">
-	         	<div style="background-color: #E0E0E0;margin: 0px;padding: 0px;">
+	         	<div style="background-color: white;margin: 0px;padding: 0px;margin-bottom: 10px;">
 	         	<img src="${photo.photoUrl }" alt="" width="100%" style="padding: 15px 15px 15px 15px;">
 	         	</div>
           	</c:if>
           </c:forEach>
-          <c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'><a href="http://pandora.hdlocker.com/draftServer/photo_loadThemeCycle.action?themeCycleId=${themeId }">活动规则</a></c:if> 
-          <p>注：每人每天一个主题下限投3票</p>
+          <c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'><a href="http://pandora.hdlocker.com/draftServer/photo_loadThemeCycle.action?themeCycleId=${themeId }">活动规则及奖项设置</a></c:if> 
+          <p style="font-size: 14px;color: rgba(51, 51, 51, 0.6);line-height: 1.4;">注：每人每天一个主题下限投3票，使用享秀APP还可以再投3票。</p>
+          </c:if>
         </div>
       </div>
     </div>
   </div>
 </div>
 <footer class="my-footer">
-  <p>享秀<br><small>© Copyright XXX. by the AmazeUI Team.</small></p>
+  <p>享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
 </footer>
 <div id="div1" class="bottomDiv">
 	<div style="font-size: 10px;text-align: center;width: 100%;color:#faca0d;">如想查看全部排名请下载享秀APP</div>
@@ -187,7 +197,7 @@
   	function vote_pic(){
   		//alert(${currentUser.id}+"-----"+${pictureSet.id});
   		var currentUserId='<%=request.getSession().getAttribute("currentUserId")%>';
-  		if(('${code}'!=null&&'${code}'!=""&&'${code}'!="null")||(currentUserId!=null&&currentUserId!="null")){
+  		if(('${code}'!=null&&'${code}'!=""&&'${code}'!="null")||(currentUserId!=null&&currentUserId!="null"&&currentUserId!="")){
   			var params = {"currentUserId": currentUserId,"pictureSetId":'${pictureSet.id}'};  
   			var actionUrl = "<%=request.getContextPath()%>/photo_vote.action";
   			$.ajax({  

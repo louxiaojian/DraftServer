@@ -89,7 +89,7 @@
     }
 
     .my-footer {
-      border-top: 1px solid #eeeeee;
+      border-top: 1px solid rgba(238, 238, 238, 0.42);
       padding: 10px 0;
       margin-top: 10px;
       text-align: center;
@@ -103,24 +103,12 @@
 <div class="am-g am-g-fixed">
   <div class="am-u-md-9 am-u-md-push-3">
     <div class="am-g">
-      <div class="am-u-sm-11 am-u-sm-centered">
-        <div class="am-cf am-article">
-            <img src="${cycle.bgUrl}" alt="" width="100%">
-          <h2>主题介绍</h2>
-          <p>${cycle.descs}</p>
-          <h2>活动细则</h2>
-          <p>${cycle.role}</p>
-          <h2>活动时间</h2>
-          <p><fmt:formatDate value="${cycle.starttime}" pattern="yyyy年MM月dd日"/> 至 <fmt:formatDate value="${cycle.endtime }" pattern="yyyy年MM月dd日"/></p>
-          <h2>奖项设置</h2>
-          <p>${cycle.awardSetting}</p>
-        </div>
-      </div>
+       <img src="${cycle.webDetailUrl}" alt="" width="100%">
     </div>
   </div>
 </div>
 <footer class="my-footer">
-  <p>享秀<br><small>© Copyright XXX. by the AmazeUI Team.</small></p>
+  <p>享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
 </footer>
 
 <!--[if lt IE 9]>

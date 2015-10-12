@@ -25,6 +25,7 @@
 		<property name="thirdParty" column="third_party"/>
 		<property name="fileid" column="fileid"/>
 		<property name="validateUrl" column="validateUrl"/>
+		<property name="alias" column="alias"/>
 	</class>
 	
 </hibernate-mapping>

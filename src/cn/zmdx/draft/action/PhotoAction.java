@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -373,8 +374,8 @@ public class PhotoAction extends ActionSupport {
 			String themeTitle = request.getParameter("themeTitle");// 选秀主题标题
 
 			Map<String, Object> filterMap = new HashMap();
-			if (userid == null || "".equals(userid)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
+			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				User user = (User) this.photoService.getObjectById(User.class,
 						userid);
@@ -802,8 +803,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-
-			if ("".equals(userid) || userid == null) {
+			User user=(User)this.photoService.getObjectById(User.class, userid);
+			if (("".equals(userid) || userid == null)||user==null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先登录\"}");
 			} else {
 				if ("".equals(pictureSetId) || pictureSetId == null) {
@@ -811,19 +812,30 @@ public class PhotoAction extends ActionSupport {
 				} else {
 					PictureSet ps = (PictureSet) this.photoService
 							.getObjectById(PictureSet.class, pictureSetId);
-					Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
-					surplusVotesFilterMap.put("userId", userid);
-					surplusVotesFilterMap.put("themeId",
-							String.valueOf(ps.getThemeCycleId()));
-					int votes = this.photoService
-							.queryUserSurplusVote(surplusVotesFilterMap);
-					if (votes >= 3) {
-						out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
-					} else {
-						String result = photoService.OperationPictureSet(
-								userid, pictureSetId, 3);
-						out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
-								+ (3 - votes - 1) + "\"}}");
+					int themeId=ps.getThemeCycleId();
+					Cycle cycle=(Cycle)this.photoService.getObjectById(Cycle.class, String.valueOf(themeId));
+					Date currentDate=new Date();
+					if(!"1".equals(cycle.getStatus())){
+						out.print("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
+					}else if(cycle.getVoteStartTime().getTime()<currentDate.getTime()&&cycle.getVoteEndTime().getTime()>currentDate.getTime()){
+						Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
+						surplusVotesFilterMap.put("userId", userid);
+						surplusVotesFilterMap.put("themeId",
+								String.valueOf(ps.getThemeCycleId()));
+						int votes = this.photoService
+								.queryUserSurplusVote(surplusVotesFilterMap);
+						if (votes >= 3) {
+							out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
+						} else {
+							String result = photoService.OperationPictureSet(
+									userid, pictureSetId, 3);
+							out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
+									+ (3 - votes - 1) + "\"}}");
+						}
+					}else if(cycle.getVoteStartTime().getTime()>currentDate.getTime()){
+						out.print("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
+					}else if(cycle.getVoteEndTime().getTime()<currentDate.getTime()){
+						out.print("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
 					}
 				}
 			}
@@ -1531,9 +1543,9 @@ public class PhotoAction extends ActionSupport {
 				surplusVotesFilterMap.put("themeId", themeCycleId);
 				int surplusVotes = this.photoService
 						.queryUserSurplusVote(surplusVotesFilterMap);
-				out.print("{\"state\":0,\"result\":{\"psRank\":"
+				out.print("{\"state\":0,\"result\":{\"psList\":"
 						+ JSON.toJSONString(photoSetResult, true)
-						+ ",\"psList\":" + JSON.toJSONString(result, true)
+						+ ",\"psRank\":" + JSON.toJSONString(result, true)
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
 						+ ",\"isUserAttented\":\"" + isvalidate
 						+ "\",\"surplusVotes\":\"" + (3 - surplusVotes)

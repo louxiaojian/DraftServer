@@ -17,6 +17,10 @@
 		<property name="role" column="role" />
 		<property name="awardSetting" column="award_setting" />
 		<property name="isNeedValidate" column="isNeedValidate" />
+		<property name="voteStartTime" column="vote_start_time" />
+		<property name="voteEndTime" column="vote_end_time" />
+		<property name="webDetailUrl" column="web_detail_url" />
+		<property name="webTitleUrl" column="web_title_url" />
 	</class>
 	
 </hibernate-mapping>

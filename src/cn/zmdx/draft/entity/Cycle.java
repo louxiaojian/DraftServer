@@ -13,10 +13,14 @@ public class Cycle {
 	private String descs;//主题描述
 	private String tag;//标签图片路径
 	private String detailImageUrl;//描述图片
-	private String insideDetailImageUrl;//描述图片
+	private String insideDetailImageUrl;//选秀查看详情页面内
+	private String webDetailUrl;//web页面显示主题活动详情
+	private String webTitleUrl;//web页面标题图片
 	private String role;//主题规则
 	private String awardSetting;//奖项设置
 	private String isNeedValidate;//是否需要真人验证，0：需要，1：不需要
+	private Date voteStartTime;//投票开始时间
+	private Date voteEndTime;//投票结束时间
 	
 	public int getId() {
 		return id;
@@ -95,5 +99,29 @@ public class Cycle {
 	}
 	public void setInsideDetailImageUrl(String insideDetailImageUrl) {
 		this.insideDetailImageUrl = insideDetailImageUrl;
+	}
+	public Date getVoteStartTime() {
+		return voteStartTime;
+	}
+	public void setVoteStartTime(Date voteStartTime) {
+		this.voteStartTime = voteStartTime;
+	}
+	public Date getVoteEndTime() {
+		return voteEndTime;
+	}
+	public void setVoteEndTime(Date voteEndTime) {
+		this.voteEndTime = voteEndTime;
+	}
+	public String getWebDetailUrl() {
+		return webDetailUrl;
+	}
+	public void setWebDetailUrl(String webDetailUrl) {
+		this.webDetailUrl = webDetailUrl;
+	}
+	public String getWebTitleUrl() {
+		return webTitleUrl;
+	}
+	public void setWebTitleUrl(String webTitleUrl) {
+		this.webTitleUrl = webTitleUrl;
 	}
 }

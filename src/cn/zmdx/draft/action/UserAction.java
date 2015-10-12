@@ -16,6 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
+import cn.jpush.api.JPushClient;
+import cn.jpush.api.common.resp.APIConnectionException;
+import cn.jpush.api.common.resp.APIRequestException;
+import cn.jpush.api.push.PushResult;
+import cn.jpush.api.push.model.notification.IosAlert;
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.Notify;
 import cn.zmdx.draft.entity.PictureSet;
@@ -63,7 +68,10 @@ public class UserAction extends ActionSupport {
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
-
+	private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
+	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
+	private JPushClient jPushClient=new JPushClient(jpushMasterSecret, jpushAppKey, 3);
+	
 	public UserServiceImpl getUserService() {
 		return userService;
 	}
@@ -237,6 +245,7 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			String loginname = request.getParameter("loginname");
 			String pwd = request.getParameter("password");
+			String alias = request.getParameter("alias");//用户登录设备别名
 			if ("".equals(loginname) || loginname == null || "".equals(pwd)
 					|| pwd == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
@@ -245,6 +254,8 @@ public class UserAction extends ActionSupport {
 				if (user == null) {
 					out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 				} else {
+					user.setAlias(alias);//更新用户登录设备别名
+					this.userService.updateUser(user);
 					Sha1 sha1 = new Sha1();
 					pwd = sha1.Digest(pwd);
 					if (user.getPassword().equals(pwd)) {
@@ -605,6 +616,12 @@ public class UserAction extends ActionSupport {
 					if (u != null) {
 						out.print("{\"state\":1,\"errorMsg\":\"已关注\"}");
 					} else {
+//						IosAlert alert = IosAlert.newBuilder()
+//				                .setTitleAndBody("测试标题", "你被关注了")
+//				                .setActionLocKey("PLAY")
+//				                .build();
+//						PushResult result = jPushClient.sendIosNotificationWithAlias(alert, new HashMap<String, String>(), "ios");
+//						logger.info("jpush result："+result );
 						UserAttentionFans uaf = new UserAttentionFans();
 						uaf.setAttentionUserId(Integer
 								.parseInt(attentionUserId));
@@ -615,7 +632,18 @@ public class UserAction extends ActionSupport {
 					}
 				}
 			}
-		} catch (Exception e) {
+//		}catch (APIConnectionException e) {
+//			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+//					+ "\",\"errorMsg\":\"系统异常\"}");
+//			logger.error("Connection error, should retry later", e);
+//        } catch (APIRequestException e) {
+//			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+//					+ "\",\"errorMsg\":\"系统异常\"}");
+//        	logger.error("Should review the error, and fix the request", e);
+//        	logger.info("HTTP Status: " + e.getStatus());
+//        	logger.info("Error Code: " + e.getErrorCode());
+//        	logger.info("Error Message: " + e.getErrorMessage());
+        } catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			logger.error(e);
@@ -859,10 +887,13 @@ public class UserAction extends ActionSupport {
 			String thirdParty = request.getParameter("thirdParty");// 登录平台
 			String userId = request.getParameter("userId");// 第三方uid
 			String expiresIn = request.getParameter("expiresIn");// 过期时间
+			String alias = request.getParameter("alias");//用户登录设备别名
 			// 验证是否已注册
 			User user = this.userService.validateThirdPartyUser(userId,
 					thirdParty);
 			if (user != null) {// 已存在用户信息
+				user.setAlias(alias);//保存用户登录设备别名
+				this.userService.updateObject(user);
 				UserCookieUtil.saveCookie(user,
 						ServletActionContext.getResponse());
 				out.print("{\"state\":0,\"result\":{\"user\":"
@@ -891,6 +922,7 @@ public class UserAction extends ActionSupport {
 					newUser.setAge(0);
 					newUser.setRegistrationDate(new Date());
 					newUser.setOrgId(0);
+					newUser.setAlias(alias);//保存用户登录设备别名
 					if (!"".equals(wbUser.getAvatarLarge())
 							&& wbUser.getAvatarLarge() != null) {
 						// 设置默认头像
@@ -934,6 +966,7 @@ public class UserAction extends ActionSupport {
 					newUser.setOrgId(0);
 					newUser.setThirdParty(thirdParty);
 					newUser.setUid(userId);
+					newUser.setAlias(alias);//保存用户登录设备别名
 					this.userService.saveUser(newUser);
 
 					Cookie cookie = UserCookieUtil.saveCookie(newUser,

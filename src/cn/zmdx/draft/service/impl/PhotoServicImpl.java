@@ -53,6 +53,7 @@ public class PhotoServicImpl implements PhotoService {
 				this.photoDao.saveEntity(cyclePhoto);
 			}
 		}
+		this.photoDao.executeSql("call syncRankPhoto()");
 		this.photoDao.updateEntity(ps);
 	}
 
@@ -115,8 +116,8 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public String OperationPictureSet(String userid, String pictureSetId,
 			int operationType) {
-		List list=this.photoDao.queryPhotoByPictureSetId(userid,pictureSetId,operationType);
-		if(operationType!=3){
+		if(!((operationType==2)||(operationType==3))){
+			List list=this.photoDao.queryPhotoByPictureSetId(userid,pictureSetId,operationType);
 			if(list.size()>0){
 				return "failed";
 			}
@@ -256,6 +257,8 @@ public class PhotoServicImpl implements PhotoService {
 		this.photoDao.executeSql("DELETE from picture_set where id in ("+ids+")");
 		//删除排名
 		this.photoDao.executeSql("DELETE from rank_picture_set where picture_set_id in ("+ids+")");
+		//删除排名
+		this.photoDao.executeSql("DELETE from draft_rank_picture_set where picture_set_id in ("+ids+")");
 	}
 
 	@Override
