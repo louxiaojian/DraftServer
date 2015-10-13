@@ -197,7 +197,8 @@
   	function vote_pic(){
   		//alert(${currentUser.id}+"-----"+${pictureSet.id});
   		var currentUserId='<%=request.getSession().getAttribute("currentUserId")%>';
-  		if(('${code}'!=null&&'${code}'!=""&&'${code}'!="null")||(currentUserId!=null&&currentUserId!="null"&&currentUserId!="")){
+  		//if(('${code}'!=null&&'${code}'!=""&&'${code}'!="null")||(currentUserId!=null&&currentUserId!="null"&&currentUserId!="")){
+  		if(currentUserId!=null&&currentUserId!="null"&&currentUserId!=""){
   			var params = {"currentUserId": currentUserId,"pictureSetId":'${pictureSet.id}'};  
   			var actionUrl = "<%=request.getContextPath()%>/photo_vote.action";
   			$.ajax({  

@@ -108,7 +108,8 @@ public class PhotoAction extends ActionSupport {
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "10";
 			}
-			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+			if (userid == null || "".equals(userid) || "null".equals(userid)
+					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"查看的用户不存在\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
@@ -374,59 +375,89 @@ public class PhotoAction extends ActionSupport {
 			String themeTitle = request.getParameter("themeTitle");// 选秀主题标题
 
 			Map<String, Object> filterMap = new HashMap();
-			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+			if (userid == null || "".equals(userid) || "null".equals(userid)
+					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				User user = (User) this.photoService.getObjectById(User.class,
 						userid);
 				if (themeCycleId != null && !"".equals(themeCycleId)) {
-					Cycle cycle = (Cycle) this.photoService.getObjectById(
-							Cycle.class, themeCycleId);
-					if ("1".equals(cycle.getIsNeedValidate())
-							|| "1".equals(user.getIsvalidate())) {// 不需要真人验证、或者已经通过真人验证
-						if (getImage() != null && getImage().length > 0) {
-							// 创建图集
-							PictureSet ps = new PictureSet();
-							ps.setType(type);
-							ps.setDescs(descs);
-							ps.setUserid(Integer.parseInt(userid));
-							ps.setUploadDate(new Date());
-							ps.setStatus("1");
-							ps.setRank(0);
-							if ("1".equals(type)) {
-								ps.setThemeCycleId(Integer
-										.parseInt(themeCycleId));
-							} else {
-								ps.setThemeCycleId(Integer.parseInt("0"));
-							}
-							filterMap.put("pictureSet", ps);
-
-							for (int i = 0; i < files.length; i++) {
-								UploadResult result = new UploadResult();
-								int ret = pc.Upload(files[i], result);
-								if (i > 8) {
-									break;
-								}
-								// int ret=1;
-								if (ret != 0) {
-									System.out.println(pc.GetError());
-									errorcount++;
-									break;
+					Map<String, Object> valifilterMap = new HashMap<String, Object>();
+					valifilterMap.put("themeCycleId", themeCycleId);
+					valifilterMap.put("userId", userid);
+					List<?> list = photoService.validateIsAttend(valifilterMap);
+					if (list != null && list.size() > 0) {// 参与过
+						out.print("{\"state\":\"1\",\"errorMsg\":\"您以参与过此次主题选秀\"}");
+					}else{
+						Cycle cycle = (Cycle) this.photoService.getObjectById(
+								Cycle.class, themeCycleId);
+						if ("1".equals(cycle.getIsNeedValidate())
+								|| "1".equals(user.getIsvalidate())) {// 不需要真人验证、或者已经通过真人验证
+							if (getImage() != null && getImage().length > 0) {
+								// 创建图集
+								PictureSet ps = new PictureSet();
+								ps.setType(type);
+								ps.setDescs(descs);
+								ps.setUserid(Integer.parseInt(userid));
+								ps.setUploadDate(new Date());
+								ps.setStatus("1");
+								ps.setRank(0);
+								if ("1".equals(type)) {
+									ps.setThemeCycleId(Integer
+											.parseInt(themeCycleId));
 								} else {
-									Photo photo = new Photo();
-									photo.setPhotoUrl(result.download_url);
-									photo.setUploadDate(new Date());
-									photo.setUserid(Integer.parseInt(userid));
-									photo.setType(0);// 图集
-									photo.setFileid(result.fileid);
-									filterMap.put("photo" + i, photo);
-									fileids[i] = result.fileid;
+									ps.setThemeCycleId(Integer.parseInt("0"));
 								}
-							}
-							if (errorcount == 0) {
-								filterMap.put("count", files.length);
-								if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
-									// 删除本次所有上传照片
+								filterMap.put("pictureSet", ps);
+
+								for (int i = 0; i < files.length; i++) {
+									UploadResult result = new UploadResult();
+									int ret = pc.Upload(files[i], result);
+									if (i > 8) {
+										break;
+									}
+									// int ret=1;
+									if (ret != 0) {
+										System.out.println(pc.GetError());
+										errorcount++;
+										break;
+									} else {
+										Photo photo = new Photo();
+										photo.setPhotoUrl(result.download_url);
+										photo.setUploadDate(new Date());
+										photo.setUserid(Integer
+												.parseInt(userid));
+										photo.setType(0);// 图集
+										photo.setFileid(result.fileid);
+										filterMap.put("photo" + i, photo);
+										fileids[i] = result.fileid;
+									}
+								}
+								if (errorcount == 0) {
+									filterMap.put("count", files.length);
+									if (!"1".equals(cycle.getStatus())) {// 选秀非进行中的状态
+										// 删除本次所有上传照片
+										for (int i = 0; i < fileids.length; i++) {
+											if (fileids[i] != null
+													&& !"".equals(fileids[i])) {
+												int code = pc
+														.Delete(fileids[i]);
+												System.out.println("删除code："
+														+ code);
+											}
+										}
+										out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
+									} else {
+										// 图片选秀信息
+										CyclePhotoSet cyclePhoto = new CyclePhotoSet();
+										cyclePhoto.setThemeCycleId(Integer
+												.parseInt(themeCycleId));
+										cyclePhoto.setThemeTitle(themeTitle);
+										filterMap.put("cyclePhoto", cyclePhoto);
+										photoService.uploadPhoto(filterMap);
+										out.print("{\"state\":0,\"result\":{\"state\":0}}");
+									}
+								} else {// 失败删除本次所有上传照片
 									for (int i = 0; i < fileids.length; i++) {
 										if (fileids[i] != null
 												&& !"".equals(fileids[i])) {
@@ -435,32 +466,14 @@ public class PhotoAction extends ActionSupport {
 													.println("删除code：" + code);
 										}
 									}
-									out.print("{\"state\":\"1\",\"errorMsg\":\"请选择其它正在进行中的主题活动\"}");
-								} else {
-									// 图片选秀信息
-									CyclePhotoSet cyclePhoto = new CyclePhotoSet();
-									cyclePhoto.setThemeCycleId(Integer
-											.parseInt(themeCycleId));
-									cyclePhoto.setThemeTitle(themeTitle);
-									filterMap.put("cyclePhoto", cyclePhoto);
-									photoService.uploadPhoto(filterMap);
-									out.print("{\"state\":0,\"result\":{\"state\":0}}");
+									out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 								}
-							} else {// 失败删除本次所有上传照片
-								for (int i = 0; i < fileids.length; i++) {
-									if (fileids[i] != null
-											&& !"".equals(fileids[i])) {
-										int code = pc.Delete(fileids[i]);
-										System.out.println("删除code：" + code);
-									}
-								}
-								out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
+							} else {
+								out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
 							}
 						} else {
-							out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
+							out.print("{\"state\":\"1\",\"errorMsg\":\"未通过真人验证\"}");
 						}
-					} else {
-						out.print("{\"state\":\"1\",\"errorMsg\":\"未通过真人验证\"}");
 					}
 				} else {
 					if (getImage() != null && getImage().length > 0) {
@@ -553,7 +566,8 @@ public class PhotoAction extends ActionSupport {
 		try {
 			out = ServletActionContext.getResponse().getWriter();
 			String userId = request.getParameter("currentUserId");
-			if (userId == null || "".equals(userId)|| "null".equals(userId)|| "0".equals(userId)) {
+			if (userId == null || "".equals(userId) || "null".equals(userId)
+					|| "0".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				File[] files = getImage();
@@ -607,7 +621,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+			if (userid == null || "".equals(userid) || "null".equals(userid)
+					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
@@ -647,7 +662,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+			if (userid == null || "".equals(userid) || "null".equals(userid)
+					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
@@ -687,7 +703,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+			if (userid == null || "".equals(userid) || "null".equals(userid)
+					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
@@ -727,7 +744,8 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			if (userid == null || "".equals(userid)|| "null".equals(userid)|| "0".equals(userid)) {
+			if (userid == null || "".equals(userid) || "null".equals(userid)
+					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (pictureSetId == null || "".equals(pictureSetId)) {
@@ -803,8 +821,9 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			User user=(User)this.photoService.getObjectById(User.class, userid);
-			if (("".equals(userid) || userid == null)||user==null) {
+			User user = (User) this.photoService.getObjectById(User.class,
+					userid);
+			if (("".equals(userid) || userid == null) || user == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if ("".equals(pictureSetId) || pictureSetId == null) {
@@ -812,12 +831,16 @@ public class PhotoAction extends ActionSupport {
 				} else {
 					PictureSet ps = (PictureSet) this.photoService
 							.getObjectById(PictureSet.class, pictureSetId);
-					int themeId=ps.getThemeCycleId();
-					Cycle cycle=(Cycle)this.photoService.getObjectById(Cycle.class, String.valueOf(themeId));
-					Date currentDate=new Date();
-					if(!"1".equals(cycle.getStatus())){
+					int themeId = ps.getThemeCycleId();
+					Cycle cycle = (Cycle) this.photoService.getObjectById(
+							Cycle.class, String.valueOf(themeId));
+					Date currentDate = new Date();
+					if (!"1".equals(cycle.getStatus())) {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
-					}else if(cycle.getVoteStartTime().getTime()<currentDate.getTime()&&cycle.getVoteEndTime().getTime()>currentDate.getTime()){
+					} else if (cycle.getVoteStartTime().getTime() < currentDate
+							.getTime()
+							&& cycle.getVoteEndTime().getTime() > currentDate
+									.getTime()) {
 						Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
 						surplusVotesFilterMap.put("userId", userid);
 						surplusVotesFilterMap.put("themeId",
@@ -832,9 +855,11 @@ public class PhotoAction extends ActionSupport {
 							out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
 									+ (3 - votes - 1) + "\"}}");
 						}
-					}else if(cycle.getVoteStartTime().getTime()>currentDate.getTime()){
+					} else if (cycle.getVoteStartTime().getTime() > currentDate
+							.getTime()) {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
-					}else if(cycle.getVoteEndTime().getTime()<currentDate.getTime()){
+					} else if (cycle.getVoteEndTime().getTime() < currentDate
+							.getTime()) {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
 					}
 				}
@@ -1079,7 +1104,8 @@ public class PhotoAction extends ActionSupport {
 			// int i =Integer.parseInt("s");
 			String themeCycleId = request.getParameter("themeCycleId");// 周期id
 			String userId = request.getParameter("currentUserId");// 用户id
-			if (userId == null || "".equals(userId)|| "null".equals(userId)|| "0".equals(userId)) {
+			if (userId == null || "".equals(userId) || "null".equals(userId)
+					|| "0".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (themeCycleId == null || "".equals(themeCycleId)) {
@@ -1137,7 +1163,8 @@ public class PhotoAction extends ActionSupport {
 			if (pictureSetId == null || "".equals(pictureSetId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 			} else {
-				if (userId == null || "".equals(userId)|| "null".equals(userId)|| "0".equals(userId)) {
+				if (userId == null || "".equals(userId)
+						|| "null".equals(userId) || "0".equals(userId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 				} else {
 					if (content == null || "".equals(content)) {
@@ -1770,9 +1797,10 @@ public class PhotoAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 加载图集信息
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-9-29 时间：上午11:31:20
 	 * @return
@@ -1782,25 +1810,30 @@ public class PhotoAction extends ActionSupport {
 		String pictureSetId = request.getParameter("pictureSetId");
 		String themeId = request.getParameter("themeId");
 		String code = request.getParameter("code");
-		if (code!=null&&!"".equals(code)) {
-			logger.error("code****"+code+"****");
-			String secret="9d992669fdd0cadc51110e20571be7e9";
-			String appid="wx81b0d978030f90aa";
-			SnsToken snsToken=SnsAPI.oauth2AccessToken(appid, secret, code);
-			logger.error("Openid****"+snsToken.getOpenid()+"****");
+		if (code != null && !"".equals(code)) {
+			logger.error("code****" + code + "****");
+			String secret = "9d992669fdd0cadc51110e20571be7e9";
+			String appid = "wx81b0d978030f90aa";
+			SnsToken snsToken = SnsAPI.oauth2AccessToken(appid, secret, code);
+			logger.error("Openid****" + snsToken.getOpenid() + "****");
 			// 验证是否已注册
-			User currentUser = this.userService.validateThirdPartyUser(snsToken.getOpenid(),"weixin");
+			User currentUser = this.userService.validateThirdPartyUser(
+					snsToken.getOpenid(), "weixin");
 			if (currentUser != null) {// 已存在用户信息
 				request.setAttribute("currentUser", currentUser);
-				request.getSession().setAttribute("currentUserId", currentUser.getId());
+				request.getSession().setAttribute("currentUserId",
+						currentUser.getId());
 			} else {
-				logger.error("Access_token****"+snsToken.getAccess_token()+"****");
-				WeiXinUser weixinUser =new WeiXinUser();
-				weixinUser=SnsAPI.userinfo(snsToken.getAccess_token(),
+				logger.error("Access_token****" + snsToken.getAccess_token()
+						+ "****");
+				WeiXinUser weixinUser = new WeiXinUser();
+				weixinUser = SnsAPI.userinfo(snsToken.getAccess_token(),
 						snsToken.getOpenid(), "zh_CN");
-				logger.error("Openid****"+snsToken.getOpenid()+"****");
-				logger.error("weixinUser****"+weixinUser.getNickname()+"****");
-				if(weixinUser.getNickname()!=null&&!"".equals(weixinUser.getNickname())){
+				logger.error("Openid****" + snsToken.getOpenid() + "****");
+				logger.error("weixinUser****" + weixinUser.getNickname()
+						+ "****");
+				if (weixinUser.getNickname() != null
+						&& !"".equals(weixinUser.getNickname())) {
 					User newUser = new User();
 					newUser.setUsername(weixinUser.getNickname());
 					if (!"".equals(weixinUser.getHeadimgurl())
@@ -1809,7 +1842,9 @@ public class PhotoAction extends ActionSupport {
 					} else {
 						newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
 					}
-					newUser.setGender(weixinUser.getSex()==null?0:weixinUser.getSex());
+					newUser.setGender(weixinUser.getSex() == null
+							? 0
+							: weixinUser.getSex());
 					newUser.setIntroduction("");
 					newUser.setLoginname("");
 					newUser.setPassword("");
@@ -1822,26 +1857,28 @@ public class PhotoAction extends ActionSupport {
 					newUser.setUid(snsToken.getOpenid());
 					this.photoService.saveEntity(newUser);
 					request.setAttribute("currentUser", newUser);
-					request.getSession().setAttribute("currentUserId", newUser.getId());
+					request.getSession().setAttribute("currentUserId",
+							newUser.getId());
 				}
 			}
 		}
-		PictureSet pictureSet =null;
-		List pList =new ArrayList();
-		if(pictureSetId!=null&&!"".equals(pictureSetId)){
-			pictureSet = (PictureSet) this.photoService.getObjectById(PictureSet.class,
-					pictureSetId);
-			if(pictureSet!=null){
+		PictureSet pictureSet = null;
+		List pList = new ArrayList();
+		if (pictureSetId != null && !"".equals(pictureSetId)) {
+			pictureSet = (PictureSet) this.photoService.getObjectById(
+					PictureSet.class, pictureSetId);
+			if (pictureSet != null) {
 				// 图集所属用户
-				User user = (User) this.photoService.getObjectById(
-						User.class, String.valueOf(pictureSet.getUserid()));
+				User user = (User) this.photoService.getObjectById(User.class,
+						String.valueOf(pictureSet.getUserid()));
 				pictureSet.setUser(UserUtil.getUser(user));
 				// 图集所有图片
-				pList = photoService.queryPhotoByPictureSetId(pictureSet.getId());
+				pList = photoService.queryPhotoByPictureSetId(pictureSet
+						.getId());
 			}
 		}
 		request.setAttribute("pictureSet", pictureSet);
-		if(themeId!=null&&!"".equals(themeId)&&!"0".equals(themeId)){
+		if (themeId != null && !"".equals(themeId) && !"0".equals(themeId)) {
 			Cycle cycle = (Cycle) this.photoService.getObjectById(Cycle.class,
 					themeId);
 			request.setAttribute("themeId", themeId);

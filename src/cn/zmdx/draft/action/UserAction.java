@@ -16,11 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
-import cn.jpush.api.JPushClient;
-import cn.jpush.api.common.resp.APIConnectionException;
-import cn.jpush.api.common.resp.APIRequestException;
-import cn.jpush.api.push.PushResult;
-import cn.jpush.api.push.model.notification.IosAlert;
+//import cn.jpush.api.JPushClient;
+//import cn.jpush.api.common.resp.APIConnectionException;
+//import cn.jpush.api.common.resp.APIRequestException;
+//import cn.jpush.api.push.PushResult;
+//import cn.jpush.api.push.model.notification.IosAlert;
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.Notify;
 import cn.zmdx.draft.entity.PictureSet;
@@ -68,9 +68,9 @@ public class UserAction extends ActionSupport {
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
-	private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
-	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
-	private JPushClient jPushClient=new JPushClient(jpushMasterSecret, jpushAppKey, 3);
+//	private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
+//	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
+//	private JPushClient jPushClient=new JPushClient(jpushMasterSecret, jpushAppKey, 3);
 	
 	public UserServiceImpl getUserService() {
 		return userService;

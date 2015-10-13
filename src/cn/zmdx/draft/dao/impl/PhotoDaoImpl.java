@@ -439,7 +439,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,photoCount from picture_set where status =1 and userid>0 and type=0 ");
+				+ "') as coverUrl,photoCount from picture_set where status =1 and userid>0 and report<10 and type=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			sql.append(" order by rand() limit :limit");
 		}
