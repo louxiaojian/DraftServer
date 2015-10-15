@@ -342,12 +342,12 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 			int operationType) {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select id from operation_records where operation_type=:operationType");
-		// if (userid != null && !"".equals(userid)) {
-		sql.append(" and informer_id =:userid");
-		// }
 		if (pictureSetId != null && !"".equals(pictureSetId)) {
 			sql.append(" and picture_set_id=:pictureSetId");
 		}
+		// if (userid != null && !"".equals(userid)) {
+		sql.append(" and informer_id =:userid");
+		// }
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString());
 		if (userid != null && !"".equals(userid)) {

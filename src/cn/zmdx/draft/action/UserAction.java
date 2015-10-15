@@ -68,10 +68,11 @@ public class UserAction extends ActionSupport {
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
-//	private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
-//	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
-//	private JPushClient jPushClient=new JPushClient(jpushMasterSecret, jpushAppKey, 3);
-	
+//	 private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
+//	 private static final String jpushMasterSecret ="acc4ade2f7b4b5757f9bd5d8";
+//	 private JPushClient jPushClient=new JPushClient(jpushMasterSecret,
+//	 jpushAppKey, 3);
+
 	public UserServiceImpl getUserService() {
 		return userService;
 	}
@@ -127,14 +128,14 @@ public class UserAction extends ActionSupport {
 				// 获取当前可用的验证码
 				Captcha captcha = this.userService
 						.queryUsableCaptcha(loginname);
-				if (captcha != null) {
-					if (code.equals(captcha.getCode())) {
-						if (captcha.getDeadline().getTime() > new Date()
-								.getTime()) {
-							Sha1 sha1 = new Sha1();
-							pwd = sha1.Digest(pwd);
-							User user = userService.findByName(loginname);
-							if (user == null) {
+				User user = userService.findByName(loginname);
+				if (user == null) {
+					if (captcha != null) {
+						if (code.equals(captcha.getCode())) {
+							if (captcha.getDeadline().getTime() > new Date()
+									.getTime()) {
+								Sha1 sha1 = new Sha1();
+								pwd = sha1.Digest(pwd);
 								User newUser = new User();
 								newUser.setLoginname(loginname);
 								newUser.setUsername("手机用户"
@@ -150,25 +151,25 @@ public class UserAction extends ActionSupport {
 								newUser.setThirdParty("vshow");// 默认本产品
 								this.userService.register(newUser, captcha);
 								out.print("{\"state\":0,\"result\":{\"state\":0}}");
-							} else {// 用户名已存在
-								out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
+							} else {// 验证码失效
+								captcha.setStatus("1");
+								// this.userService.updateObject(captcha);
+								out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 							}
-						} else {// 验证码失效
-							captcha.setStatus("1");
-							// this.userService.updateObject(captcha);
-							out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
+						} else {// 验证码错误
+							out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
 						}
-					} else {// 验证码错误
-						out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
+					} else {// 未获取验证码
+						out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 					}
-				} else {// 未获取验证码
-					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
+				} else {// 用户名已存在
+					out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
 				}
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("用户注册register报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -196,7 +197,7 @@ public class UserAction extends ActionSupport {
 				// 验证该手机号今日是否能获取
 				int count = this.userService
 						.qualificationByTelephone(telephone);
-				if (count > 9) {//每天最多获取10条验证码
+				if (count > 9) {// 每天最多获取10条验证码
 					out.print("{\"state\":1,\"errorMsg\":\"今日已无发送资格\"}");
 				} else {
 					String code = String
@@ -222,7 +223,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("生成验证码createCaptcha报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -245,7 +246,7 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			String loginname = request.getParameter("loginname");
 			String pwd = request.getParameter("password");
-			String alias = request.getParameter("alias");//用户登录设备别名
+			String alias = request.getParameter("alias");// 用户登录设备别名
 			if ("".equals(loginname) || loginname == null || "".equals(pwd)
 					|| pwd == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
@@ -254,7 +255,7 @@ public class UserAction extends ActionSupport {
 				if (user == null) {
 					out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 				} else {
-					user.setAlias(alias);//更新用户登录设备别名
+					user.setAlias(alias);// 更新用户登录设备别名
 					this.userService.updateUser(user);
 					Sha1 sha1 = new Sha1();
 					pwd = sha1.Digest(pwd);
@@ -273,7 +274,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("登录login报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -299,7 +300,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("注销logout报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -320,7 +321,8 @@ public class UserAction extends ActionSupport {
 		try {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			String id = request.getParameter("currentUserId");
-			if (id == null || "".equals(id)|| "null".equals(id)|| "0".equals(id)) {
+			if (id == null || "".equals(id) || "null".equals(id)
+					|| "0".equals(id)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
@@ -354,7 +356,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("上传头像logout报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -391,7 +393,8 @@ public class UserAction extends ActionSupport {
 			if (!"".equals(ageStr) && ageStr != null) {
 				age = Integer.parseInt(ageStr);
 			}
-			if (id == null || "".equals(id)|| "null".equals(id)|| "0".equals(id)) {
+			if (id == null || "".equals(id) || "null".equals(id)
+					|| "0".equals(id)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
@@ -439,7 +442,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("修改个人信息perfectInformation报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -483,7 +486,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("修改密码updatePassword报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -507,7 +510,8 @@ public class UserAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			User user = userService.getById(Integer.parseInt(userId));
-			if (userId == null || "".equals(userId) || user == null|| "null".equals(userId)|| "0".equals(userId)) {
+			if (userId == null || "".equals(userId) || user == null
+					|| "null".equals(userId) || "0".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				// 验证是否已经关注
@@ -547,18 +551,17 @@ public class UserAction extends ActionSupport {
 				}
 				List fansList = userService.queryFans(filterMap2);
 				List notifyList = null;
-				int isRead=1;
-				if(currentUserId.equals(userId)){
+				int isRead = 1;
+				if (currentUserId.equals(userId)) {
 					// 通知
 					Map<String, String> notifyFilterMap = new HashMap();
 					notifyFilterMap.put("currentUserId", currentUserId);
 					notifyFilterMap.put("limit", "10");
-					notifyList = this.photoService
-							.queryNotify(notifyFilterMap);
+					notifyList = this.photoService.queryNotify(notifyFilterMap);
 					for (int i = 0; i < notifyList.size(); i++) {
-						Notify notify=(Notify)notifyList.get(i);
-						if("0".equals(notify.getIsRead())){
-							isRead=0;
+						Notify notify = (Notify) notifyList.get(i);
+						if ("0".equals(notify.getIsRead())) {
+							isRead = 0;
 							break;
 						}
 					}
@@ -574,7 +577,8 @@ public class UserAction extends ActionSupport {
 							+ ",\"fansUserList\":"
 							+ JSON.toJSONString(fansList, true)
 							+ ",\"notifyList\":"
-							+ JSON.toJSONString(notifyList, true) + ",\"isRead\":"+isRead+"}}");
+							+ JSON.toJSONString(notifyList, true)
+							+ ",\"isRead\":" + isRead + "}}");
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
@@ -582,7 +586,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("查看用户信息viewUserInfo报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -604,7 +608,8 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
 			String attentionUserId = request.getParameter("userId");
-			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+			if (fansUserId == null || "".equals(fansUserId)
+					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
@@ -616,12 +621,17 @@ public class UserAction extends ActionSupport {
 					if (u != null) {
 						out.print("{\"state\":1,\"errorMsg\":\"已关注\"}");
 					} else {
-//						IosAlert alert = IosAlert.newBuilder()
-//				                .setTitleAndBody("测试标题", "你被关注了")
-//				                .setActionLocKey("PLAY")
-//				                .build();
-//						PushResult result = jPushClient.sendIosNotificationWithAlias(alert, new HashMap<String, String>(), "ios");
-//						logger.info("jpush result："+result );
+//						User user=this.userService.getById(Integer.parseInt(attentionUserId));
+//						if(!"".equals(user.getAlias())&&user.getAlias()!=null){
+//							 IosAlert alert = IosAlert.newBuilder()
+//									 .setTitleAndBody("测试标题", "你被关注了")
+//									 .setActionLocKey("PLAY")
+//									 .build();
+//									 PushResult result =
+//									 jPushClient.sendIosNotificationWithAlias(alert, new
+//									 HashMap<String, String>(), user.getAlias());
+//									 logger.info("jpush result："+result );
+//						}
 						UserAttentionFans uaf = new UserAttentionFans();
 						uaf.setAttentionUserId(Integer
 								.parseInt(attentionUserId));
@@ -632,21 +642,21 @@ public class UserAction extends ActionSupport {
 					}
 				}
 			}
-//		}catch (APIConnectionException e) {
-//			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
-//					+ "\",\"errorMsg\":\"系统异常\"}");
-//			logger.error("Connection error, should retry later", e);
-//        } catch (APIRequestException e) {
-//			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
-//					+ "\",\"errorMsg\":\"系统异常\"}");
-//        	logger.error("Should review the error, and fix the request", e);
-//        	logger.info("HTTP Status: " + e.getStatus());
-//        	logger.info("Error Code: " + e.getErrorCode());
-//        	logger.info("Error Message: " + e.getErrorMessage());
-        } catch (Exception e) {
+//			 }catch (APIConnectionException e) {
+//			 out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+//			 + "\",\"errorMsg\":\"系统异常\"}");
+//			 logger.error("Connection error, should retry later", e);
+//			 } catch (APIRequestException e) {
+//			 out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+//			 + "\",\"errorMsg\":\"系统异常\"}");
+//			 logger.error("Should review the error, and fix the request", e);
+//			 logger.info("HTTP Status: " + e.getStatus());
+//			 logger.info("Error Code: " + e.getErrorCode());
+//			 logger.info("Error Message: " + e.getErrorMessage());
+		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("关注attention报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -669,7 +679,8 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
 			String attentionUserId = request.getParameter("userId");
-			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+			if (fansUserId == null || "".equals(fansUserId)
+					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
@@ -688,7 +699,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("验证是否已经关注isAttention报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -711,7 +722,8 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String fansUserId = request.getParameter("currentUserId");
 			String attentionUserId = request.getParameter("userId");
-			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+			if (fansUserId == null || "".equals(fansUserId)
+					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
@@ -726,7 +738,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("取消关注cancelAttention报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -748,7 +760,8 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = response.getWriter();
 		try {
 			String fansUserId = request.getParameter("currentUserId");
-			if (fansUserId == null || "".equals(fansUserId)|| "null".equals(fansUserId)|| "0".equals(fansUserId)) {
+			if (fansUserId == null || "".equals(fansUserId)
+					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
@@ -762,7 +775,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("加载查看用户的关注的人queryAttentions报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -784,7 +797,9 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = response.getWriter();
 		try {
 			String attentionUserId = request.getParameter("currentUserId");
-			if (attentionUserId == null || "".equals(attentionUserId)|| "null".equals(attentionUserId)|| "0".equals(attentionUserId)) {
+			if (attentionUserId == null || "".equals(attentionUserId)
+					|| "null".equals(attentionUserId)
+					|| "0".equals(attentionUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
@@ -797,7 +812,7 @@ public class UserAction extends ActionSupport {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载查看用户的粉丝queryFans报错：" + e);
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 		} finally {
@@ -861,7 +876,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("重置密码resetPassword报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -887,12 +902,12 @@ public class UserAction extends ActionSupport {
 			String thirdParty = request.getParameter("thirdParty");// 登录平台
 			String userId = request.getParameter("userId");// 第三方uid
 			String expiresIn = request.getParameter("expiresIn");// 过期时间
-			String alias = request.getParameter("alias");//用户登录设备别名
+			String alias = request.getParameter("alias");// 用户登录设备别名
 			// 验证是否已注册
 			User user = this.userService.validateThirdPartyUser(userId,
 					thirdParty);
 			if (user != null) {// 已存在用户信息
-				user.setAlias(alias);//保存用户登录设备别名
+				user.setAlias(alias);// 保存用户登录设备别名
 				this.userService.updateObject(user);
 				UserCookieUtil.saveCookie(user,
 						ServletActionContext.getResponse());
@@ -922,7 +937,7 @@ public class UserAction extends ActionSupport {
 					newUser.setAge(0);
 					newUser.setRegistrationDate(new Date());
 					newUser.setOrgId(0);
-					newUser.setAlias(alias);//保存用户登录设备别名
+					newUser.setAlias(alias);// 保存用户登录设备别名
 					if (!"".equals(wbUser.getAvatarLarge())
 							&& wbUser.getAvatarLarge() != null) {
 						// 设置默认头像
@@ -966,7 +981,7 @@ public class UserAction extends ActionSupport {
 					newUser.setOrgId(0);
 					newUser.setThirdParty(thirdParty);
 					newUser.setUid(userId);
-					newUser.setAlias(alias);//保存用户登录设备别名
+					newUser.setAlias(alias);// 保存用户登录设备别名
 					this.userService.saveUser(newUser);
 
 					Cookie cookie = UserCookieUtil.saveCookie(newUser,
@@ -981,7 +996,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("第三方登录thirdPartyLogin报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -991,6 +1006,7 @@ public class UserAction extends ActionSupport {
 
 	/**
 	 * @ 自动提示加载人员
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-9-22 时间：下午4:58:11
 	 * @throws IOException
@@ -1002,8 +1018,11 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = response.getWriter();
 		try {
 			String attentionUserId = request.getParameter("currentUserId");
-			String nickName = StringUtil.encodingUrl(request.getParameter("nickName"));//用户昵称
-			if (attentionUserId == null || "".equals(attentionUserId)|| "null".equals(attentionUserId)|| "0".equals(attentionUserId)) {
+			String nickName = StringUtil.encodingUrl(request
+					.getParameter("nickName"));// 用户昵称
+			if (attentionUserId == null || "".equals(attentionUserId)
+					|| "null".equals(attentionUserId)
+					|| "0".equals(attentionUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
@@ -1016,7 +1035,7 @@ public class UserAction extends ActionSupport {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("@自动提示加载人员automaticPrompt报错：" + e);
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 		} finally {

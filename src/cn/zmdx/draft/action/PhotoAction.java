@@ -148,7 +148,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载个人图集queryPersonalPhotos报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -256,7 +256,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载最新、最热图集照片墙queryPhotosWall报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -315,9 +315,9 @@ public class PhotoAction extends ActionSupport {
 						ps.setIsUserPraised("0");
 					}
 					// 图集评论数
-					int comments = photoService.queryCommentByPictureSetId(ps
-							.getId());
-					ps.setComments(comments);
+//					int comments = photoService.queryCommentByPictureSetId(ps
+//							.getId());
+//					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, ps.getUserid() + "");
@@ -343,7 +343,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载选秀最新图集queryDraftPhotosWall报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -538,7 +538,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("上传图片uploadPhoto报错："+e);
 			// 删除本次所有上传照片
 			for (int i = 0; i < fileids.length; i++) {
 				if (fileids[i] != null && !"".equals(fileids[i])) {
@@ -600,7 +600,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("上传真人验证照片realityVerification报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -641,7 +641,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("点赞praisePhoto报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -682,7 +682,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("取消点赞cancelPraisePhoto报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -723,7 +723,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("踩图集treadPhoto报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -764,7 +764,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("举报图集reportPhoto报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -800,7 +800,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("增加浏览量viewPhoto报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -868,7 +868,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("投票vote报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -925,9 +925,9 @@ public class PhotoAction extends ActionSupport {
 						ps.setIsUserPraised("0");
 					}
 					// 图集评论数
-					int comments = photoService.queryCommentByPictureSetId(ps
-							.getId());
-					ps.setComments(comments);
+//					int comments = photoService.queryCommentByPictureSetId(ps
+//							.getId());
+//					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, ps.getUserid() + "");
@@ -965,7 +965,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载选秀图集queryCycleRanking报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1026,7 +1026,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载选秀用户排名queryUserCycleRanking报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1055,7 +1055,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载全部主题queryThemes报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1132,7 +1132,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("验证用户是否参加此次选秀validateQualification报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1189,7 +1189,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("发表评论replyComment报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1229,7 +1229,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载图集评论loadComment报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1273,7 +1273,7 @@ public class PhotoAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error(e);
+			logger.error("加载审批记录queryReviewRecords报错："+e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -1313,7 +1313,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("举报用户接口reportUser报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1370,7 +1370,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("发现接口discoverPictureSet报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1448,7 +1448,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载图集viewPictureSet报错："+e.getMessage());
 		} finally {
 			out.flush();
 			out.close();
@@ -1517,9 +1517,9 @@ public class PhotoAction extends ActionSupport {
 						ps.setIsUserPraised("0");
 					}
 					// 图集评论数
-					int comments = photoService.queryCommentByPictureSetId(ps
-							.getId());
-					ps.setComments(comments);
+//					int comments = photoService.queryCommentByPictureSetId(ps
+//							.getId());
+//					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, ps.getUserid() + "");
@@ -1548,9 +1548,9 @@ public class PhotoAction extends ActionSupport {
 						ps.setIsUserPraised("0");
 					}
 					// 图集评论数
-					int comments = photoService.queryCommentByPictureSetId(ps
-							.getId());
-					ps.setComments(comments);
+//					int comments = photoService.queryCommentByPictureSetId(ps
+//							.getId());
+//					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, ps.getUserid() + "");
@@ -1565,11 +1565,13 @@ public class PhotoAction extends ActionSupport {
 				List userlist = photoService.queryUserCycleRanking(filterMap);
 
 				// 用户当前主题剩余票数
-				Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
-				surplusVotesFilterMap.put("userId", currentUserId);
-				surplusVotesFilterMap.put("themeId", themeCycleId);
-				int surplusVotes = this.photoService
-						.queryUserSurplusVote(surplusVotesFilterMap);
+				int surplusVotes =0;
+				if(currentUserId!=null&&!"".equals(currentUserId)&&!"null".equals(currentUserId)){
+					Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
+					surplusVotesFilterMap.put("userId", currentUserId);
+					surplusVotesFilterMap.put("themeId", themeCycleId);
+					surplusVotes =this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
+				}
 				out.print("{\"state\":0,\"result\":{\"psList\":"
 						+ JSON.toJSONString(photoSetResult, true)
 						+ ",\"psRank\":" + JSON.toJSONString(result, true)
@@ -1582,7 +1584,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载选秀详情loadCycleInfo报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1627,7 +1629,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载点赞人员loadPraiseUserList报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1665,7 +1667,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("删除图集deletePictureSet报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1715,7 +1717,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("加载通知loadNotify报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1752,7 +1754,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("将通知改为已读状态readNotify报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1791,7 +1793,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error(e);
+			logger.error("删除评论deleteComment报错："+e);
 		} finally {
 			out.flush();
 			out.close();
