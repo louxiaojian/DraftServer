@@ -192,4 +192,12 @@ public interface PhotoDao extends BaseDao {
 	 * @return
 	 */
 	public int queryUserSurplusVote(Map<String, String> surplusVotesFilterMap);
+	/**
+	 * 检查当前ip投票次数
+	 * @author louxiaojian
+	 * @date： 日期：2015-10-16 时间：下午12:11:59
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryOperations(Map<String, String> filterMap);
 }

@@ -115,7 +115,7 @@ public class PhotoServicImpl implements PhotoService {
 
 	@Override
 	public String OperationPictureSet(String userid, String pictureSetId,
-			int operationType) {
+			int operationType,String ip) {
 		if(!((operationType==2)||(operationType==3))){
 			List list=this.photoDao.queryPhotoByPictureSetId(userid,pictureSetId,operationType);
 			if(list.size()>0){
@@ -171,6 +171,7 @@ public class PhotoServicImpl implements PhotoService {
 				or.setPictureSetId(Integer.parseInt(pictureSetId));
 				or.setInformerId(Integer.parseInt(userid));
 				or.setIsRead("0");//未读
+				or.setIp(ip);
 				this.photoDao.saveEntity(or);
 			}
 			return "success";
@@ -295,6 +296,11 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public int queryUserSurplusVote(Map<String, String> surplusVotesFilterMap) {
 		return this.photoDao.queryUserSurplusVote(surplusVotesFilterMap);
+	}
+
+	@Override
+	public List queryOperations(Map<String, String> filterMap) {
+		return this.photoDao.queryOperations(filterMap);
 	}
 	
 }

@@ -16,16 +16,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
-//import cn.jpush.api.JPushClient;
-//import cn.jpush.api.common.resp.APIConnectionException;
-//import cn.jpush.api.common.resp.APIRequestException;
-//import cn.jpush.api.push.PushResult;
-//import cn.jpush.api.push.model.notification.IosAlert;
+import cn.jpush.api.JPushClient;
+import cn.jpush.api.push.PushResult;
+import cn.jpush.api.push.model.PushPayload;
 import cn.zmdx.draft.entity.Captcha;
 import cn.zmdx.draft.entity.Notify;
 import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.User;
 import cn.zmdx.draft.entity.UserAttentionFans;
+import cn.zmdx.draft.jpush.PushExample;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.Sha1;
@@ -68,10 +67,10 @@ public class UserAction extends ActionSupport {
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
-//	 private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
-//	 private static final String jpushMasterSecret ="acc4ade2f7b4b5757f9bd5d8";
-//	 private JPushClient jPushClient=new JPushClient(jpushMasterSecret,
-//	 jpushAppKey, 3);
+	 private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
+	 private static final String jpushMasterSecret ="acc4ade2f7b4b5757f9bd5d8";
+	 private JPushClient jPushClient=new JPushClient(jpushMasterSecret,
+	 jpushAppKey, 3);
 
 	public UserServiceImpl getUserService() {
 		return userService;
@@ -124,6 +123,7 @@ public class UserAction extends ActionSupport {
 			if ("".equals(loginname) || loginname == null || "".equals(pwd)
 					|| pwd == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名、密码不能为空\"}");
+				logger.error("{\"state\":1,\"errorMsg\":\"用户名、密码不能为空\"}");
 			} else {
 				// 获取当前可用的验证码
 				Captcha captcha = this.userService
@@ -155,15 +155,19 @@ public class UserAction extends ActionSupport {
 								captcha.setStatus("1");
 								// this.userService.updateObject(captcha);
 								out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
+								logger.error("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 							}
 						} else {// 验证码错误
 							out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
+							logger.error("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
 						}
 					} else {// 未获取验证码
 						out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 					}
 				} else {// 用户名已存在
 					out.print("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
+					logger.error("{\"state\":1,\"errorMsg\":\"用户名已存在\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -193,12 +197,14 @@ public class UserAction extends ActionSupport {
 			String telephone = request.getParameter("phoneNumber");
 			if ("".equals(telephone) || telephone == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"请先填写手机号\"}");
+				logger.error("{\"state\":1,\"errorMsg\":\"请先填写手机号\"}");
 			} else {
 				// 验证该手机号今日是否能获取
 				int count = this.userService
 						.qualificationByTelephone(telephone);
 				if (count > 9) {// 每天最多获取10条验证码
 					out.print("{\"state\":1,\"errorMsg\":\"今日已无发送资格\"}");
+					logger.error("{\"state\":1,\"errorMsg\":\"今日已无发送资格\"}");
 				} else {
 					String code = String
 							.valueOf((int) ((Math.random() * 9 + 1) * 100000));
@@ -213,10 +219,13 @@ public class UserAction extends ActionSupport {
 								+ JSON.toJSONString(captcha) + "}}");
 					} else if ("107".equals(returnCode)) {// 手机号错误
 						out.print("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
 					} else if ("109".equals(returnCode)) {// 短信额度不足
 						out.print("{\"state\":1,\"errorCode\":\"短信额度不足\",\"errorMsg\":\"系统异常\"}");
+						logger.error("{\"state\":1,\"errorCode\":\"短信额度不足\",\"errorMsg\":\"系统异常\"}");
 					} else {
 						out.print("{\"state\":1,\"errorMsg\":\"系统异常\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"系统异常\"}");
 					}
 				}
 			}
@@ -250,13 +259,17 @@ public class UserAction extends ActionSupport {
 			if ("".equals(loginname) || loginname == null || "".equals(pwd)
 					|| pwd == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
+				logger.error("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
 			} else {
 				User user = userService.findByName(loginname);
 				if (user == null) {
 					out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
+					logger.error("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 				} else {
-					user.setAlias(alias);// 更新用户登录设备别名
-					this.userService.updateUser(user);
+					if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+						user.setAlias(alias);// 更新用户登录设备别名
+						this.userService.updateUser(user);
+					}
 					Sha1 sha1 = new Sha1();
 					pwd = sha1.Digest(pwd);
 					if (user.getPassword().equals(pwd)) {
@@ -268,6 +281,7 @@ public class UserAction extends ActionSupport {
 								+ JSON.toJSONString(user2) + "}}");
 					} else {
 						out.print("{\"state\":1,\"errorMsg\":\"密码错误\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"密码错误\"}");
 					}
 				}
 			}
@@ -324,6 +338,7 @@ public class UserAction extends ActionSupport {
 			if (id == null || "".equals(id) || "null".equals(id)
 					|| "0".equals(id)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
 				if (user != null) {
@@ -334,6 +349,7 @@ public class UserAction extends ActionSupport {
 					if (ret != 0) {
 						System.out.println(pc.GetError());
 						out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
+						logger.error("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 					} else {
 						if (!"http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0"
 								.equals(user.getHeadPortrait())) {
@@ -351,6 +367,7 @@ public class UserAction extends ActionSupport {
 					}
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -396,6 +413,7 @@ public class UserAction extends ActionSupport {
 			if (id == null || "".equals(id) || "null".equals(id)
 					|| "0".equals(id)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				User user = this.userService.getById(Integer.parseInt(id));
 				if (user != null) {
@@ -437,6 +455,7 @@ public class UserAction extends ActionSupport {
 					// }
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -467,6 +486,7 @@ public class UserAction extends ActionSupport {
 			String userName = request.getParameter("loginname");
 			if ("".equals(userName) || userName == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名不能为空\"}");
+				logger.error("{\"state\":1,\"errorMsg\":\"用户名不能为空\"}");
 			} else {
 				User user = userService.findByName(userName);
 				if (user != null) {
@@ -478,9 +498,11 @@ public class UserAction extends ActionSupport {
 						out.print("{\"state\":0,\"result\":{\"state\":0}}");
 					} else {// 原密码错误
 						out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
 					}
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -513,6 +535,7 @@ public class UserAction extends ActionSupport {
 			if (userId == null || "".equals(userId) || user == null
 					|| "null".equals(userId) || "0".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				// 验证是否已经关注
 				UserAttentionFans u = this.userService.isAttention(
@@ -581,6 +604,7 @@ public class UserAction extends ActionSupport {
 							+ ",\"isRead\":" + isRead + "}}");
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -611,27 +635,40 @@ public class UserAction extends ActionSupport {
 			if (fansUserId == null || "".equals(fansUserId)
 					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				} else {
 					// 是否关注过
 					UserAttentionFans u = this.userService.isAttention(
 							fansUserId, attentionUserId);
 					if (u != null) {
 						out.print("{\"state\":1,\"errorMsg\":\"已关注\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"已关注\"}");
 					} else {
-//						User user=this.userService.getById(Integer.parseInt(attentionUserId));
-//						if(!"".equals(user.getAlias())&&user.getAlias()!=null){
+						User attentionUser=this.userService.getById(Integer.parseInt(attentionUserId));
+						User currentUser=this.userService.getById(Integer.parseInt(fansUserId));
+						if(!"".equals(attentionUser.getAlias())&&attentionUser.getAlias()!=null){
+							HashMap<String, String> map=new HashMap<String, String>();
+							map.put("scheme", "vshow://vshow.com/notification");
+							PushPayload pushPayload = PushExample.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+									currentUser.getUsername()+" 关注了您",map,attentionUser.getAlias());
+							PushResult result = jPushClient.sendPush(pushPayload);
+							System.out.println("jpush result："+result );
+							logger.error("发送通知："+result );
+			            
 //							 IosAlert alert = IosAlert.newBuilder()
 //									 .setTitleAndBody("测试标题", "你被关注了")
 //									 .setActionLocKey("PLAY")
 //									 .build();
-//									 PushResult result =
-//									 jPushClient.sendIosNotificationWithAlias(alert, new
-//									 HashMap<String, String>(), user.getAlias());
-//									 logger.info("jpush result："+result );
-//						}
+//							 PushPayload pushPayload =PushPayload.newBuilder();
+//							 PushResult result =
+//							 jPushClient.sendIosNotificationWithAlias(alert, new
+//							 HashMap<String, String>(), "91");
+//							 logger.info("jpush result："+result );
+						}
 						UserAttentionFans uaf = new UserAttentionFans();
 						uaf.setAttentionUserId(Integer
 								.parseInt(attentionUserId));
@@ -682,9 +719,11 @@ public class UserAction extends ActionSupport {
 			if (fansUserId == null || "".equals(fansUserId)
 					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				} else {
 					// 是否关注过
 					UserAttentionFans u = this.userService.isAttention(
@@ -725,9 +764,11 @@ public class UserAction extends ActionSupport {
 			if (fansUserId == null || "".equals(fansUserId)
 					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if (attentionUserId == null || "".equals(attentionUserId)) {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				} else {
 					// 取消关注
 					this.userService.cancelAttention(fansUserId,
@@ -763,6 +804,7 @@ public class UserAction extends ActionSupport {
 			if (fansUserId == null || "".equals(fansUserId)
 					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				if (fansUserId != null && !"".equals(fansUserId)) {
@@ -801,6 +843,7 @@ public class UserAction extends ActionSupport {
 					|| "null".equals(attentionUserId)
 					|| "0".equals(attentionUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				if (attentionUserId != null && !"".equals(attentionUserId)) {
@@ -840,6 +883,7 @@ public class UserAction extends ActionSupport {
 			if ("".equals(loginname) || loginname == null || pwd == null
 					|| "".equals(pwd)) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
+				logger.error("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
 			} else {
 				// 获取当前可用的验证码
 				Captcha captcha = this.userService
@@ -859,18 +903,22 @@ public class UserAction extends ActionSupport {
 												.getUser(user)) + "}}");
 							} else {// 用户名不存在
 								out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+								logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 							}
 						} else {// 验证码失效
 							captcha.setStatus("1");
 							this.userService.updateObject(captcha);
 							out.print("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
+							logger.error("{\"state\":1,\"errorMsg\":\"验证码已失效\"}");
 						}
 					} else {// 验证码错误
 						out.print("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"验证码错误\"}");
 					}
 				} else {// 未获取验证码
 					// out.print("{\"state\":1,\"errorMsg\":\"no available code\"}");
 					out.print("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
+					logger.error("{\"state\":1,\"errorMsg\":\"请先获取验证码\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -907,8 +955,10 @@ public class UserAction extends ActionSupport {
 			User user = this.userService.validateThirdPartyUser(userId,
 					thirdParty);
 			if (user != null) {// 已存在用户信息
-				user.setAlias(alias);// 保存用户登录设备别名
-				this.userService.updateObject(user);
+				if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+					user.setAlias(alias);// 保存用户登录设备别名
+					this.userService.updateObject(user);
+				}
 				UserCookieUtil.saveCookie(user,
 						ServletActionContext.getResponse());
 				out.print("{\"state\":0,\"result\":{\"user\":"
@@ -937,7 +987,9 @@ public class UserAction extends ActionSupport {
 					newUser.setAge(0);
 					newUser.setRegistrationDate(new Date());
 					newUser.setOrgId(0);
-					newUser.setAlias(alias);// 保存用户登录设备别名
+					if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+						newUser.setAlias(alias);// 保存用户登录设备别名
+					}
 					if (!"".equals(wbUser.getAvatarLarge())
 							&& wbUser.getAvatarLarge() != null) {
 						// 设置默认头像
@@ -981,7 +1033,9 @@ public class UserAction extends ActionSupport {
 					newUser.setOrgId(0);
 					newUser.setThirdParty(thirdParty);
 					newUser.setUid(userId);
-					newUser.setAlias(alias);// 保存用户登录设备别名
+					if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+						newUser.setAlias(alias);// 保存用户登录设备别名
+					}
 					this.userService.saveUser(newUser);
 
 					Cookie cookie = UserCookieUtil.saveCookie(newUser,
@@ -1024,6 +1078,7 @@ public class UserAction extends ActionSupport {
 					|| "null".equals(attentionUserId)
 					|| "0".equals(attentionUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				if (nickName != null && !"".equals(nickName)) {
@@ -1036,6 +1091,45 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("@自动提示加载人员automaticPrompt报错：" + e);
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 绑定用户发送通知的设备别名（divaceToken）
+	 * @author louxiaojian
+	 * @date： 日期：2015-10-17 时间：下午12:04:54
+	 * @throws IOException
+	 */
+	public void bindingUserAlias() throws IOException {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = response.getWriter();
+		try {
+			String userId = request.getParameter("currentUserId");
+			String aliasStr = request.getParameter("alias");
+			if(userId!=null&&!"".equals(userId)&&!"null".equals(userId)&&!"0".equals(userId)&&aliasStr!=null&&!"".equals(aliasStr)&&!"null".equals(aliasStr)){
+				User user=this.userService.getById(Integer.parseInt(userId));
+				if(user!=null){
+					user.setAlias(aliasStr);
+					this.userService.updateUser(user);
+					out.print("{\"state\":0}");
+				}else{
+					out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				}
+			}else {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("绑定用户发送通知的设备别名（divaceToken）bindingUserAlias报错：" + e);
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 		} finally {

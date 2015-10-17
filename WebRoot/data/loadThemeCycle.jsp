@@ -89,7 +89,7 @@
     }
 
     .my-footer {
-      border-top: 1px solid rgba(238, 238, 238, 0.42);
+      border-top: 1px solid rgba(238, 238, 238, 0.2);
       padding: 10px 0;
       margin-top: 10px;
       text-align: center;
@@ -99,7 +99,7 @@
 <%
 	response.setHeader("Cache-Control","max-age=1800");
 %>
-<body style="background-color: black;color: white;">
+<body style="background-color: #141414;color: white;">
 <div class="am-g am-g-fixed">
   <div class="am-u-md-9 am-u-md-push-3">
     <div class="am-g">
@@ -108,7 +108,7 @@
   </div>
 </div>
 <footer class="my-footer">
-  <p>享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
+  <p style="color: rgba(238, 238, 238, 0.4);margin-bottom: -5px;">享秀<br><small style="color: rgba(238, 238, 238, 0.4);">© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
 </footer>
 
 <!--[if lt IE 9]>

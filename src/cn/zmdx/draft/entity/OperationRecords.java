@@ -11,6 +11,7 @@ public class OperationRecords {
 	private int type;//举报类型，0：举报图集，1举报用户,2其他操作
 	private Date datetime;//举报时间
 	private String isRead;//是否已读：0：未读，1：已读
+	private String ip;//操作请求ip
 	public int getId() {
 		return id;
 	}
@@ -58,5 +59,11 @@ public class OperationRecords {
 	}
 	public void setIsRead(String isRead) {
 		this.isRead = isRead;
+	}
+	public String getIp() {
+		return ip;
+	}
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 }

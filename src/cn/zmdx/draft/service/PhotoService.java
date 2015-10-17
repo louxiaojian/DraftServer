@@ -125,7 +125,7 @@ public interface PhotoService {
 	 * @return
 	 */
 	public String OperationPictureSet(String userid, String pictureSetId,
-			int operationType);
+			int operationType,String ip);
 	/**
 	 * 真人验证申请
 	 * @author louxiaojian
@@ -236,4 +236,12 @@ public interface PhotoService {
 	 * @return
 	 */
 	public int queryUserSurplusVote(Map<String, String> surplusVotesFilterMap);
+	/**
+	 * 检查当前ip投票次数
+	 * @author louxiaojian
+	 * @date： 日期：2015-10-16 时间：下午12:11:09
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryOperations(Map<String, String> filterMap);
 }

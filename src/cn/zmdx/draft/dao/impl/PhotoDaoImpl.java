@@ -623,4 +623,35 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		return query.list().size();
 	}
 
+	@Override
+	public List queryOperations(Map<String, String> filterMap) {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		Date date=new Date();
+		StringBuffer sql=new StringBuffer("select ors.id,ors.informer_id from operation_records ors left join picture_set ps on ps.id=ors.picture_set_id where ors.operation_type=3 ");
+		sql.append("and ors.datetime like '%"+sdf.format(date)+"%'");
+		if(filterMap!=null&&!filterMap.isEmpty()){
+			if (!"".equals(filterMap.get("operate_type"))
+					&& filterMap.get("operate_type") != null) {
+				sql.append("  and ors.operation_type=:operate_type");
+			}
+			if (!"".equals(filterMap.get("ip"))
+					&& filterMap.get("ip") != null) {
+				sql.append(" and ors.ip=:ip");
+			}
+		}
+		Query query=getSession().createSQLQuery(sql.toString());
+		if(filterMap!=null&&!filterMap.isEmpty()){
+			if (!"".equals(filterMap.get("operate_type"))
+					&& filterMap.get("operate_type") != null) {
+				query.setInteger("operate_type",
+						Integer.parseInt(filterMap.get("operate_type")));
+			}
+			if (!"".equals(filterMap.get("ip"))
+					&& filterMap.get("ip") != null) {
+				query.setString("ip",filterMap.get("ip"));
+			}
+		}
+		return query.list();
+	}
+
 }

@@ -161,7 +161,7 @@
   </div>
 </div>
 <footer class="my-footer">
-  <p>享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
+  <p style="margin-bottom: -5px;">享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
 </footer>
 <div id="div1" class="bottomDiv">
 	<div style="font-size: 10px;text-align: center;width: 100%;color:#faca0d;">如想查看全部排名请下载享秀APP</div>

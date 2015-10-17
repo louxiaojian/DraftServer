@@ -10,6 +10,14 @@
     <param-value>/WEB-INF/applicationContext.xml,/WEB-INF/applicationContext-*.xml</param-value>
   </context-param>
   <filter>
+  	<filter-name>requestUrl</filter-name>
+    <filter-class>cn.zmdx.draft.filter.RequestUrl</filter-class>
+  </filter>
+   <filter-mapping>
+		<filter-name>requestUrl</filter-name>
+	    <url-pattern>*.action</url-pattern>
+  </filter-mapping>
+  <filter>
     <filter-name>Login</filter-name>
     <filter-class>cn.zmdx.draft.filter.LoginFilter</filter-class>
     <init-param>

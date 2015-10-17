@@ -12,6 +12,7 @@
 		<property name="type" column="type"/>
 		<property name="datetime" column="datetime"/>
 		<property name="isRead" column="isRead"/>
+		<property name="ip" column="ip"/>
 	</class>
 	
 </hibernate-mapping>
