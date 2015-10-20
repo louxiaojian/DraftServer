@@ -156,7 +156,7 @@
           </c:forEach>
           <c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'>
     		<div align="center">
-    			<input type="button" value="为ta投票" class="button" onclick="vote_pic()">
+    			<input type="button" value="为ta投票" class="button1" onclick="vote_pic()">
           		<p class="zhu">注：每人每天一个主题下限投3票，使用享秀APP还可以再投3票。</p>
           	</div>
           </c:if> 
