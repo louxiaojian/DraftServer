@@ -97,6 +97,7 @@
       margin-top: 10px;
       text-align: center;
     }
+    
   </style>
 </head>
 <%
@@ -108,28 +109,29 @@
     <div class="am-g">
 <header class="am-g my-head">
   <div class="am-u-sm-12 am-article" style="padding-left:0px;padding-right: 0px;">
+    		<div class="am-article-title">
+    			<img src="${cycle.webTitleUrl }" alt="" class="" width="100%">
+    		</div>
         <c:if test="${pictureSet!=null }">
-    		<h1 class="am-article-title"><c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'>
-    			<img src="${cycle.webTitleUrl }" alt="" class="" width="100%"></c:if>
-    		</h1>
-        </c:if>
-        <c:if test="${pictureSet==null }">
-    		<h1 class="am-article-title">您所查看的图集不存在</h1>
+    		<div class="vote" style="" align="center">
+    			<input type="button" value="我也要参加" class="button" onclick="downloadApp()">
+    		</div>
         </c:if>
   </div>
 </header>
         <c:if test="${pictureSet!=null }">
-        <div class="am-cf am-article" style="width: 100%;background-color: white;margin-left: auto;margin-right: auto;margin-top: -5px;">
-          <div style="width: 91.66666667%;height: 40px;background-color: white;;margin-left: auto;margin-right: auto">
+        <div class="am-cf am-article" style="width: 100%;background-color: white;margin-left: auto;margin-right: auto;">
+          <div class="user">
           	<div class="headerPic">
           		<img src="${pictureSet.user.headPortrait }" alt="" class="am-comment-avatar" width="48" height="48">
           	</div>
-          	<div style="width: 60%;float: left;height: 40px">
-          		<p style="width: 100%;margin: 0;font-weight:bold;" class="title">${fn:substring(pictureSet.user.username, 0, 12) }<c:if test="${fn:length(pictureSet.user.username)>12 }">...</c:if>  </p>
-          		<p style="width: 100%;margin: 0;color: rgba(51, 51, 51, 0.8);" class="title">当前票数：<span id="vote">${pictureSet.votes }</span></p>
-          	</div>
-          	<div style="width: 25%;float: right;height: 40px">
-          	<input type="button" value="为ta投票" class="button" style="border: 0;" onclick="vote_pic()">
+          	<div class="userInfo">
+	          	<div style="float: left;">
+	          		<p style="width: 100%;margin: 0;font-weight:bold;float: left;" class="title">${fn:substring(pictureSet.user.username, 0, 12) }<c:if test="${fn:length(pictureSet.user.username)>12 }">...</c:if>  </p>
+	          	</div>
+	          	<div style="float: right;">
+	          		<p style="width: 100%;margin: 0;color: rgba(51, 51, 51, 0.8);float: right;" class="title">当前票数：<span id="vote">${pictureSet.votes }</span></p>
+	          	</div>
           	</div>
           <div class="headerPic" style="width: 100%;height: auto;margin-bottom: -10px;">
           	<p class="descs">${pictureSet.descs }</p>
@@ -142,18 +144,22 @@
           <p style="text-align: right;margin: 0;font-size: 12px;color: rgba(51, 51, 51, 0.6);"><fmt:formatDate value="${pictureSet.uploadDate}" pattern="MM/dd"/></p>
           <c:forEach var="photo" items="${photos }" varStatus="vs">
           	<c:if test="${vs.count!= fn:length(photos)}">
-	         	<div style="background-color: #white;margin: 0px;padding: 0px;">
+	         	<div style="background-color: white;margin: 0px;padding: 0px;">
 	         	<img src="${photo.photoUrl }" alt="" width="100%" style="padding: 15px 15px 0px 15px;">
 	         	</div>
           	</c:if>
           	<c:if test="${vs.count== fn:length(photos)}">
-	         	<div style="background-color: white;margin: 0px;padding: 0px;margin-bottom: 10px;">
+	         	<div class="lastPhoto">
 	         	<img src="${photo.photoUrl }" alt="" width="100%" style="padding: 15px 15px 15px 15px;">
 	         	</div>
           	</c:if>
           </c:forEach>
-          <c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'><a href="http://pandora.hdlocker.com/draftServer/photo_loadThemeCycle.action?themeCycleId=${themeId }">活动规则及奖项设置</a></c:if> 
-          <p style="font-size: 14px;color: rgba(51, 51, 51, 0.6);line-height: 1.4;">注：每人每天一个主题下限投3票，使用享秀APP还可以再投3票。</p>
+          <c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'>
+    		<div align="center">
+    			<input type="button" value="为ta投票" class="button" onclick="vote_pic()">
+          		<p class="zhu">注：每人每天一个主题下限投3票，使用享秀APP还可以再投3票。</p>
+          	</div>
+          </c:if> 
           </c:if>
         </div>
       </div>
@@ -163,24 +169,6 @@
 <footer class="my-footer">
   <p style="margin-bottom: -5px;">享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
 </footer>
-<div id="div1" class="bottomDiv">
-	<div style="font-size: 10px;text-align: center;width: 100%;color:#faca0d;">如想查看全部排名请下载享秀APP</div>
-			<div style="width: 740px;margin-left: auto;margin-right: auto;">
-				<table style="width: 100%;">
-					<tr>
-						<div class="td1"><img alt="" class="bandeLogo" src="<%=request.getContextPath()%>/data/assets/i/vshowlogo.png"></div>
-						<div align="left" class="td2">
-						<p class="bande1">享秀</p>
-						<p class="bande2">属于你的生活秀场</p></div>
-						<div align="left" class="td3">
-							<img alt="" src="<%=request.getContextPath()%>/data/assets/i/download_button_nor.png" class="bandeDownload" onclick="downloadApp();">
-							<img alt="" src="<%=request.getContextPath()%>/data/assets/i/close.png" class="bandeClose" onclick="closeDiv();">
-						</div>
-					</tr>
-				</table>
-			</div>
-		</div>
-
 <!--[if lt IE 9]>
 <script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
 <script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>

@@ -3571,7 +3571,14 @@ a.am-badge:focus,a.am-badge:hover {
 .descs{
     	margin-top: 10px;
     }
-.button {
+    .userInfo{width: 90%;float: left;margin-top: 10px;
+    }
+    .vote{
+    	background-color: #111111;height: auto;margin-top: -8px;
+    } .lastPhoto{
+    background-color: white;margin: 0px;padding: 0px;margin-bottom: 10px;
+    }
+.button {outline: none;
         display: inline-block;
         border: 0;
        /* margin-top: 70px;
@@ -3587,7 +3594,6 @@ a.am-badge:focus,a.am-badge:hover {
         text-decoration: none;
         width:100px;
         height:60px;
-        float: right;
     }
     
 .am-comment-flip .am-comment-avatar,.am-list>li>.am-badge {
@@ -3618,7 +3624,6 @@ a.am-badge:focus,a.am-badge:hover {
         text-decoration: none;
         width:100px;
         height:60px;
-        float: right;
     }
     .vote{
     	line-height:100%;
@@ -3639,6 +3644,8 @@ a.am-badge:focus,a.am-badge:hover {
 }
 
 @media only screen and (min-width:300px) {
+	.user{width: 100%;background-color: white;margin-left: auto;margin-right: auto;margin-top: 10px;
+	width: 91.66666667%;height: 40px;background-color: white;;margin-left: auto;margin-right: auto}
 	.am-comment-avatar {
 		width: 36px;
 		height: 36px
@@ -3652,6 +3659,8 @@ a.am-badge:focus,a.am-badge:hover {
     font-size: 1.2rem;
     margin-top: 1rem;
 }
+    .userInfo{width: 90%;float: left;margin-top: 12px;
+    }
 	.button {
         display: inline-block;
         border: 0;
@@ -3663,18 +3672,22 @@ a.am-badge:focus,a.am-badge:hover {
         -webkit-transition: background-color 300ms ease-in;
         transition: background-color 300ms ease-in;
         color: white;
-        font-size: 14px;
+        font-size: 12px;
         text-align: center;
         text-decoration: none;
-        width:65px;
-        height:35px;
-        float: right;
+        width:150px;
+        height:32px;
+        margin-top: 6px;
     }
     .vote{
     	line-height:100%;
     	vertical-align: middle;
     	padding-top: 1px;
     	font-size: 14px;
+    	height: 50px;margin-top: -7px;
+    }
+    .zhu{
+    font-size: 12px;color: rgba(51, 51, 51, 0.6);line-height: 1.4;margin-top: 10px;
     }
     .descs{
     	margin-top: 10px;
@@ -3872,14 +3885,19 @@ a.am-badge:focus,a.am-badge:hover {
         font-size: 20px;
         text-align: center;
         text-decoration: none;
-        width:90px;
-        height:50px;
-        float: right;
+        width:120px;
+        height:40px;
+        margin-top: -30px;
+    }
+    .lastPhoto{
+    background-color: white;margin: 0px;padding: 0px;margin-bottom: 25px;
     }
     .vote{
     	line-height:100%;
     	vertical-align: middle;
     	padding-top: 24px;
+    	margin-top: -6px;
+    	height: 60px;
     }
 .descs{
     	padding-top: 25px;
