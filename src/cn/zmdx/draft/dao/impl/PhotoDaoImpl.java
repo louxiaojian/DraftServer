@@ -534,6 +534,10 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					&& filterMap.get("lastId") != null) {
 				sql.append(" and o.id<:lastId ");
 			}
+			if (!"".equals(filterMap.get("status"))
+					&& filterMap.get("status") != null) {
+				sql.append(" and o.isRead=:status ");
+			}
 			sql.append(" order by o.id desc ");
 			if (!"".equals(filterMap.get("limit"))
 					&& filterMap.get("limit") != null) {
@@ -554,6 +558,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				&& filterMap.get("lastId") != null) {
 			query.setInteger("lastId",
 					Integer.parseInt(filterMap.get("lastId")));
+		}
+		if (!"".equals(filterMap.get("status"))
+				&& filterMap.get("status") != null) {
+			query.setInteger("status",
+					Integer.parseInt(filterMap.get("status")));
 		}
 		if (!"".equals(filterMap.get("limit"))
 				&& filterMap.get("limit") != null) {

@@ -574,7 +574,7 @@ public class UserAction extends ActionSupport {
 				}
 				List fansList = userService.queryFans(filterMap2);
 				List notifyList = null;
-				int isRead = 1;
+				int isRead = 1;//0：未读 ，1：已读
 				if (currentUserId.equals(userId)) {
 					// 通知
 					Map<String, String> notifyFilterMap = new HashMap();
@@ -1132,6 +1132,47 @@ public class UserAction extends ActionSupport {
 			logger.error("绑定用户发送通知的设备别名（divaceToken）bindingUserAlias报错：" + e);
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 加载个人中心通知状态
+	 * @author louxiaojian
+	 * @date： 日期：2015-10-23 时间：上午11:15:02
+	 */
+	public void loadNotifyStatus() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			User user = userService.getById(Integer.parseInt(currentUserId));
+			if (currentUserId == null || "".equals(currentUserId) || user == null
+					|| "null".equals(currentUserId) || "0".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				// 通知 0：未读 ，1：已读
+				Map<String, String> notifyFilterMap = new HashMap();
+				notifyFilterMap.put("currentUserId", currentUserId);
+				notifyFilterMap.put("status", "0");
+				List notifyList = this.photoService.queryNotify(notifyFilterMap);
+				if(notifyList.size()>0){//有未读通知
+					out.print("{\"state\":0,\"result\":{\"isRead\":0}}");
+				}else{//没有未读通知
+					out.print("{\"state\":0,\"result\":{\"isRead\":1}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("查看用户信息viewUserInfo报错：" + e);
+			e.printStackTrace();
 		} finally {
 			out.flush();
 			out.close();
