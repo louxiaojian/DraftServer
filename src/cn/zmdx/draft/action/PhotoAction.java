@@ -3,9 +3,6 @@ package cn.zmdx.draft.action;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
-
 import cn.jpush.api.JPushClient;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.PushPayload;
@@ -31,13 +27,11 @@ import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.SensitivewordFilter;
 import cn.zmdx.draft.util.StringUtil;
-import cn.zmdx.draft.util.UserCookieUtil;
 import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
 import cn.zmdx.draft.weixin.api.SnsAPI;
 import cn.zmdx.draft.weixin.bean.SnsToken;
 import cn.zmdx.draft.weixin.entity.WeiXinUser;
-
 import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
 import com.qcloud.UploadResult;
@@ -214,15 +208,15 @@ public class PhotoAction extends ActionSupport {
 				for (int i = 0; i < list.size(); i++) {
 					RankPictureSet ps = (RankPictureSet) list.get(i);
 					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
-					}
+//					int count = this.photoService.isPraisedPictureSet(
+//							currentUserId, ps.getId() + "");
+//					if (count > 0) {// 已赞
+//						ps.setIsUserPraised("1");
+//					} else {// 未赞
+//						ps.setIsUserPraised("0");
+//					}
 					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());
@@ -242,16 +236,16 @@ public class PhotoAction extends ActionSupport {
 				// 图集所属用户信息
 				for (int i = 0; i < list.size(); i++) {
 					PictureSet ps = (PictureSet) list.get(i);
-					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
-					}
+//					// 验证当前用户是否已赞
+//					int count = this.photoService.isPraisedPictureSet(
+//							currentUserId, ps.getId() + "");
+//					if (count > 0) {// 已赞
+//						ps.setIsUserPraised("1");
+//					} else {// 未赞
+//						ps.setIsUserPraised("0");
+//					}
 					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());
@@ -318,20 +312,20 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
-					}
+//					int count = this.photoService.isPraisedPictureSet(
+//							currentUserId, ps.getId() + "");
+//					if (count > 0) {// 已赞
+//						ps.setIsUserPraised("1");
+//					} else {// 未赞
+//						ps.setIsUserPraised("0");
+//					}
 					// 图集评论数
 //					int comments = photoService.queryCommentByPictureSetId(ps
 //							.getId());
 //					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());
@@ -990,20 +984,20 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getPictureSetId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
-					}
+//					int count = this.photoService.isPraisedPictureSet(
+//							currentUserId, ps.getPictureSetId() + "");
+//					if (count > 0) {// 已赞
+//						ps.setIsUserPraised("1");
+//					} else {// 未赞
+//						ps.setIsUserPraised("0");
+//					}
 					// 图集评论数
 //					int comments = photoService.queryCommentByPictureSetId(ps
 //							.getId());
 //					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());
@@ -1454,7 +1448,7 @@ public class PhotoAction extends ActionSupport {
 			for (int i = 0; i < list.size(); i++) {
 				PictureSet ps = (PictureSet) list.get(i);
 				User user = (User) this.photoService.getObjectById(User.class,
-						ps.getUserid() + "");
+						String.valueOf(ps.getUserid()));
 				User u = new User();
 				u.setId(user.getId());
 				u.setHeadPortrait(user.getHeadPortrait());
@@ -1505,7 +1499,7 @@ public class PhotoAction extends ActionSupport {
 					ps.setPhotoList(pList);
 					// 验证是否已点赞
 					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getId() + "");
+							currentUserId, String.valueOf(ps.getId()));
 					if (count > 0) {// 已赞
 						ps.setIsUserPraised("1");
 					} else {// 未赞
@@ -1609,20 +1603,20 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
-					}
+//					int count = this.photoService.isPraisedPictureSet(
+//							currentUserId, ps.getId() + "");
+//					if (count > 0) {// 已赞
+//						ps.setIsUserPraised("1");
+//					} else {// 未赞
+//						ps.setIsUserPraised("0");
+//					}
 					// 图集评论数
 //					int comments = photoService.queryCommentByPictureSetId(ps
 //							.getId());
 //					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());
@@ -1640,20 +1634,20 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-					int count = this.photoService.isPraisedPictureSet(
-							currentUserId, ps.getPictureSetId() + "");
-					if (count > 0) {// 已赞
-						ps.setIsUserPraised("1");
-					} else {// 未赞
-						ps.setIsUserPraised("0");
-					}
+//					int count = this.photoService.isPraisedPictureSet(
+//							currentUserId, ps.getPictureSetId() + "");
+//					if (count > 0) {// 已赞
+//						ps.setIsUserPraised("1");
+//					} else {// 未赞
+//						ps.setIsUserPraised("0");
+//					}
 					// 图集评论数
 //					int comments = photoService.queryCommentByPictureSetId(ps
 //							.getId());
 //					ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
-							User.class, ps.getUserid() + "");
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());

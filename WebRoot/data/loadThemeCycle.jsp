@@ -118,8 +118,8 @@
 <![endif]-->
 
 <!--[if (gte IE 9)|!(IE)]><!-->
-<script src="assets/js/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/data/assets/js/jquery.min.js"></script>
 <!--<![endif]-->
-<script src="assets/js/amazeui.min.js"></script>
+<script src="<%=request.getContextPath()%>/data/assets/js/amazeui.min.js"></script>
 </body>
 </html>

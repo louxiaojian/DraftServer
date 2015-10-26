@@ -176,9 +176,9 @@
 <![endif]-->
 
 <!--[if (gte IE 9)|!(IE)]><!-->
-<script src="assets/js/jquery.min.js"></script>
+<script src="<%=request.getContextPath()%>/data/assets/js/jquery.min.js"></script>
 <!--<![endif]-->
-<script src="assets/js/amazeui.min.js"></script>
+<script src="<%=request.getContextPath()%>/data/assets/js/amazeui.min.js"></script>
 </body>
 </html>
   <script type="text/javascript">
@@ -222,4 +222,6 @@
 	function downloadApp(){
 		window.location.href="https://itunes.apple.com/cn/app/xiang-xiu/id1034657726?mt=8";
 	}
+	
+	
   </script>

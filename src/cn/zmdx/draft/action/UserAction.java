@@ -645,8 +645,8 @@ public class UserAction extends ActionSupport {
 					UserAttentionFans u = this.userService.isAttention(
 							fansUserId, attentionUserId);
 					if (u != null) {
-						out.print("{\"state\":1,\"errorMsg\":\"已关注\"}");
-						logger.error("{\"state\":1,\"errorMsg\":\"已关注\"}");
+						out.print("{\"state\":0,\"result\":{\"state\":1}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":1}}");
 					} else {
 						User attentionUser=this.userService.getById(Integer.parseInt(attentionUserId));
 						User currentUser=this.userService.getById(Integer.parseInt(fansUserId));
