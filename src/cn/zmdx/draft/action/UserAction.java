@@ -67,10 +67,10 @@ public class UserAction extends ActionSupport {
 	public static final String SECRET_ID_V2 = "AKIDo26nbKDLWZA6xpPXzRUaYVPgf5wqqlp6";
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
-	 private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
-	 private static final String jpushMasterSecret ="acc4ade2f7b4b5757f9bd5d8";
-	 private JPushClient jPushClient=new JPushClient(jpushMasterSecret,
-	 jpushAppKey, 3);
+	private static final String jpushAppKey = "b1d281203f8f4d8b2d7f2993";
+	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
+	private JPushClient jPushClient = new JPushClient(jpushMasterSecret,
+			jpushAppKey, 3);
 
 	public UserServiceImpl getUserService() {
 		return userService;
@@ -266,7 +266,8 @@ public class UserAction extends ActionSupport {
 					out.print("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 					logger.error("{\"state\":1,\"errorMsg\":\"用户名不存在\"}");
 				} else {
-					if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+					if (alias != null && !"".equals(alias)
+							&& !"null".equals(alias)) {
 						user.setAlias(alias);// 更新用户登录设备别名
 						this.userService.updateUser(user);
 					}
@@ -563,23 +564,25 @@ public class UserAction extends ActionSupport {
 				// }
 				// 获取要查看的用户的关注
 				Map<String, String> filterMap1 = new HashMap();
+				filterMap1.put("limit", "20");
 				if (userId != null && !"".equals(userId)) {
 					filterMap1.put("fansUserId", userId);
 				}
 				List attentionList = userService.queryAttentions(filterMap1);
 				// 获取要查看的用户的粉丝
 				Map<String, String> filterMap2 = new HashMap();
+				filterMap2.put("limit", "20");
 				if (userId != null && !"".equals(userId)) {
 					filterMap2.put("attentionUserId", userId);
 				}
 				List fansList = userService.queryFans(filterMap2);
 				List notifyList = null;
-				int isRead = 1;//0：未读 ，1：已读
+				int isRead = 1;// 0：未读 ，1：已读
 				if (currentUserId.equals(userId)) {
 					// 通知
 					Map<String, String> notifyFilterMap = new HashMap();
 					notifyFilterMap.put("currentUserId", currentUserId);
-					notifyFilterMap.put("limit", "10");
+					notifyFilterMap.put("limit", "20");
 					notifyList = this.photoService.queryNotify(notifyFilterMap);
 					for (int i = 0; i < notifyList.size(); i++) {
 						Notify notify = (Notify) notifyList.get(i);
@@ -648,26 +651,34 @@ public class UserAction extends ActionSupport {
 						out.print("{\"state\":0,\"result\":{\"state\":1}}");
 						logger.error("{\"state\":0,\"result\":{\"state\":1}}");
 					} else {
-						User attentionUser=this.userService.getById(Integer.parseInt(attentionUserId));
-						User currentUser=this.userService.getById(Integer.parseInt(fansUserId));
-						if(!"".equals(attentionUser.getAlias())&&attentionUser.getAlias()!=null){
-							HashMap<String, String> map=new HashMap<String, String>();
+						User attentionUser = this.userService.getById(Integer
+								.parseInt(attentionUserId));
+						User currentUser = this.userService.getById(Integer
+								.parseInt(fansUserId));
+						if (!"".equals(attentionUser.getAlias())
+								&& attentionUser.getAlias() != null) {
+							HashMap<String, String> map = new HashMap<String, String>();
 							map.put("scheme", "vshow://vshow.com/notification");
-							PushPayload pushPayload = PushExample.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-									currentUser.getUsername()+" 关注了您",map,attentionUser.getAlias());
-							PushResult result = jPushClient.sendPush(pushPayload);
-							System.out.println("jpush result："+result );
-							logger.error("发送通知："+result );
-			            
-//							 IosAlert alert = IosAlert.newBuilder()
-//									 .setTitleAndBody("测试标题", "你被关注了")
-//									 .setActionLocKey("PLAY")
-//									 .build();
-//							 PushPayload pushPayload =PushPayload.newBuilder();
-//							 PushResult result =
-//							 jPushClient.sendIosNotificationWithAlias(alert, new
-//							 HashMap<String, String>(), "91");
-//							 logger.info("jpush result："+result );
+							PushPayload pushPayload = PushExample
+									.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+											currentUser.getUsername() + " 关注了您",
+											map, attentionUser.getAlias());
+							PushResult result = jPushClient
+									.sendPush(pushPayload);
+							System.out.println("jpush result：" + result);
+							logger.error("发送通知：" + result);
+
+							// IosAlert alert = IosAlert.newBuilder()
+							// .setTitleAndBody("测试标题", "你被关注了")
+							// .setActionLocKey("PLAY")
+							// .build();
+							// PushPayload pushPayload
+							// =PushPayload.newBuilder();
+							// PushResult result =
+							// jPushClient.sendIosNotificationWithAlias(alert,
+							// new
+							// HashMap<String, String>(), "91");
+							// logger.info("jpush result："+result );
 						}
 						UserAttentionFans uaf = new UserAttentionFans();
 						uaf.setAttentionUserId(Integer
@@ -679,17 +690,17 @@ public class UserAction extends ActionSupport {
 					}
 				}
 			}
-//			 }catch (APIConnectionException e) {
-//			 out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
-//			 + "\",\"errorMsg\":\"系统异常\"}");
-//			 logger.error("Connection error, should retry later", e);
-//			 } catch (APIRequestException e) {
-//			 out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
-//			 + "\",\"errorMsg\":\"系统异常\"}");
-//			 logger.error("Should review the error, and fix the request", e);
-//			 logger.info("HTTP Status: " + e.getStatus());
-//			 logger.info("Error Code: " + e.getErrorCode());
-//			 logger.info("Error Message: " + e.getErrorMessage());
+			// }catch (APIConnectionException e) {
+			// out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+			// + "\",\"errorMsg\":\"系统异常\"}");
+			// logger.error("Connection error, should retry later", e);
+			// } catch (APIRequestException e) {
+			// out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+			// + "\",\"errorMsg\":\"系统异常\"}");
+			// logger.error("Should review the error, and fix the request", e);
+			// logger.info("HTTP Status: " + e.getStatus());
+			// logger.info("Error Code: " + e.getErrorCode());
+			// logger.info("Error Message: " + e.getErrorMessage());
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -801,6 +812,12 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = response.getWriter();
 		try {
 			String fansUserId = request.getParameter("currentUserId");
+			// lastModified
+			String lastid = request.getParameter("lastId");
+			String limit = request.getParameter("limit");
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "20";
+			}
 			if (fansUserId == null || "".equals(fansUserId)
 					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
@@ -810,6 +827,8 @@ public class UserAction extends ActionSupport {
 				if (fansUserId != null && !"".equals(fansUserId)) {
 					filterMap.put("fansUserId", fansUserId);
 				}
+				filterMap.put("lastid", lastid);
+				filterMap.put("limit", limit);
 				List list = userService.queryAttentions(filterMap);
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(list, true) + "}}");
@@ -839,6 +858,12 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = response.getWriter();
 		try {
 			String attentionUserId = request.getParameter("currentUserId");
+			// lastModified
+			String lastid = request.getParameter("lastId");
+			String limit = request.getParameter("limit");
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "20";
+			}
 			if (attentionUserId == null || "".equals(attentionUserId)
 					|| "null".equals(attentionUserId)
 					|| "0".equals(attentionUserId)) {
@@ -846,9 +871,11 @@ public class UserAction extends ActionSupport {
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
+				filterMap.put("lastid", lastid);
 				if (attentionUserId != null && !"".equals(attentionUserId)) {
 					filterMap.put("attentionUserId", attentionUserId);
 				}
+				filterMap.put("limit", limit);
 				List list = userService.queryFans(filterMap);
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(list, true) + "}}");
@@ -955,7 +982,7 @@ public class UserAction extends ActionSupport {
 			User user = this.userService.validateThirdPartyUser(userId,
 					thirdParty);
 			if (user != null) {// 已存在用户信息
-				if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+				if (alias != null && !"".equals(alias) && !"null".equals(alias)) {
 					user.setAlias(alias);// 保存用户登录设备别名
 					this.userService.updateObject(user);
 				}
@@ -987,7 +1014,8 @@ public class UserAction extends ActionSupport {
 					newUser.setAge(0);
 					newUser.setRegistrationDate(new Date());
 					newUser.setOrgId(0);
-					if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+					if (alias != null && !"".equals(alias)
+							&& !"null".equals(alias)) {
 						newUser.setAlias(alias);// 保存用户登录设备别名
 					}
 					if (!"".equals(wbUser.getAvatarLarge())
@@ -1033,7 +1061,8 @@ public class UserAction extends ActionSupport {
 					newUser.setOrgId(0);
 					newUser.setThirdParty(thirdParty);
 					newUser.setUid(userId);
-					if(alias!=null&&!"".equals(alias)&&!"null".equals(alias)){
+					if (alias != null && !"".equals(alias)
+							&& !"null".equals(alias)) {
 						newUser.setAlias(alias);// 保存用户登录设备别名
 					}
 					this.userService.saveUser(newUser);
@@ -1098,9 +1127,10 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 绑定用户发送通知的设备别名（divaceToken）
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-10-17 时间：下午12:04:54
 	 * @throws IOException
@@ -1113,17 +1143,19 @@ public class UserAction extends ActionSupport {
 		try {
 			String userId = request.getParameter("currentUserId");
 			String aliasStr = request.getParameter("alias");
-			if(userId!=null&&!"".equals(userId)&&!"null".equals(userId)&&!"0".equals(userId)&&aliasStr!=null&&!"".equals(aliasStr)&&!"null".equals(aliasStr)){
-				User user=this.userService.getById(Integer.parseInt(userId));
-				if(user!=null){
+			if (userId != null && !"".equals(userId) && !"null".equals(userId)
+					&& !"0".equals(userId) && aliasStr != null
+					&& !"".equals(aliasStr) && !"null".equals(aliasStr)) {
+				User user = this.userService.getById(Integer.parseInt(userId));
+				if (user != null) {
 					user.setAlias(aliasStr);
 					this.userService.updateUser(user);
 					out.print("{\"state\":0}");
-				}else{
+				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 				}
-			}else {
+			} else {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			}
@@ -1137,9 +1169,10 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 加载个人中心通知状态
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-10-23 时间：上午11:15:02
 	 */
@@ -1152,8 +1185,9 @@ public class UserAction extends ActionSupport {
 			out = response.getWriter();
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			User user = userService.getById(Integer.parseInt(currentUserId));
-			if (currentUserId == null || "".equals(currentUserId) || user == null
-					|| "null".equals(currentUserId) || "0".equals(currentUserId)) {
+			if (currentUserId == null || "".equals(currentUserId)
+					|| user == null || "null".equals(currentUserId)
+					|| "0".equals(currentUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
@@ -1161,11 +1195,65 @@ public class UserAction extends ActionSupport {
 				Map<String, String> notifyFilterMap = new HashMap();
 				notifyFilterMap.put("currentUserId", currentUserId);
 				notifyFilterMap.put("status", "0");
-				List notifyList = this.photoService.queryNotify(notifyFilterMap);
-				if(notifyList.size()>0){//有未读通知
+				List notifyList = this.photoService
+						.queryNotify(notifyFilterMap);
+				if (notifyList.size() > 0) {// 有未读通知
 					out.print("{\"state\":0,\"result\":{\"isRead\":0}}");
-				}else{//没有未读通知
+				} else {// 没有未读通知
 					out.print("{\"state\":0,\"result\":{\"isRead\":1}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("查看用户信息viewUserInfo报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 个人中心-加载通知
+	 * 
+	 * @author louxiaojian
+	 * @date： 日期：2015-10-30 时间：上午10:41:25
+	 */
+	public void loadNotify() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			// lastModified
+			String lastId = request.getParameter("lastId");
+			// 查询数据数量
+			String limit = request.getParameter("limit");
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "20";
+			}
+			if (currentUserId == null || "".equals(currentUserId)
+					|| "null".equals(currentUserId)
+					|| "0".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				User user = userService
+						.getById(Integer.parseInt(currentUserId));
+				if (user == null) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				} else {
+					// 通知 0：未读 ，1：已读
+					Map<String, String> filterMap = new HashMap();
+					filterMap.put("limit", limit);
+					filterMap.put("lastId", lastId);
+					filterMap.put("currentUserId", currentUserId);
+					List notifyList = this.photoService.queryNotify(filterMap);
+					out.print("{\"state\":0,\"result\":{\"notifyList\":"
+							+ JSON.toJSONString(notifyList, true) + "}}");
 				}
 			}
 		} catch (Exception e) {

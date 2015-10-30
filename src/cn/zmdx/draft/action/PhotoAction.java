@@ -109,7 +109,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "20";
 			}
 			if (userid == null || "".equals(userid) || "null".equals(userid)
 					|| "0".equals(userid)) {
@@ -182,7 +182,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "20";
 			}
 			if ("".equals(lastid) || lastid == null) {
 				lastid = "0";
@@ -290,7 +290,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "20";
 			}
 			if (themeCycleId == null || "".equals(themeCycleId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请选择选秀主题\"}");
@@ -962,7 +962,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "20";
 			}
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("themeCycleId", themeCycleId);
@@ -1060,7 +1060,7 @@ public class PhotoAction extends ActionSupport {
 			String themeCycleId = request.getParameter("themeCycleId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "20";
 			}
 			if ("".equals(themeCycleId) || themeCycleId == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
@@ -1304,7 +1304,7 @@ public class PhotoAction extends ActionSupport {
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 			} else {
 				if ("".equals(limit) || limit == null) {
-					limit = "10";
+					limit = "20";
 				}
 				Map<String, Object> filterMap = new HashMap();
 				filterMap.put("pictureSetId", pictureSetId);
@@ -1429,7 +1429,7 @@ public class PhotoAction extends ActionSupport {
 			String limit = request.getParameter("limit");
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "20";
 			}
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("limit", limit);
@@ -1453,6 +1453,7 @@ public class PhotoAction extends ActionSupport {
 				u.setId(user.getId());
 				u.setHeadPortrait(user.getHeadPortrait());
 				u.setUsername(user.getUsername());
+				u.setAge(user.getAge());
 				ps.setUser(u);
 				result.add(ps);
 			}
@@ -1570,7 +1571,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "20";
 			}
 			if ("".equals(themeCycleId) || themeCycleId == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
@@ -1800,7 +1801,7 @@ public class PhotoAction extends ActionSupport {
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 			} else {
 				if ("".equals(limit) || limit == null) {
-					limit = "10";
+					limit = "20";
 				}
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("currentUserId", currentUserId);

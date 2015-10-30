@@ -18,6 +18,7 @@ public class Comment {
 	private String username;//评论人昵称
 	private String parentusername;//评论回复人昵称
 	private User user;
+	private int orderId;//排序id
 	
 	public int getId() {
 		return id;
@@ -72,6 +73,12 @@ public class Comment {
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	public int getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 
 }

@@ -6,6 +6,7 @@ public class Notify {
 	//id,u.id as userId,u.username as username,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,
 	//o.operation_type as type,o.datetime as datetime,ps.coverUrl as coverUrl,ps.id as pictureSetId
 	private int id;
+	private int orderId;//排序id
 	private int userId;
 	private String userName;
 	private int gender;
@@ -81,5 +82,11 @@ public class Notify {
 	}
 	public void setIsRead(String isRead) {
 		this.isRead = isRead;
+	}
+	public int getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 }

@@ -27,6 +27,7 @@ public class User {
 	private String isAttention;//是否已关注，0已关注，1未关注
 	private String cookie;
 	private String alias;//用户登录设备别名
+	private int orderId;//排序id
 	
 	//选秀排名所用
 	private int praise;//赞
@@ -187,6 +188,12 @@ public class User {
 	}
 	public void setVotes(int votes) {
 		this.votes = votes;
+	}
+	public int getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 	
 }
