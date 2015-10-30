@@ -156,7 +156,7 @@
           </c:forEach>
           <c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'>
     		<div align="center">
-    			<input type="button" value="为ta投票" class="button1" onclick="vote_pic()">
+    			<input type="button" value="为ta投票" id="voteButton" class="button1" onclick="vote_pic()">
           		<p class="zhu">注：每人每天一个主题下限投3票，使用享秀APP还可以再投3票。</p>
           	</div>
           </c:if> 
@@ -185,6 +185,7 @@
   	function vote_pic(){
   		//alert(${currentUser.id}+"-----"+${pictureSet.id});
   		var currentUserId='<%=request.getSession().getAttribute("currentUserId")%>';
+  		document.getElementById("voteButton").disabled="disabled";
   		//if(('${code}'!=null&&'${code}'!=""&&'${code}'!="null")||(currentUserId!=null&&currentUserId!="null"&&currentUserId!="")){
   		if(currentUserId!=null&&currentUserId!="null"&&currentUserId!=""){
   			var params = {"currentUserId": currentUserId,"pictureSetId":'${pictureSet.id}'};  
@@ -197,6 +198,7 @@
   			      cache : false,  
   			      error : function(textStatus, errorThrown) {
   			    	  alert("系统错误");
+     			  	  document.getElementById("voteButton").disabled=false;
   			      },  
   			      success : function(data, textStatus) {
   			      	if(data.state=='0'){
@@ -206,8 +208,10 @@
   			      		}else{
   			      			alert("今日票数已用尽！");
   			      		}
+  	   			  		document.getElementById("voteButton").disabled=false;
   			      	}else{
   			      		alert(data.errorMsg);
+  	   			  		document.getElementById("voteButton").disabled=false;
   			      	}
   			    }  
   			});
