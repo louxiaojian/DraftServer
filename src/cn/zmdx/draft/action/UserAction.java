@@ -550,7 +550,7 @@ public class UserAction extends ActionSupport {
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("userid", userId);
 				filterMap.put("currentUserId", currentUserId);
-				filterMap.put("limit", "20");
+//				filterMap.put("limit", "20");
 				filterMap.put("width", width);
 				List photoSet = new ArrayList();
 				List<PictureSet> list = photoService
@@ -564,14 +564,14 @@ public class UserAction extends ActionSupport {
 				// }
 				// 获取要查看的用户的关注
 				Map<String, String> filterMap1 = new HashMap();
-				filterMap1.put("limit", "20");
+//				filterMap1.put("limit", "20");
 				if (userId != null && !"".equals(userId)) {
 					filterMap1.put("fansUserId", userId);
 				}
 				List attentionList = userService.queryAttentions(filterMap1);
 				// 获取要查看的用户的粉丝
 				Map<String, String> filterMap2 = new HashMap();
-				filterMap2.put("limit", "20");
+//				filterMap2.put("limit", "20");
 				if (userId != null && !"".equals(userId)) {
 					filterMap2.put("attentionUserId", userId);
 				}
@@ -582,7 +582,7 @@ public class UserAction extends ActionSupport {
 					// 通知
 					Map<String, String> notifyFilterMap = new HashMap();
 					notifyFilterMap.put("currentUserId", currentUserId);
-					notifyFilterMap.put("limit", "20");
+//					notifyFilterMap.put("limit", "20");
 					notifyList = this.photoService.queryNotify(notifyFilterMap);
 					for (int i = 0; i < notifyList.size(); i++) {
 						Notify notify = (Notify) notifyList.get(i);

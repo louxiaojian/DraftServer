@@ -113,7 +113,12 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				sql.append(" and uaf.id < :lastid");
 			}
 		}
-		sql.append(" order by uaf.attention_time desc limit :limit");
+		sql.append(" order by uaf.attention_time desc ");
+		if (!"0".equals(filterMap.get("limit"))
+				&& !"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null) {
+			sql.append(" limit :limit");
+		}
 //		sql.append(") t");
 		Query query = getSession().createSQLQuery(sql.toString()).setResultTransformer(Transformers.aliasToBean(User.class));
 		if(!"".equals(filterMap.get("fansUserId"))&&filterMap.get("fansUserId")!=null){
@@ -125,7 +130,11 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 			query.setInteger("lastid",
 					Integer.parseInt(filterMap.get("lastid")));
 		}
-		query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		if (!"0".equals(filterMap.get("limit"))
+				&& !"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null) {
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
 		return query.list();
 	}
 
@@ -142,7 +151,12 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				sql.append(" and uaf.id < :lastid");
 			}
 		}
-		sql.append(" order by uaf.attention_time desc limit :limit");
+		sql.append(" order by uaf.attention_time desc");
+		if (!"0".equals(filterMap.get("limit"))
+				&& !"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null) {
+			sql.append(" limit :limit");
+		}
 //		sql.append(") t");
 		Query query = getSession().createSQLQuery(sql.toString()).setResultTransformer(Transformers.aliasToBean(User.class));
 		if(!"".equals(filterMap.get("attentionUserId"))&&filterMap.get("attentionUserId")!=null){
@@ -154,7 +168,11 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 			query.setInteger("lastid",
 					Integer.parseInt(filterMap.get("lastid")));
 		}
-		query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		if (!"0".equals(filterMap.get("limit"))
+				&& !"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null) {
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
 		return query.list();
 	}
 
