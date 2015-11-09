@@ -19,7 +19,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
   </head>
   <body>
-    <form action="photo_uploadPhoto.action?currentUserId=5&type=1&themeCycleId=4" id="pageFrom" name="" method="post" enctype="multipart/form-data">
+    <!-- <form action="photo_uploadPhoto.action?currentUserId=5&type=1&themeCycleId=4" id="pageFrom" name="" method="post" enctype="multipart/form-data">
 		<fieldset class="fieldsetStyle">
 			<legend>
 				<font size="3">选秀上传</font>
@@ -49,14 +49,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 		</fieldset>
 	</form>
-	<!-- 
+	
 	<form action="user!register.action" method="post">
 		<table>
 			<tr><td>用户名：<input name="loginname" type="text" /></td></tr>
 			<tr><td>密码：<input name="pwd" type="password" /></td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
-	</form> -->
+	</form>
 	<a href="photo_replyComment.action?currentUserId=20&pictureSetId=133&content="+encodeuri(encodeuri('就看见啊回复技能'))>asdf</a>
 	<form action="user_automaticPrompt.action?currentUserId=20&pictureSetId=133" method="post">
 		<table>
@@ -75,7 +75,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							name="image" value="" onchange="uploadImg()" /></td></tr>
 			<tr><td><input type="submit" value="登录"/></td></tr>
 		</table>
-  <s:debug></s:debug>
-	</form>
+	</form> -->
   </body>
 </html>
