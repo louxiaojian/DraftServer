@@ -708,4 +708,56 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		return query.list();
 	}
 
+	@Override
+	public List queryPhotoSetByAttentedUser(Map<String, String> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select id as orderId,id,uploadDate,descs,type,praise,userid,CONCAT(coverUrl,'?imageView2/0/w/"
+				+ filterMap.get("width")
+				+ "/h/"
+				+ filterMap.get("width")
+				+ "') as coverUrl,rank,photoCount from picture_set where status =1 and userid>0 and report<10 ");// 个人、选秀图片全部显示在照片墙
+																														// and
+																														// type=0
+		if (filterMap != null && !filterMap.isEmpty()) {
+			if (!"0".equals(filterMap.get("lastid"))
+					&& !"".equals(filterMap.get("lastid"))
+					&& filterMap.get("lastid") != null) {
+				sql.append(" and id < :lastid");
+			}
+			if (!"0".equals(filterMap.get("currentUserId"))
+					&& !"".equals(filterMap.get("currentUserId"))
+					&& filterMap.get("currentUserId") != null) {
+				sql.append("and userid in (select attention_user_id from user_attention_fans uaf where uaf.fans_user_id=:userId )");
+			}
+			sql.append(" order by uploadDate desc,orderId desc ");
+			if (!"0".equals(filterMap.get("limit"))
+					&& !"".equals(filterMap.get("limit"))
+					&& filterMap.get("limit") != null) {
+				sql.append(" limit :limit");
+			}
+		}
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(
+						Transformers.aliasToBean(PictureSet.class));
+		if (!"0".equals(filterMap.get("lastid"))
+				&& !"".equals(filterMap.get("lastid"))
+				&& filterMap.get("lastid") != null) {
+			query.setInteger("lastid",
+					Integer.parseInt(filterMap.get("lastid")));
+		}
+		if (!"0".equals(filterMap.get("currentUserId"))
+				&& !"".equals(filterMap.get("currentUserId"))
+				&& filterMap.get("currentUserId") != null) {
+			query.setInteger("userId",
+					Integer.parseInt(filterMap.get("currentUserId")));
+		}
+		if (!"0".equals(filterMap.get("limit"))
+				&& !"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null) {
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
+		return query.list();
+	}
+
 }

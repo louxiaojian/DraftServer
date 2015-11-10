@@ -159,7 +159,8 @@ public class PhotoAction extends ActionSupport {
 		}
 	}
 	/**
-	 * 查看最新、热门照片集
+	 * (主页)（原  查看最新、热门照片集）
+	 * 现  最热、我关注的人的最新图集
 	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-8 时间：上午10:51:54
@@ -173,6 +174,10 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
+			// app版本号  1.0.1
+			String appversion = request.getParameter("appversion");
+			//平台  iPhone  Android
+			String pf = request.getParameter("pf");  
 			// lastid
 			String lastid = request.getParameter("lastId");
 			// 查询数据数量
@@ -193,28 +198,32 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("lastid", lastid);
 			filterMap.put("category", category);
 			filterMap.put("width", width);
-			List list = null;
-			List result = new ArrayList();
-			if ("1".equals(category)) {// 热门
-				list = photoService.queryHotPhotosWall(filterMap);
-				// for (int i = 0; i < list.size(); i++) {
-				// RankPictureSet ps=(RankPictureSet)list.get(i);
-				// List<Photo>
-				// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
-				// ps.setPhotoList(pList);
-				// result.add(ps);
-				// }
-				// 图集所属用户信息
-				for (int i = 0; i < list.size(); i++) {
-					RankPictureSet ps = (RankPictureSet) list.get(i);
-					// 验证当前用户是否已赞
-//					int count = this.photoService.isPraisedPictureSet(
-//							currentUserId, ps.getId() + "");
-//					if (count > 0) {// 已赞
-//						ps.setIsUserPraised("1");
-//					} else {// 未赞
-//						ps.setIsUserPraised("0");
-//					}
+			filterMap.put("currentUserId", currentUserId);
+			//版本号中间数字
+			String middleNum=appversion.substring(2, 3);//1.0.2  >>	0
+			if("1".equals(middleNum)||"Android".equals(pf)){//1.1.0···9  版本  或者Android版本
+				List result = new ArrayList();
+				// 热门
+				if ("1".equals(category)) {
+					List list = photoService.queryHotPhotosWall(filterMap);
+					// 图集所属用户信息
+					for (int i = 0; i < list.size(); i++) {
+						RankPictureSet ps = (RankPictureSet) list.get(i);
+						User user = (User) this.photoService.getObjectById(
+								User.class, String.valueOf(ps.getUserid()));
+						User u = new User();
+						u.setId(user.getId());
+						u.setHeadPortrait(user.getHeadPortrait());
+						u.setUsername(user.getUsername());
+						ps.setUser(u);
+						result.add(ps);
+					}
+				}	
+				//查询我关注的人的最新图集
+				List attentedResult = new ArrayList();
+				List AttentedPhotoSetList=photoService.queryPhotoSetByAttentedUser(filterMap);
+				for (int i = 0; i < AttentedPhotoSetList.size(); i++) {
+					PictureSet ps = (PictureSet) AttentedPhotoSetList.get(i);
 					User user = (User) this.photoService.getObjectById(
 							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
@@ -222,40 +231,46 @@ public class PhotoAction extends ActionSupport {
 					u.setHeadPortrait(user.getHeadPortrait());
 					u.setUsername(user.getUsername());
 					ps.setUser(u);
-					result.add(ps);
+					attentedResult.add(ps);
 				}
-			} else if ("0".equals(category)) {// 新
-				list = photoService.queryPhotosWall(filterMap);
-				// for (int i = 0; i < list.size(); i++) {
-				// PictureSet ps=(PictureSet)list.get(i);
-				// List<Photo>
-				// pList=photoService.queryPhotoByPictureSetId(ps.getId());
-				// ps.setPhotoList(pList);
-				// result.add(ps);
-				// }
-				// 图集所属用户信息
-				for (int i = 0; i < list.size(); i++) {
-					PictureSet ps = (PictureSet) list.get(i);
-//					// 验证当前用户是否已赞
-//					int count = this.photoService.isPraisedPictureSet(
-//							currentUserId, ps.getId() + "");
-//					if (count > 0) {// 已赞
-//						ps.setIsUserPraised("1");
-//					} else {// 未赞
-//						ps.setIsUserPraised("0");
-//					}
-					User user = (User) this.photoService.getObjectById(
-							User.class, String.valueOf(ps.getUserid()));
-					User u = new User();
-					u.setId(user.getId());
-					u.setHeadPortrait(user.getHeadPortrait());
-					u.setUsername(user.getUsername());
-					ps.setUser(u);
-					result.add(ps);
+				out.print("{\"state\":0,\"result\":{\"photoSet\":"
+						+ JSON.toJSONString(result, true) + ",\"attentedPhotoSet\":"
+						+ JSON.toJSONString(attentedResult, true) + "}}");
+			}else{//1.0.0···9  版本
+				List list = null;
+				List result = new ArrayList();
+				if ("1".equals(category)) {// 热门
+					list = photoService.queryHotPhotosWall(filterMap);
+					// 图集所属用户信息
+					for (int i = 0; i < list.size(); i++) {
+						RankPictureSet ps = (RankPictureSet) list.get(i);
+						User user = (User) this.photoService.getObjectById(
+								User.class, String.valueOf(ps.getUserid()));
+						User u = new User();
+						u.setId(user.getId());
+						u.setHeadPortrait(user.getHeadPortrait());
+						u.setUsername(user.getUsername());
+						ps.setUser(u);
+						result.add(ps);
+					}
+				} else if ("0".equals(category)) {// 新
+					list = photoService.queryPhotosWall(filterMap);
+					// 图集所属用户信息
+					for (int i = 0; i < list.size(); i++) {
+						PictureSet ps = (PictureSet) list.get(i);
+						User user = (User) this.photoService.getObjectById(
+								User.class, String.valueOf(ps.getUserid()));
+						User u = new User();
+						u.setId(user.getId());
+						u.setHeadPortrait(user.getHeadPortrait());
+						u.setUsername(user.getUsername());
+						ps.setUser(u);
+						result.add(ps);
+					}
 				}
+				out.print("{\"state\":0,\"result\":{\"photoSet\":"
+						+ JSON.toJSONString(result, true) + "}}");
 			}
-			out.print("{\"state\":0,\"result\":{\"photoSet\":"
-					+ JSON.toJSONString(result, true) + "}}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -1425,6 +1440,10 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
+			// app版本号  1.0.1
+			String appversion = request.getParameter("appversion");
+			//平台  iPhone  Android
+			String pf = request.getParameter("pf");  
 			// 查询数据数量
 			String limit = request.getParameter("limit");
 			String width = request.getParameter("w");// 缩放宽度
@@ -1434,31 +1453,62 @@ public class PhotoAction extends ActionSupport {
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("limit", limit);
 			filterMap.put("width", width);
-			List list = photoService.discoverPictureSet(filterMap);
-
-			List result = new ArrayList();
-			// for (int i = 0; i < list.size(); i++) {
-			// PictureSet ps=(PictureSet)list.get(i);
-			// List<Photo>
-			// pList=photoService.queryPhotoByPictureSetId(ps.getId());
-			// ps.setPhotoList(pList);
-			// result.add(ps);
-			// }
-			// 图集所属用户信息
-			for (int i = 0; i < list.size(); i++) {
-				PictureSet ps = (PictureSet) list.get(i);
-				User user = (User) this.photoService.getObjectById(User.class,
-						String.valueOf(ps.getUserid()));
-				User u = new User();
-				u.setId(user.getId());
-				u.setHeadPortrait(user.getHeadPortrait());
-				u.setUsername(user.getUsername());
-				u.setAge(user.getAge());
-				ps.setUser(u);
-				result.add(ps);
+			//版本号中间数字
+			String middleNum=appversion.substring(2, 3);//1.0.2  >>	0
+			if("1".equals(middleNum)||"Android".equals(pf)){//1.1.0···9  版本  
+				List disList = photoService.discoverPictureSet(filterMap);
+				List disResult = new ArrayList();
+				// 图集所属用户信息
+				for (int i = 0; i < disList.size(); i++) {
+					PictureSet ps = (PictureSet) disList.get(i);
+					User user = (User) this.photoService.getObjectById(User.class,
+							String.valueOf(ps.getUserid()));
+					User u = new User();
+					u.setId(user.getId());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					u.setAge(user.getAge());
+					ps.setUser(u);
+					disResult.add(ps);
+				}
+				//最新
+				filterMap.put("limit", "21");
+				List list = photoService.queryPhotosWall(filterMap);
+				List result = new ArrayList();
+				// 图集所属用户信息
+				for (int i = 0; i < list.size(); i++) {
+					PictureSet ps = (PictureSet) list.get(i);
+					User user = (User) this.photoService.getObjectById(
+							User.class, String.valueOf(ps.getUserid()));
+					User u = new User();
+					u.setId(user.getId());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					ps.setUser(u);
+					result.add(ps);
+				}
+				out.print("{\"state\":0,\"result\":{\"photoSet\":"
+						+ JSON.toJSONString(result, true) + ",\"disPhotoSet\":"
+						+ JSON.toJSONString(disResult, true) + "}}");
+			}else{
+				List list = photoService.discoverPictureSet(filterMap);
+				List result = new ArrayList();
+				// 图集所属用户信息
+				for (int i = 0; i < list.size(); i++) {
+					PictureSet ps = (PictureSet) list.get(i);
+					User user = (User) this.photoService.getObjectById(User.class,
+							String.valueOf(ps.getUserid()));
+					User u = new User();
+					u.setId(user.getId());
+					u.setHeadPortrait(user.getHeadPortrait());
+					u.setUsername(user.getUsername());
+					u.setAge(user.getAge());
+					ps.setUser(u);
+					result.add(ps);
+				}
+				out.print("{\"state\":0,\"result\":{\"photoSet\":"
+						+ JSON.toJSONString(result, true) + "}}");
 			}
-			out.print("{\"state\":0,\"result\":{\"photoSet\":"
-					+ JSON.toJSONString(result, true) + "}}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -2041,6 +2091,119 @@ public class PhotoAction extends ActionSupport {
 	        return xforwardIp;  
 	    }  
 	    return xforwardIp.substring( 0 , commaOffset );  
+	}
+	
+	/**
+	 * 加载我关注的人的最新图集
+	 * @author louxiaojian
+	 * @date： 日期：2015-11-10 时间：上午11:17:40
+	 */
+	public void queryPhotoSetByAttentedUser() {
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		// ServletActionContext.getResponse().setHeader("Cache-Control",
+		// "max-age=300");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		try {
+			out = ServletActionContext.getResponse().getWriter();
+			// app版本号  1.0.1
+			String appversion = request.getParameter("appversion");
+			// lastid
+			String lastid = request.getParameter("lastId");
+			// 查询数据数量
+			String limit = request.getParameter("limit");
+			// 标示，0查询lastModified之后的数据，1查询lastModified之前的数据
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String width = request.getParameter("w");// 缩放宽度
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "10";
+			}
+			if ("".equals(lastid) || lastid == null) {
+				lastid = "0";
+			}
+
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("limit", limit);
+			filterMap.put("lastid", lastid);
+			filterMap.put("width", width);
+			filterMap.put("currentUserId", currentUserId);
+			//查询我关注的人的最新图集
+			List attentedResult = new ArrayList();
+			List AttentedPhotoSetList=photoService.queryPhotoSetByAttentedUser(filterMap);
+			for (int i = 0; i < AttentedPhotoSetList.size(); i++) {
+				PictureSet ps = (PictureSet) AttentedPhotoSetList.get(i);
+				User user = (User) this.photoService.getObjectById(
+						User.class, String.valueOf(ps.getUserid()));
+				User u = new User();
+				u.setId(user.getId());
+				u.setHeadPortrait(user.getHeadPortrait());
+				u.setUsername(user.getUsername());
+				ps.setUser(u);
+				attentedResult.add(ps);
+			}
+			out.print("{\"state\":0,\"result\":{\"attentedPhotoSet\":"
+					+ JSON.toJSONString(attentedResult, true) + "}}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error("加载最新、最热图集照片墙queryPhotosWall报错："+e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 随便看看
+	 * @author louxiaojian
+	 * @date： 日期：2015-11-10 时间：下午1:59:37
+	 */
+	public void browsePhotoSet() {
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		try {
+			out = ServletActionContext.getResponse().getWriter();
+			// app版本号  1.0.1
+			String appversion = request.getParameter("appversion");
+			// 查询数据数量
+			String limit = request.getParameter("limit");
+			String width = request.getParameter("w");// 缩放宽度
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "20";
+			}
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("limit", limit);
+			filterMap.put("width", width);
+			List list = photoService.discoverPictureSet(filterMap);
+			List result = new ArrayList();
+			// 图集所属用户信息
+			for (int i = 0; i < list.size(); i++) {
+				PictureSet ps = (PictureSet) list.get(i);
+				User user = (User) this.photoService.getObjectById(User.class,
+						String.valueOf(ps.getUserid()));
+				User u = new User();
+				u.setId(user.getId());
+				u.setHeadPortrait(user.getHeadPortrait());
+				u.setUsername(user.getUsername());
+				u.setAge(user.getAge());
+				ps.setUser(u);
+				result.add(ps);
+			}
+			out.print("{\"state\":0,\"result\":{\"photoSet\":"
+					+ JSON.toJSONString(result, true) + "}}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error("发现接口discoverPictureSet报错："+e);
+		} finally {
+			out.flush();
+			out.close();
+		}
 	}
 	/**
 	 * 测试上传数据
