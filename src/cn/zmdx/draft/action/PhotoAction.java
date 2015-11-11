@@ -2148,7 +2148,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载最新、最热图集照片墙queryPhotosWall报错："+e);
+			logger.error("加载我关注的人的最新图集queryPhotoSetByAttentedUser报错："+e);
 		} finally {
 			out.flush();
 			out.close();
@@ -2199,7 +2199,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("发现接口discoverPictureSet报错："+e);
+			logger.error("随便看看browsePhotoSet报错："+e);
 		} finally {
 			out.flush();
 			out.close();

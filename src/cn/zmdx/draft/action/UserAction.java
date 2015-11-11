@@ -1266,4 +1266,38 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
+	/**
+	 * 加载用户信息
+	 * @author louxiaojian
+	 * @date： 日期：2015-11-10 时间：下午5:29:10
+	 */
+	public void loadUserInfo() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String userId = request.getParameter("userId");// 要查看的用户
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String width = request.getParameter("w");// 缩放宽度
+			User user = userService.getById(Integer.parseInt(userId));
+			if (userId == null || "".equals(userId) || user == null
+					|| "null".equals(userId) || "0".equals(userId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("加载用户信息loadUserInfo报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
 }
