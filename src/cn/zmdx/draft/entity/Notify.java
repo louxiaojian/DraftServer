@@ -17,6 +17,7 @@ public class Notify {
 	private String coverUrl;
 	private int pictureSetId;
 	private String isRead;//是否已读：0：未读，1：已读
+	private String area;//地区
 	public int getId() {
 		return id;
 	}
@@ -88,5 +89,11 @@ public class Notify {
 	}
 	public void setOrderId(int orderId) {
 		this.orderId = orderId;
+	}
+	public String getArea() {
+		return area;
+	}
+	public void setArea(String area) {
+		this.area = area;
 	}
 }

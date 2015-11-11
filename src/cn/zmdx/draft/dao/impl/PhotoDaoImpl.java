@@ -433,7 +433,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryUserCycleRanking(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select rps.id as orderId,u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,rps.praise,rps.votes from users u left join draft_rank_picture_set rps on rps.userid=u.id where rps.status =1 and rps.userid>0 and rps.type=1 ");
+		sql.append("select rps.id as orderId,u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,u.area,rps.praise,rps.votes from users u left join draft_rank_picture_set rps on rps.userid=u.id where rps.status =1 and rps.userid>0 and rps.type=1 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -499,7 +499,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryPraiseUsers(Map<String, String> praiseFilterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select o.id as orderId,u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction from users u left join operation_records o on informer_id=u.id where operation_type= 7");
+		sql.append("select o.id as orderId,u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,u.area from users u left join operation_records o on informer_id=u.id where operation_type= 7");
 		if (praiseFilterMap != null && !praiseFilterMap.isEmpty()) {
 			if (!"".equals(praiseFilterMap.get("pictureSetId"))
 					&& praiseFilterMap.get("pictureSetId") != null) {
@@ -566,7 +566,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryNotify(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select o.id as id,o.id as orderId,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead  from picture_set ps  left join operation_records o on ps.id=o.picture_set_id  left join  users u  on informer_id=u.id  where operation_type>3  and u.id>0 ");
+		sql.append("select o.id as id,o.id as orderId,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,u.area as area,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead  from picture_set ps  left join operation_records o on ps.id=o.picture_set_id  left join  users u  on informer_id=u.id  where operation_type>3  and u.id>0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("currentUserId"))
 					&& filterMap.get("currentUserId") != null) {

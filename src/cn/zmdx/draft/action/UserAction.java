@@ -405,6 +405,7 @@ public class UserAction extends ActionSupport {
 			String name = request.getParameter("name");// 真实姓名
 			String ageStr = request.getParameter("age");// 年龄
 			String gender = request.getParameter("gender");// 性别
+			String area = request.getParameter("area");// 地区
 			String introduction = StringUtil.encodingUrl(request
 					.getParameter("introduction"));// 个人介绍
 			int age = 0;
@@ -438,6 +439,9 @@ public class UserAction extends ActionSupport {
 					}
 					if (!"".equals(introduction) && introduction != null) {
 						user.setIntroduction(introduction);
+					}
+					if (!"".equals(area) && area != null) {
+						user.setArea(area);
 					}
 					// if (!"".equals(username) && username != null) {
 					// int

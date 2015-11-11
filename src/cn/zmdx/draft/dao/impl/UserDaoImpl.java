@@ -102,7 +102,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
 	@Override
 	public List queryAttentions(Map<String, String> filterMap) {
-		StringBuffer sql=new StringBuffer("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,uaf.id as orderId from users u left join user_attention_fans uaf on uaf.attention_user_id=u.id where 1=1 ");
+		StringBuffer sql=new StringBuffer("select u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,u.area,uaf.id as orderId from users u left join user_attention_fans uaf on uaf.attention_user_id=u.id where 1=1 ");
 		if(filterMap!=null&&!filterMap.isEmpty()){
 			if(!"".equals(filterMap.get("fansUserId"))&&filterMap.get("fansUserId")!=null){
 				sql.append(" and fans_user_id =?");
@@ -113,7 +113,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				sql.append(" and uaf.id < :lastid");
 			}
 		}
-		sql.append(" order by uaf.attention_time desc ");
+		sql.append(" group by u.id order by uaf.attention_time desc ");
 		if (!"0".equals(filterMap.get("limit"))
 				&& !"".equals(filterMap.get("limit"))
 				&& filterMap.get("limit") != null) {
@@ -140,7 +140,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
 	@Override
 	public List queryFans(Map<String, String> filterMap) {
-		StringBuffer sql=new StringBuffer("select  u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,uaf.id as orderId from users u left join user_attention_fans uaf on uaf.fans_user_id=u.id where 1=1 ");
+		StringBuffer sql=new StringBuffer("select  u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,u.area,uaf.id as orderId from users u left join user_attention_fans uaf on uaf.fans_user_id=u.id where 1=1 ");
 		if(filterMap!=null&&!filterMap.isEmpty()){
 			if(!"".equals(filterMap.get("attentionUserId"))&&filterMap.get("attentionUserId")!=null){
 				sql.append(" and attention_user_id =?");
@@ -151,7 +151,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				sql.append(" and uaf.id < :lastid");
 			}
 		}
-		sql.append(" order by uaf.attention_time desc");
+		sql.append(" group by u.id order by uaf.attention_time desc");
 		if (!"0".equals(filterMap.get("limit"))
 				&& !"".equals(filterMap.get("limit"))
 				&& filterMap.get("limit") != null) {

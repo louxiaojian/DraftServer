@@ -26,6 +26,7 @@
 		<property name="fileid" column="fileid"/>
 		<property name="validateUrl" column="validateUrl"/>
 		<property name="alias" column="alias"/>
+		<property name="area" column="area"/>
 	</class>
 	
 </hibernate-mapping>

@@ -23,6 +23,7 @@ public class UserUtil {
 		newUser.setLoginname(user.getLoginname());
 		newUser.setGender(user.getGender());
 		newUser.setIsvalidate(user.getIsvalidate());
+		newUser.setArea(user.getArea());
 		return newUser;
 	}
 }

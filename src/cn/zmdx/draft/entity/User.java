@@ -27,6 +27,7 @@ public class User {
 	private String isAttention;//是否已关注，0已关注，1未关注
 	private String cookie;
 	private String alias;//用户登录设备别名
+	private String area;//地区
 	private int orderId;//排序id
 	
 	//选秀排名所用
@@ -194,6 +195,12 @@ public class User {
 	}
 	public void setOrderId(int orderId) {
 		this.orderId = orderId;
+	}
+	public String getArea() {
+		return area;
+	}
+	public void setArea(String area) {
+		this.area = area;
 	}
 	
 }
