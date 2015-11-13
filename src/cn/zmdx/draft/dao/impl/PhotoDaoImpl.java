@@ -722,12 +722,12 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
 					&& filterMap.get("lastid") != null) {
-				sql.append(" and id < :lastid");
+				sql.append(" and id < :lastid ");
 			}
 			if (!"0".equals(filterMap.get("currentUserId"))
 					&& !"".equals(filterMap.get("currentUserId"))
 					&& filterMap.get("currentUserId") != null) {
-				sql.append("and userid in (select attention_user_id from user_attention_fans uaf where uaf.fans_user_id=:userId )");
+				sql.append(" and userid in (select attention_user_id from user_attention_fans uaf where uaf.fans_user_id=:userId )");
 			}
 			sql.append(" order by uploadDate desc,orderId desc ");
 			if (!"0".equals(filterMap.get("limit"))
