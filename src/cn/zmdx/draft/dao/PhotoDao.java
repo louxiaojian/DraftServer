@@ -208,4 +208,12 @@ public interface PhotoDao extends BaseDao {
 	 * @return
 	 */
 	public List queryPhotoSetByAttentedUser(Map<String, String> filterMap);
+	/**
+	 * 获取公告栏
+	 * @author louxiaojian
+	 * @date： 日期：2015-11-16 时间：上午11:37:30
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryBulletinBoard(Map<String, String> filterMap);
 }

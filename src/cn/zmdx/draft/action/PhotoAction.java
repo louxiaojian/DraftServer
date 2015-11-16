@@ -186,8 +186,8 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			// 版本号中间数字
-			String middleNum = appversion.substring(2, 3);// 1.0.2 >> 0
-			if ("1".equals(middleNum) || "Android".equals(pf)) {// 1.1.0···9 版本或者Android版本
+			int middleNum = Integer.parseInt(appversion.substring(2, 3));// 1.0.2 >> 0
+			if (middleNum>=1 || "Android".equals(pf)) {// 1.1.0···9 版本或者Android版本
 				if ("".equals(limit) || limit == null || "0".equals(limit)) {
 					limit = "15";
 				}
@@ -206,8 +206,10 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("category", category);
 			filterMap.put("width", width);
 			filterMap.put("currentUserId", currentUserId);
-			if ("1".equals(middleNum) || "Android".equals(pf)) {// 1.1.0···9 版本
+			if (middleNum>=1 || "Android".equals(pf)) {// 1.1.0···9 版本
 																// 或者Android版本
+				//获取公告栏
+				List blist=photoService.queryBulletinBoard(filterMap);
 				// 热门
 				if ("1".equals(category)) {
 					List result = new ArrayList();
@@ -225,7 +227,7 @@ public class PhotoAction extends ActionSupport {
 						result.add(ps);
 					}
 					out.print("{\"state\":0,\"result\":{\"photoSet\":"
-							+ JSON.toJSONString(result, true) + "}}");
+							+ JSON.toJSONString(result, true) + ",\"bulletinList\":"+JSON.toJSONString(blist)+"}}");
 				} else if ("0".equals(category)) {
 					// 查询我关注的人的最新图集
 					List attentedResult = new ArrayList();
@@ -236,6 +238,14 @@ public class PhotoAction extends ActionSupport {
 								.get(i);
 						User user = (User) this.photoService.getObjectById(
 								User.class, String.valueOf(ps.getUserid()));
+						// 验证当前用户是否已赞
+					    int count = this.photoService.isPraisedPictureSet(
+					    currentUserId, ps.getId() + "");
+						if (count > 0) {// 已赞
+							ps.setIsUserPraised("1");
+						} else {// 未赞
+							ps.setIsUserPraised("0");
+						}
 						User u = new User();
 						u.setId(user.getId());
 						u.setHeadPortrait(user.getHeadPortrait());
@@ -1150,7 +1160,15 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
+			// app版本号 1.0.1
+			String appversion = request.getParameter("appversion");
+			// 平台 iPhone Android
+			String pf = request.getParameter("pf");
+			// 版本号中间数字
+			String middleNum = appversion.substring(2, 3);// 1.0.2 >> 0
 			Map<String, Object> filterMap = new HashMap();
+			filterMap.put("pf", pf);
+			filterMap.put("middleNum", middleNum);
 			List list = photoService.queryThemes(filterMap);
 
 			out.print("{\"state\":0,\"result\":{\"themeCycle\":"
@@ -1489,8 +1507,8 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("limit", limit);
 			filterMap.put("width", width);
 			// 版本号中间数字
-			String middleNum = appversion.substring(2, 3);// 1.0.2 >> 0
-			if ("1".equals(middleNum) || "Android".equals(pf)) {// 1.1.0···9 版本
+			int middleNum = Integer.parseInt(appversion.substring(2, 3));// 1.0.2 >> 0
+			if (middleNum>=1 || "Android".equals(pf)) {// 1.1.0···9 版本
 				List disList = photoService.discoverPictureSet(filterMap);
 				List disResult = new ArrayList();
 				// 图集所属用户信息
@@ -1678,6 +1696,7 @@ public class PhotoAction extends ActionSupport {
 				} else {// 未参与
 					isvalidate = "0";
 				}
+				Cycle cycle=(Cycle)photoService.getObjectById(Cycle.class, themeCycleId);
 				// 选秀最新图集
 				List<PictureSet> list = photoService
 						.queryDraftPhotosWall(filterMap);
@@ -1760,7 +1779,7 @@ public class PhotoAction extends ActionSupport {
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
 						+ ",\"isUserAttented\":\"" + isvalidate
 						+ "\",\"surplusVotes\":\"" + (3 - surplusVotes)
-						+ "\"}}");
+						+ "\",\"theme\":"+JSON.toJSONString(cycle)+"}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()

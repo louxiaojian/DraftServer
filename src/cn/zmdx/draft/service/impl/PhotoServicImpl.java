@@ -307,5 +307,10 @@ public class PhotoServicImpl implements PhotoService {
 	public List queryPhotoSetByAttentedUser(Map<String, String> filterMap) {
 		return this.photoDao.queryPhotoSetByAttentedUser(filterMap);
 	}
+
+	@Override
+	public List queryBulletinBoard(Map<String, String> filterMap) {
+		return this.photoDao.queryBulletinBoard(filterMap);
+	}
 	
 }

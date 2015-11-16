@@ -10,6 +10,7 @@ public class Cycle {
 	private Date endtime;//选秀结束时间
 	private String status;//选秀状态，0:结束，1:进行中，2:未开始
 	private String bgUrl;//背景图
+	private String insideBgUrl;//选秀查看详情页面内
 	private String descs;//主题描述
 	private String tag;//标签图片路径
 	private String detailImageUrl;//描述图片
@@ -123,5 +124,11 @@ public class Cycle {
 	}
 	public void setWebTitleUrl(String webTitleUrl) {
 		this.webTitleUrl = webTitleUrl;
+	}
+	public String getInsideBgUrl() {
+		return insideBgUrl;
+	}
+	public void setInsideBgUrl(String insideBgUrl) {
+		this.insideBgUrl = insideBgUrl;
 	}
 }
