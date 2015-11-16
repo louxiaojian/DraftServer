@@ -169,6 +169,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and theme_cycle_id=:themeCycleId");
 			}
 			sql.append(" order by votes desc,orderId desc ");
+			if (!"".equals(filterMap.get("limit"))
+					&& filterMap.get("limit") != null
+					&& !"0".equals(filterMap.get("limit"))) {
+				sql.append(" limit :limit");
+			}
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -184,6 +189,12 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				&& filterMap.get("themeCycleId") != null) {
 			query.setInteger("themeCycleId",
 					Integer.parseInt(filterMap.get("themeCycleId")));
+		}
+		if (!"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null
+				&& !"0".equals(filterMap.get("limit"))) {
+			query.setInteger("limit",
+					Integer.parseInt(filterMap.get("limit")));
 		}
 		return query.list();
 	}
@@ -310,6 +321,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and theme_cycle_id=:themeCycleId");
 			}
 			sql.append(" order by uploadDate desc,id desc");// limit :limit
+			if (!"".equals(filterMap.get("limit"))
+					&& filterMap.get("limit") != null
+					&& !"0".equals(filterMap.get("limit"))) {
+				sql.append(" limit :limit");
+			}
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -326,10 +342,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 			query.setInteger("themeCycleId",
 					Integer.parseInt(filterMap.get("themeCycleId")));
 		}
-		// if (!"".equals(filterMap.get("limit"))
-		// && filterMap.get("limit") != null) {
-		// query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
-		// }
+		if (!"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null
+				&& !"0".equals(filterMap.get("limit"))) {
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
 		return query.list();
 	}
 
@@ -445,6 +462,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and rps.theme_cycle_id=:themeCycleId");
 			}
 			sql.append(" order by rps.votes desc,rps.id desc ");
+			if (!"".equals(filterMap.get("limit"))
+					&& filterMap.get("limit") != null
+					&& !"0".equals(filterMap.get("limit"))) {
+				sql.append(" limit :limit");
+			}
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
@@ -459,6 +481,12 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				&& filterMap.get("themeCycleId") != null) {
 			query.setInteger("themeCycleId",
 					Integer.parseInt(filterMap.get("themeCycleId")));
+		}
+		if (!"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null
+				&& !"0".equals(filterMap.get("limit"))) {
+			query.setInteger("limit",
+					Integer.parseInt(filterMap.get("limit")));
 		}
 		return query.list();
 	}
@@ -716,8 +744,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ "/h/"
 				+ filterMap.get("width")
 				+ "') as coverUrl,rank,photoCount from picture_set where status =1 and userid>0 and report<10 ");// 个人、选秀图片全部显示在照片墙
-																														// and
-																														// type=0
+																													// and
+																													// type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))

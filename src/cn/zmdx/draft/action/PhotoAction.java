@@ -51,10 +51,10 @@ public class PhotoAction extends ActionSupport {
 	public static final String SECRET_KEY_V2 = "upfmsUJgzOitvj0pCzSy4tV9ihdGeZMV";
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
 	public static final String ALBUMBUCKET = "album"; // 空间名
-	 private static final String jpushAppKey ="b1d281203f8f4d8b2d7f2993";
-	 private static final String jpushMasterSecret ="acc4ade2f7b4b5757f9bd5d8";
-	 private JPushClient jPushClient=new JPushClient(jpushMasterSecret,
-	 jpushAppKey, 3);
+	private static final String jpushAppKey = "b1d281203f8f4d8b2d7f2993";
+	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
+	private JPushClient jPushClient = new JPushClient(jpushMasterSecret,
+			jpushAppKey, 3);
 
 	public PhotoService getPhotoService() {
 		return photoService;
@@ -109,7 +109,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "20";
+				limit = "15";
 			}
 			if (userid == null || "".equals(userid) || "null".equals(userid)
 					|| "0".equals(userid)) {
@@ -152,15 +152,14 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载个人图集queryPersonalPhotos报错："+e);
+			logger.error("加载个人图集queryPersonalPhotos报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
 		}
 	}
 	/**
-	 * (主页)（原  查看最新、热门照片集）
-	 * 现  最热、我关注的人的最新图集
+	 * (主页)（原 查看最新、热门照片集） 现 最热、我关注的人的最新图集
 	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-7-8 时间：上午10:51:54
@@ -174,10 +173,10 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
-			// app版本号  1.0.1
+			// app版本号 1.0.1
 			String appversion = request.getParameter("appversion");
-			//平台  iPhone  Android
-			String pf = request.getParameter("pf");  
+			// 平台 iPhone Android
+			String pf = request.getParameter("pf");
 			// lastid
 			String lastid = request.getParameter("lastId");
 			// 查询数据数量
@@ -186,8 +185,16 @@ public class PhotoAction extends ActionSupport {
 			String category = request.getParameter("category");// 0 新，1 热门
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
-			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+			// 版本号中间数字
+			String middleNum = appversion.substring(2, 3);// 1.0.2 >> 0
+			if ("1".equals(middleNum) || "Android".equals(pf)) {// 1.1.0···9 版本或者Android版本
+				if ("".equals(limit) || limit == null || "0".equals(limit)) {
+					limit = "15";
+				}
+			} else {
+				if ("".equals(limit) || limit == null || "0".equals(limit)) {
+					limit = "10";
+				}
 			}
 			if ("".equals(lastid) || lastid == null) {
 				lastid = "0";
@@ -199,9 +206,8 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("category", category);
 			filterMap.put("width", width);
 			filterMap.put("currentUserId", currentUserId);
-			//版本号中间数字
-			String middleNum=appversion.substring(2, 3);//1.0.2  >>	0
-			if("1".equals(middleNum)||"Android".equals(pf)){//1.1.0···9  版本  或者Android版本
+			if ("1".equals(middleNum) || "Android".equals(pf)) {// 1.1.0···9 版本
+																// 或者Android版本
 				// 热门
 				if ("1".equals(category)) {
 					List result = new ArrayList();
@@ -220,12 +226,14 @@ public class PhotoAction extends ActionSupport {
 					}
 					out.print("{\"state\":0,\"result\":{\"photoSet\":"
 							+ JSON.toJSONString(result, true) + "}}");
-				}else if ("0".equals(category)) {
-					//查询我关注的人的最新图集
+				} else if ("0".equals(category)) {
+					// 查询我关注的人的最新图集
 					List attentedResult = new ArrayList();
-					List AttentedPhotoSetList=photoService.queryPhotoSetByAttentedUser(filterMap);
+					List AttentedPhotoSetList = photoService
+							.queryPhotoSetByAttentedUser(filterMap);
 					for (int i = 0; i < AttentedPhotoSetList.size(); i++) {
-						PictureSet ps = (PictureSet) AttentedPhotoSetList.get(i);
+						PictureSet ps = (PictureSet) AttentedPhotoSetList
+								.get(i);
 						User user = (User) this.photoService.getObjectById(
 								User.class, String.valueOf(ps.getUserid()));
 						User u = new User();
@@ -238,7 +246,7 @@ public class PhotoAction extends ActionSupport {
 					out.print("{\"state\":0,\"result\":{\"photoSet\":"
 							+ JSON.toJSONString(attentedResult, true) + "}}");
 				}
-			}else{//1.0.0···9  版本
+			} else {// 1.0.0···9 版本
 				List list = null;
 				List result = new ArrayList();
 				if ("1".equals(category)) {// 热门
@@ -277,7 +285,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载最新、最热图集照片墙queryPhotosWall报错："+e);
+			logger.error("加载最新、最热图集照片墙queryPhotosWall报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -307,7 +315,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "15";
 			}
 			if (themeCycleId == null || "".equals(themeCycleId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请选择选秀主题\"}");
@@ -329,17 +337,17 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-//					int count = this.photoService.isPraisedPictureSet(
-//							currentUserId, ps.getId() + "");
-//					if (count > 0) {// 已赞
-//						ps.setIsUserPraised("1");
-//					} else {// 未赞
-//						ps.setIsUserPraised("0");
-//					}
+					// int count = this.photoService.isPraisedPictureSet(
+					// currentUserId, ps.getId() + "");
+					// if (count > 0) {// 已赞
+					// ps.setIsUserPraised("1");
+					// } else {// 未赞
+					// ps.setIsUserPraised("0");
+					// }
 					// 图集评论数
-//					int comments = photoService.queryCommentByPictureSetId(ps
-//							.getId());
-//					ps.setComments(comments);
+					// int comments = photoService.queryCommentByPictureSetId(ps
+					// .getId());
+					// ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, String.valueOf(ps.getUserid()));
@@ -365,7 +373,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载选秀最新图集queryDraftPhotosWall报错："+e);
+			logger.error("加载选秀最新图集queryDraftPhotosWall报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -412,7 +420,7 @@ public class PhotoAction extends ActionSupport {
 					if (list != null && list.size() > 0) {// 参与过
 						out.print("{\"state\":\"1\",\"errorMsg\":\"您以参与过此次主题选秀\"}");
 						logger.error("{\"state\":\"1\",\"errorMsg\":\"您以参与过此次主题选秀\"}");
-					}else{
+					} else {
 						Cycle cycle = (Cycle) this.photoService.getObjectById(
 								Cycle.class, themeCycleId);
 						if ("1".equals(cycle.getIsNeedValidate())
@@ -568,7 +576,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("上传图片uploadPhoto报错："+e);
+			logger.error("上传图片uploadPhoto报错：" + e);
 			// 删除本次所有上传照片
 			for (int i = 0; i < fileids.length; i++) {
 				if (fileids[i] != null && !"".equals(fileids[i])) {
@@ -633,7 +641,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("上传真人验证照片realityVerification报错："+e);
+			logger.error("上传真人验证照片realityVerification报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -654,7 +662,7 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			String ip = request.getRemoteAddr();//返回发出请求的IP地址
+			String ip = request.getRemoteAddr();// 返回发出请求的IP地址
 			if (userid == null || "".equals(userid) || "null".equals(userid)
 					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
@@ -665,23 +673,34 @@ public class PhotoAction extends ActionSupport {
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 				} else {
 					String result = photoService.OperationPictureSet(userid,
-							pictureSetId, 7,ip);
+							pictureSetId, 7, ip);
 					if ("failed".equals(result)) {// 已操作
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 						logger.error("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
-						PictureSet pictureSet=(PictureSet)this.photoService.getObjectById(PictureSet.class, pictureSetId);
-						if(pictureSet.getUserid()!=Integer.parseInt(userid)){
-							User PictureSetUser=(User)this.photoService.getObjectById(User.class, String.valueOf(pictureSet.getUserid()));
-							if(PictureSetUser.getAlias()!=null&&!"".equals(PictureSetUser.getAlias())){
-								User currentUser=(User)this.photoService.getObjectById(User.class,userid);
-								HashMap<String, String> map=new HashMap<String, String>();
-								map.put("scheme", "vshow://vshow.com/notification");
-								PushPayload pushPayload = PushExample.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-										currentUser.getUsername()+" 赞了您",map,PictureSetUser.getAlias());
-								PushResult pushResult = jPushClient.sendPush(pushPayload);
-								System.out.println("jpush result："+pushResult );
-								logger.error("发送通知："+pushResult );
+						PictureSet pictureSet = (PictureSet) this.photoService
+								.getObjectById(PictureSet.class, pictureSetId);
+						if (pictureSet.getUserid() != Integer.parseInt(userid)) {
+							User PictureSetUser = (User) this.photoService
+									.getObjectById(User.class, String
+											.valueOf(pictureSet.getUserid()));
+							if (PictureSetUser.getAlias() != null
+									&& !"".equals(PictureSetUser.getAlias())) {
+								User currentUser = (User) this.photoService
+										.getObjectById(User.class, userid);
+								HashMap<String, String> map = new HashMap<String, String>();
+								map.put("scheme",
+										"vshow://vshow.com/notification");
+								PushPayload pushPayload = PushExample
+										.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+												currentUser.getUsername()
+														+ " 赞了您", map,
+												PictureSetUser.getAlias());
+								PushResult pushResult = jPushClient
+										.sendPush(pushPayload);
+								System.out
+										.println("jpush result：" + pushResult);
+								logger.error("发送通知：" + pushResult);
 							}
 						}
 						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
@@ -692,7 +711,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("点赞praisePhoto报错："+e);
+			logger.error("点赞praisePhoto报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -713,7 +732,7 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			String ip = request.getRemoteAddr();//返回发出请求的IP地址
+			String ip = request.getRemoteAddr();// 返回发出请求的IP地址
 			if (userid == null || "".equals(userid) || "null".equals(userid)
 					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
@@ -724,7 +743,7 @@ public class PhotoAction extends ActionSupport {
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 				} else {
 					String result = photoService.OperationPictureSet(userid,
-							pictureSetId, 4,ip);
+							pictureSetId, 4, ip);
 					if ("failed".equals(result)) {// 已操作
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
@@ -736,7 +755,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("取消点赞cancelPraisePhoto报错："+e);
+			logger.error("取消点赞cancelPraisePhoto报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -757,7 +776,7 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			String ip = request.getRemoteAddr();//返回发出请求的IP地址
+			String ip = request.getRemoteAddr();// 返回发出请求的IP地址
 			if (userid == null || "".equals(userid) || "null".equals(userid)
 					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
@@ -768,7 +787,7 @@ public class PhotoAction extends ActionSupport {
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 				} else {
 					String result = photoService.OperationPictureSet(userid,
-							pictureSetId, 1,ip);
+							pictureSetId, 1, ip);
 					if ("failed".equals(result)) {// 已操作过
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
@@ -780,7 +799,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("踩图集treadPhoto报错："+e);
+			logger.error("踩图集treadPhoto报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -801,7 +820,7 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			String ip = request.getRemoteAddr();//返回发出请求的IP地址
+			String ip = request.getRemoteAddr();// 返回发出请求的IP地址
 			if (userid == null || "".equals(userid) || "null".equals(userid)
 					|| "0".equals(userid)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
@@ -812,7 +831,7 @@ public class PhotoAction extends ActionSupport {
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
 				} else {
 					String result = photoService.OperationPictureSet(userid,
-							pictureSetId, 2,ip);
+							pictureSetId, 2, ip);
 					if ("failed".equals(result)) {// 已操作过
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
@@ -824,7 +843,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("举报图集reportPhoto报错："+e);
+			logger.error("举报图集reportPhoto报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -861,7 +880,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("增加浏览量viewPhoto报错："+e);
+			logger.error("增加浏览量viewPhoto报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -882,76 +901,76 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			String ip=getRemoteHost(request);//返回发出请求的真实IP地址
-//			logger.error("投票请求网址："+ip);
-//			System.err.println(ip);
-//			if(!"".equals(ip)&&ip!=null&&!"null".equals(ip)){
-//				//检查当前ip投票次数
-//				Map<String, String> filterMap = new HashMap<String, String>();
-//				filterMap.put("ip", ip);
-//				filterMap.put("operate_type", "3");
-//				List list=this.photoService.queryOperations(filterMap);
-//				if(list!=null&&list.size()<9){
-					User user = (User) this.photoService.getObjectById(User.class,
-							userid);
-					if (("".equals(userid) || userid == null) || user == null) {
-						out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
-						logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
-					} else {
-						if ("".equals(pictureSetId) || pictureSetId == null) {
-							out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
-							logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
+			String ip = getRemoteHost(request);// 返回发出请求的真实IP地址
+			// logger.error("投票请求网址："+ip);
+			// System.err.println(ip);
+			// if(!"".equals(ip)&&ip!=null&&!"null".equals(ip)){
+			// //检查当前ip投票次数
+			// Map<String, String> filterMap = new HashMap<String, String>();
+			// filterMap.put("ip", ip);
+			// filterMap.put("operate_type", "3");
+			// List list=this.photoService.queryOperations(filterMap);
+			// if(list!=null&&list.size()<9){
+			User user = (User) this.photoService.getObjectById(User.class,
+					userid);
+			if (("".equals(userid) || userid == null) || user == null) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+			} else {
+				if ("".equals(pictureSetId) || pictureSetId == null) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
+				} else {
+					PictureSet ps = (PictureSet) this.photoService
+							.getObjectById(PictureSet.class, pictureSetId);
+					int themeId = ps.getThemeCycleId();
+					Cycle cycle = (Cycle) this.photoService.getObjectById(
+							Cycle.class, String.valueOf(themeId));
+					Date currentDate = new Date();
+					if (!"1".equals(cycle.getStatus())) {
+						out.print("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
+						logger.error("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
+					} else if (cycle.getVoteStartTime().getTime() < currentDate
+							.getTime()
+							&& cycle.getVoteEndTime().getTime() > currentDate
+									.getTime()) {
+						Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
+						surplusVotesFilterMap.put("userId", userid);
+						surplusVotesFilterMap.put("ip", ip);
+						surplusVotesFilterMap.put("themeId",
+								String.valueOf(ps.getThemeCycleId()));
+						int votes = this.photoService
+								.queryUserSurplusVote(surplusVotesFilterMap);
+						if (votes >= 3) {
+							out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
 						} else {
-							PictureSet ps = (PictureSet) this.photoService
-									.getObjectById(PictureSet.class, pictureSetId);
-							int themeId = ps.getThemeCycleId();
-							Cycle cycle = (Cycle) this.photoService.getObjectById(
-									Cycle.class, String.valueOf(themeId));
-							Date currentDate = new Date();
-							if (!"1".equals(cycle.getStatus())) {
-								out.print("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
-								logger.error("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
-							} else if (cycle.getVoteStartTime().getTime() < currentDate
-									.getTime()
-									&& cycle.getVoteEndTime().getTime() > currentDate
-											.getTime()) {
-								Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
-								surplusVotesFilterMap.put("userId", userid);
-								surplusVotesFilterMap.put("ip", ip);
-								surplusVotesFilterMap.put("themeId",
-										String.valueOf(ps.getThemeCycleId()));
-								int votes = this.photoService
-										.queryUserSurplusVote(surplusVotesFilterMap);
-								if (votes >= 3) {
-									out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
-								} else {
-									String result = photoService.OperationPictureSet(
-											userid, pictureSetId, 3,ip);
-									out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
-											+ (3 - votes - 1) + "\"}}");
-								}
-							} else if (cycle.getVoteStartTime().getTime() > currentDate
-									.getTime()) {
-								out.print("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
-								logger.error("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
-							} else if (cycle.getVoteEndTime().getTime() < currentDate
-									.getTime()) {
-								out.print("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
-								logger.error("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
-							}
+							String result = photoService.OperationPictureSet(
+									userid, pictureSetId, 3, ip);
+							out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
+									+ (3 - votes - 1) + "\"}}");
 						}
+					} else if (cycle.getVoteStartTime().getTime() > currentDate
+							.getTime()) {
+						out.print("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
+						logger.error("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
+					} else if (cycle.getVoteEndTime().getTime() < currentDate
+							.getTime()) {
+						out.print("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
+						logger.error("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
 					}
-//				}else{
-//					out.print("{\"state\":\"1\",\"errorMsg\":\"当前操作存在刷票嫌疑，已被系统屏蔽\"}");
-//				}
-//			}else{
-//				out.print("{\"state\":\"1\",\"errorMsg\":\"系统错误\"}");
-//			}
+				}
+			}
+			// }else{
+			// out.print("{\"state\":\"1\",\"errorMsg\":\"当前操作存在刷票嫌疑，已被系统屏蔽\"}");
+			// }
+			// }else{
+			// out.print("{\"state\":\"1\",\"errorMsg\":\"系统错误\"}");
+			// }
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("投票vote报错："+e);
+			logger.error("投票vote报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -979,7 +998,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "15";
 			}
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("themeCycleId", themeCycleId);
@@ -1001,17 +1020,17 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-//					int count = this.photoService.isPraisedPictureSet(
-//							currentUserId, ps.getPictureSetId() + "");
-//					if (count > 0) {// 已赞
-//						ps.setIsUserPraised("1");
-//					} else {// 未赞
-//						ps.setIsUserPraised("0");
-//					}
+					// int count = this.photoService.isPraisedPictureSet(
+					// currentUserId, ps.getPictureSetId() + "");
+					// if (count > 0) {// 已赞
+					// ps.setIsUserPraised("1");
+					// } else {// 未赞
+					// ps.setIsUserPraised("0");
+					// }
 					// 图集评论数
-//					int comments = photoService.queryCommentByPictureSetId(ps
-//							.getId());
-//					ps.setComments(comments);
+					// int comments = photoService.queryCommentByPictureSetId(ps
+					// .getId());
+					// ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, String.valueOf(ps.getUserid()));
@@ -1049,7 +1068,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载选秀图集queryCycleRanking报错："+e);
+			logger.error("加载选秀图集queryCycleRanking报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1111,7 +1130,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载选秀用户排名queryUserCycleRanking报错："+e);
+			logger.error("加载选秀用户排名queryUserCycleRanking报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1140,7 +1159,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载全部主题queryThemes报错："+e);
+			logger.error("加载全部主题queryThemes报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1219,7 +1238,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("验证用户是否参加此次选秀validateQualification报错："+e);
+			logger.error("验证用户是否参加此次选秀validateQualification报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1270,21 +1289,35 @@ public class PhotoAction extends ActionSupport {
 						comment.setUserId(Integer.parseInt(userId));
 						comment.setDatetime(new Date());
 						this.photoService.saveComment(comment);
-						PictureSet pictureSet=(PictureSet)this.photoService.getObjectById(PictureSet.class, pictureSetId);
-						if(pictureSet.getUserid()!=Integer.parseInt(userId)){
-							User PictureSetUser=(User)this.photoService.getObjectById(User.class, String.valueOf(pictureSet.getUserid()));
-							if(PictureSetUser.getAlias()!=null&&!"".equals(PictureSetUser.getAlias())){
-								User currentUser=(User)this.photoService.getObjectById(User.class,userId);
-								HashMap<String, String> map=new HashMap<String, String>();
-								map.put("scheme", "vshow://vshow.com/pictureSetDetail?pictureSetId="+pictureSetId);
-								PushPayload pushPayload = PushExample.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-										"您收到了 "+currentUser.getUsername()+" 的评论",map,PictureSetUser.getAlias());
-								PushResult pushResult = jPushClient.sendPush(pushPayload);
-								System.out.println("jpush result："+pushResult );
-								logger.error("发送通知："+pushResult );
+						PictureSet pictureSet = (PictureSet) this.photoService
+								.getObjectById(PictureSet.class, pictureSetId);
+						if (pictureSet.getUserid() != Integer.parseInt(userId)) {
+							User PictureSetUser = (User) this.photoService
+									.getObjectById(User.class, String
+											.valueOf(pictureSet.getUserid()));
+							if (PictureSetUser.getAlias() != null
+									&& !"".equals(PictureSetUser.getAlias())) {
+								User currentUser = (User) this.photoService
+										.getObjectById(User.class, userId);
+								HashMap<String, String> map = new HashMap<String, String>();
+								map.put("scheme",
+										"vshow://vshow.com/pictureSetDetail?pictureSetId="
+												+ pictureSetId);
+								PushPayload pushPayload = PushExample
+										.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+												"您收到了 "
+														+ currentUser
+																.getUsername()
+														+ " 的评论", map,
+												PictureSetUser.getAlias());
+								PushResult pushResult = jPushClient
+										.sendPush(pushPayload);
+								System.out
+										.println("jpush result：" + pushResult);
+								logger.error("发送通知：" + pushResult);
 							}
 						}
-						
+
 						out.print("{\"state\":0,\"result\":{\"commentId\":"
 								+ comment.getId() + "}}");
 					}
@@ -1294,7 +1327,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("发表评论replyComment报错："+e);
+			logger.error("发表评论replyComment报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1335,7 +1368,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载图集评论loadComment报错："+e);
+			logger.error("加载图集评论loadComment报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1380,7 +1413,7 @@ public class PhotoAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error("加载审批记录queryReviewRecords报错："+e);
+			logger.error("加载审批记录queryReviewRecords报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
@@ -1422,7 +1455,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("举报用户接口reportUser报错："+e);
+			logger.error("举报用户接口reportUser报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1442,10 +1475,10 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
-			// app版本号  1.0.1
+			// app版本号 1.0.1
 			String appversion = request.getParameter("appversion");
-			//平台  iPhone  Android
-			String pf = request.getParameter("pf");  
+			// 平台 iPhone Android
+			String pf = request.getParameter("pf");
 			// 查询数据数量
 			String limit = request.getParameter("limit");
 			String width = request.getParameter("w");// 缩放宽度
@@ -1455,16 +1488,16 @@ public class PhotoAction extends ActionSupport {
 			Map<String, String> filterMap = new HashMap();
 			filterMap.put("limit", limit);
 			filterMap.put("width", width);
-			//版本号中间数字
-			String middleNum=appversion.substring(2, 3);//1.0.2  >>	0
-			if("1".equals(middleNum)||"Android".equals(pf)){//1.1.0···9  版本  
+			// 版本号中间数字
+			String middleNum = appversion.substring(2, 3);// 1.0.2 >> 0
+			if ("1".equals(middleNum) || "Android".equals(pf)) {// 1.1.0···9 版本
 				List disList = photoService.discoverPictureSet(filterMap);
 				List disResult = new ArrayList();
 				// 图集所属用户信息
 				for (int i = 0; i < disList.size(); i++) {
 					PictureSet ps = (PictureSet) disList.get(i);
-					User user = (User) this.photoService.getObjectById(User.class,
-							String.valueOf(ps.getUserid()));
+					User user = (User) this.photoService.getObjectById(
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());
@@ -1473,8 +1506,8 @@ public class PhotoAction extends ActionSupport {
 					ps.setUser(u);
 					disResult.add(ps);
 				}
-				//最新
-				filterMap.put("limit", "21");
+				// 最新
+				filterMap.put("limit", "15");
 				List list = photoService.queryPhotosWall(filterMap);
 				List result = new ArrayList();
 				// 图集所属用户信息
@@ -1492,14 +1525,14 @@ public class PhotoAction extends ActionSupport {
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSONString(result, true) + ",\"disPhotoSet\":"
 						+ JSON.toJSONString(disResult, true) + "}}");
-			}else{
+			} else {
 				List list = photoService.discoverPictureSet(filterMap);
 				List result = new ArrayList();
 				// 图集所属用户信息
 				for (int i = 0; i < list.size(); i++) {
 					PictureSet ps = (PictureSet) list.get(i);
-					User user = (User) this.photoService.getObjectById(User.class,
-							String.valueOf(ps.getUserid()));
+					User user = (User) this.photoService.getObjectById(
+							User.class, String.valueOf(ps.getUserid()));
 					User u = new User();
 					u.setId(user.getId());
 					u.setHeadPortrait(user.getHeadPortrait());
@@ -1515,7 +1548,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("发现接口discoverPictureSet报错："+e);
+			logger.error("发现接口discoverPictureSet报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1594,7 +1627,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载图集viewPictureSet报错："+e.getMessage());
+			logger.error("加载图集viewPictureSet报错：" + e.getMessage());
 		} finally {
 			out.flush();
 			out.close();
@@ -1622,9 +1655,9 @@ public class PhotoAction extends ActionSupport {
 			String themeCycleId = request.getParameter("themeCycleId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
-			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
-			}
+			// if ("".equals(limit) || limit == null || "0".equals(limit)) {
+			// limit = "10";
+			// }
 			if ("".equals(themeCycleId) || themeCycleId == null) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择选秀周期\"}");
@@ -1656,17 +1689,17 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-//					int count = this.photoService.isPraisedPictureSet(
-//							currentUserId, ps.getId() + "");
-//					if (count > 0) {// 已赞
-//						ps.setIsUserPraised("1");
-//					} else {// 未赞
-//						ps.setIsUserPraised("0");
-//					}
+					// int count = this.photoService.isPraisedPictureSet(
+					// currentUserId, ps.getId() + "");
+					// if (count > 0) {// 已赞
+					// ps.setIsUserPraised("1");
+					// } else {// 未赞
+					// ps.setIsUserPraised("0");
+					// }
 					// 图集评论数
-//					int comments = photoService.queryCommentByPictureSetId(ps
-//							.getId());
-//					ps.setComments(comments);
+					// int comments = photoService.queryCommentByPictureSetId(ps
+					// .getId());
+					// ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, String.valueOf(ps.getUserid()));
@@ -1687,17 +1720,17 @@ public class PhotoAction extends ActionSupport {
 					// pList=photoService.queryPhotoByPictureSetId(ps.getPictureSetId());
 					// ps.setPhotoList(pList);
 					// 验证当前用户是否已赞
-//					int count = this.photoService.isPraisedPictureSet(
-//							currentUserId, ps.getPictureSetId() + "");
-//					if (count > 0) {// 已赞
-//						ps.setIsUserPraised("1");
-//					} else {// 未赞
-//						ps.setIsUserPraised("0");
-//					}
+					// int count = this.photoService.isPraisedPictureSet(
+					// currentUserId, ps.getPictureSetId() + "");
+					// if (count > 0) {// 已赞
+					// ps.setIsUserPraised("1");
+					// } else {// 未赞
+					// ps.setIsUserPraised("0");
+					// }
 					// 图集评论数
-//					int comments = photoService.queryCommentByPictureSetId(ps
-//							.getId());
-//					ps.setComments(comments);
+					// int comments = photoService.queryCommentByPictureSetId(ps
+					// .getId());
+					// ps.setComments(comments);
 					// 图集所属用户信息
 					User user = (User) this.photoService.getObjectById(
 							User.class, String.valueOf(ps.getUserid()));
@@ -1712,12 +1745,14 @@ public class PhotoAction extends ActionSupport {
 				List userlist = photoService.queryUserCycleRanking(filterMap);
 
 				// 用户当前主题剩余票数
-				int surplusVotes =0;
-				if(currentUserId!=null&&!"".equals(currentUserId)&&!"null".equals(currentUserId)){
+				int surplusVotes = 0;
+				if (currentUserId != null && !"".equals(currentUserId)
+						&& !"null".equals(currentUserId)) {
 					Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
 					surplusVotesFilterMap.put("userId", currentUserId);
 					surplusVotesFilterMap.put("themeId", themeCycleId);
-					surplusVotes =this.photoService.queryUserSurplusVote(surplusVotesFilterMap);
+					surplusVotes = this.photoService
+							.queryUserSurplusVote(surplusVotesFilterMap);
 				}
 				out.print("{\"state\":0,\"result\":{\"psList\":"
 						+ JSON.toJSONString(photoSetResult, true)
@@ -1731,7 +1766,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载选秀详情loadCycleInfo报错："+e);
+			logger.error("加载选秀详情loadCycleInfo报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1777,7 +1812,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载点赞人员loadPraiseUserList报错："+e);
+			logger.error("加载点赞人员loadPraiseUserList报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1816,7 +1851,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("删除图集deletePictureSet报错："+e);
+			logger.error("删除图集deletePictureSet报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1867,7 +1902,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载通知loadNotify报错："+e);
+			logger.error("加载通知loadNotify报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1905,7 +1940,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("将通知改为已读状态readNotify报错："+e);
+			logger.error("将通知改为已读状态readNotify报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -1945,7 +1980,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("删除评论deleteComment报错："+e);
+			logger.error("删除评论deleteComment报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
@@ -2042,61 +2077,64 @@ public class PhotoAction extends ActionSupport {
 		request.setAttribute("code", code);
 		return "toLoadPictureSet";
 	}
-	
+
 	/**
 	 * 获取request真实ip地址
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-10-16 时间：下午1:53:49
 	 * @param request
 	 * @return
 	 */
-	public String getRemoteHost(HttpServletRequest request){
-	    String ip = request.getHeader("x-forwarded-for");
-	    if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-	        ip = request.getHeader("Proxy-Client-IP");
-	        logger.error("Proxy-Client-IP："+ip);
-	    }else{
-	    	ip=getRemoteIpFromForward( ip.trim() );
-	        logger.error("Proxy-Client-IP2："+ip);
-	    	return ip;  
-	    }
-	    if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-	        ip = request.getHeader("WL-Proxy-Client-IP");
-	        logger.error("WL-Proxy-Client-IP："+ip);
-	    }else{
-	    	ip=getRemoteIpFromForward( ip.trim() );
-	        logger.error("WL-Proxy-Client-IP2："+ip);
-	    	return ip;  
-	    }
-	    if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-	        ip = request.getRemoteAddr();
-	        logger.error("getRemoteAddr："+ip);
-	    }else{
-	    	ip=getRemoteIpFromForward( ip.trim() );
-	        logger.error("getRemoteAddr2："+ip);
-	    	return ip;  
-	    }
-	    return ip.equals("0:0:0:0:0:0:0:1")?"127.0.0.1":ip;
+	public String getRemoteHost(HttpServletRequest request) {
+		String ip = request.getHeader("x-forwarded-for");
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+			logger.error("Proxy-Client-IP：" + ip);
+		} else {
+			ip = getRemoteIpFromForward(ip.trim());
+			logger.error("Proxy-Client-IP2：" + ip);
+			return ip;
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+			logger.error("WL-Proxy-Client-IP：" + ip);
+		} else {
+			ip = getRemoteIpFromForward(ip.trim());
+			logger.error("WL-Proxy-Client-IP2：" + ip);
+			return ip;
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
+			logger.error("getRemoteAddr：" + ip);
+		} else {
+			ip = getRemoteIpFromForward(ip.trim());
+			logger.error("getRemoteAddr2：" + ip);
+			return ip;
+		}
+		return ip.equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : ip;
 	}
-	/** 
-	 * <p> 
-	 * 从 HTTP Header 中截取客户端连接 IP 地址。如果经过多次反向代理， 
-	 * 在请求头中获得的是以“,&lt;SP&gt;”分隔 IP 地址链，第一段为客户端 IP 地址。 
-	 * </p> 
+	/**
+	 * <p>
+	 * 从 HTTP Header 中截取客户端连接 IP 地址。如果经过多次反向代理， 在请求头中获得的是以“,&lt;SP&gt;”分隔 IP
+	 * 地址链，第一段为客户端 IP 地址。
+	 * </p>
 	 * 
-	 * @param xforwardIp 从 HTTP 请求头中获取转发过来的 IP 地址链 
-	 * @return 客户端源 IP 地址 
-	 */  
-	private static String getRemoteIpFromForward( String xforwardIp ) {  
-	    int commaOffset = xforwardIp.indexOf( ',' );  
-	    if ( commaOffset < 0 ) {  
-	        return xforwardIp;  
-	    }  
-	    return xforwardIp.substring( 0 , commaOffset );  
+	 * @param xforwardIp
+	 *            从 HTTP 请求头中获取转发过来的 IP 地址链
+	 * @return 客户端源 IP 地址
+	 */
+	private static String getRemoteIpFromForward(String xforwardIp) {
+		int commaOffset = xforwardIp.indexOf(',');
+		if (commaOffset < 0) {
+			return xforwardIp;
+		}
+		return xforwardIp.substring(0, commaOffset);
 	}
-	
+
 	/**
 	 * 加载我关注的人的最新图集
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-11-10 时间：上午11:17:40
 	 */
@@ -2109,7 +2147,7 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
-			// app版本号  1.0.1
+			// app版本号 1.0.1
 			String appversion = request.getParameter("appversion");
 			// lastid
 			String lastid = request.getParameter("lastId");
@@ -2130,13 +2168,14 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("lastid", lastid);
 			filterMap.put("width", width);
 			filterMap.put("currentUserId", currentUserId);
-			//查询我关注的人的最新图集
+			// 查询我关注的人的最新图集
 			List attentedResult = new ArrayList();
-			List AttentedPhotoSetList=photoService.queryPhotoSetByAttentedUser(filterMap);
+			List AttentedPhotoSetList = photoService
+					.queryPhotoSetByAttentedUser(filterMap);
 			for (int i = 0; i < AttentedPhotoSetList.size(); i++) {
 				PictureSet ps = (PictureSet) AttentedPhotoSetList.get(i);
-				User user = (User) this.photoService.getObjectById(
-						User.class, String.valueOf(ps.getUserid()));
+				User user = (User) this.photoService.getObjectById(User.class,
+						String.valueOf(ps.getUserid()));
 				User u = new User();
 				u.setId(user.getId());
 				u.setHeadPortrait(user.getHeadPortrait());
@@ -2150,15 +2189,16 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载我关注的人的最新图集queryPhotoSetByAttentedUser报错："+e);
+			logger.error("加载我关注的人的最新图集queryPhotoSetByAttentedUser报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 随便看看
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-11-10 时间：下午1:59:37
 	 */
@@ -2169,7 +2209,7 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
-			// app版本号  1.0.1
+			// app版本号 1.0.1
 			String appversion = request.getParameter("appversion");
 			// 查询数据数量
 			String limit = request.getParameter("limit");
@@ -2201,15 +2241,16 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("随便看看browsePhotoSet报错："+e);
+			logger.error("随便看看browsePhotoSet报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 发现--最新
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-11-12 时间：下午6:18:07
 	 */
@@ -2222,10 +2263,10 @@ public class PhotoAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = ServletActionContext.getResponse().getWriter();
-			// app版本号  1.0.1
+			// app版本号 1.0.1
 			String appversion = request.getParameter("appversion");
-			//平台  iPhone  Android
-			String pf = request.getParameter("pf");  
+			// 平台 iPhone Android
+			String pf = request.getParameter("pf");
 			// lastid
 			String lastid = request.getParameter("lastId");
 			// 查询数据数量
@@ -2234,7 +2275,7 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
-				limit = "10";
+				limit = "15";
 			}
 			if ("".equals(lastid) || lastid == null) {
 				lastid = "0";
@@ -2250,8 +2291,8 @@ public class PhotoAction extends ActionSupport {
 			// 图集所属用户信息
 			for (int i = 0; i < list.size(); i++) {
 				PictureSet ps = (PictureSet) list.get(i);
-				User user = (User) this.photoService.getObjectById(
-						User.class, String.valueOf(ps.getUserid()));
+				User user = (User) this.photoService.getObjectById(User.class,
+						String.valueOf(ps.getUserid()));
 				User u = new User();
 				u.setId(user.getId());
 				u.setHeadPortrait(user.getHeadPortrait());
@@ -2265,7 +2306,7 @@ public class PhotoAction extends ActionSupport {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
-			logger.error("加载最新、最热图集照片墙queryPhotosWall报错："+e);
+			logger.error("加载最新、最热图集照片墙queryPhotosWall报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
