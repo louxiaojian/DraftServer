@@ -203,7 +203,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	public List queryThemes(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
 		if (Integer.parseInt(String.valueOf(filterMap.get("middleNum")))>=1 || "Android".equals(filterMap.get("pf"))) {// 1.1.0···9 版本或者Android版本
-			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,new_bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting from theme_cycle order by status asc,starttime asc");
+			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,new_bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting,notice from theme_cycle order by status asc,starttime asc");
 		}else{
 			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting from theme_cycle order by status asc,starttime asc");
 		}
@@ -597,7 +597,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryNotify(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select o.id as id,o.id as orderId,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,u.area as area,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead  from picture_set ps  left join operation_records o on ps.id=o.picture_set_id  left join  users u  on informer_id=u.id  where operation_type>3  and u.id>0 ");
+		sql.append("select o.id as id,o.id as orderId,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,u.area as area,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead,com.content as content from picture_set ps  left join operation_records o on ps.id=o.picture_set_id  left join  users u  on informer_id=u.id left join comment com on com.id=o.comment_id where operation_type>3  and u.id>0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("currentUserId"))
 					&& filterMap.get("currentUserId") != null) {

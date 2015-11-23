@@ -28,6 +28,7 @@ public class User {
 	private String cookie;
 	private String alias;//用户登录设备别名
 	private String area;//地区
+	private String pf;//当前登录的平台：iPhone、Android
 	private int orderId;//排序id
 	
 	//选秀排名所用
@@ -201,6 +202,12 @@ public class User {
 	}
 	public void setArea(String area) {
 		this.area = area;
+	}
+	public String getPf() {
+		return pf;
+	}
+	public void setPf(String pf) {
+		this.pf = pf;
 	}
 	
 }

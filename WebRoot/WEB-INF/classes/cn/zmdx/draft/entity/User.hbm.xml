@@ -27,6 +27,7 @@
 		<property name="validateUrl" column="validateUrl"/>
 		<property name="alias" column="alias"/>
 		<property name="area" column="area"/>
+		<property name="pf" column="pf"/>
 	</class>
 	
 </hibernate-mapping>

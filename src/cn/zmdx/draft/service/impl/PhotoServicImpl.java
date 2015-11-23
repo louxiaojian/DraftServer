@@ -275,6 +275,7 @@ public class PhotoServicImpl implements PhotoService {
 		or.setType(2);
 		or.setDatetime(new Date());
 		or.setIsRead("0");//未读
+		or.setCommentId(comment.getId());
 		this.photoDao.saveEntity(or);
 	}
 

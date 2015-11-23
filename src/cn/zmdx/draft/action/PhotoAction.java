@@ -186,8 +186,11 @@ public class PhotoAction extends ActionSupport {
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			// 版本号中间数字
-			int middleNum = Integer.parseInt(appversion.substring(2, 3));// 1.0.2 >> 0
-			if (middleNum>=1 || "Android".equals(pf)) {// 1.1.0···9 版本或者Android版本
+			int middleNum = Integer.parseInt(appversion.substring(2, 3));// 1.0.2
+																			// >>
+																			// 0
+			if (middleNum >= 1 || "Android".equals(pf)) {// 1.1.0···9
+															// 版本或者Android版本
 				if ("".equals(limit) || limit == null || "0".equals(limit)) {
 					limit = "15";
 				}
@@ -206,10 +209,10 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("category", category);
 			filterMap.put("width", width);
 			filterMap.put("currentUserId", currentUserId);
-			if (middleNum>=1 || "Android".equals(pf)) {// 1.1.0···9 版本
-																// 或者Android版本
-				//获取公告栏
-				List blist=photoService.queryBulletinBoard(filterMap);
+			if (middleNum >= 1 || "Android".equals(pf)) {// 1.1.0···9 版本
+															// 或者Android版本
+				// 获取公告栏
+				List blist = photoService.queryBulletinBoard(filterMap);
 				// 热门
 				if ("1".equals(category)) {
 					List result = new ArrayList();
@@ -227,7 +230,9 @@ public class PhotoAction extends ActionSupport {
 						result.add(ps);
 					}
 					out.print("{\"state\":0,\"result\":{\"photoSet\":"
-							+ JSON.toJSONString(result, true) + ",\"bulletinList\":"+JSON.toJSONString(blist)+"}}");
+							+ JSON.toJSONString(result, true)
+							+ ",\"bulletinList\":" + JSON.toJSONString(blist)
+							+ "}}");
 				} else if ("0".equals(category)) {
 					// 查询我关注的人的最新图集
 					List attentedResult = new ArrayList();
@@ -239,8 +244,8 @@ public class PhotoAction extends ActionSupport {
 						User user = (User) this.photoService.getObjectById(
 								User.class, String.valueOf(ps.getUserid()));
 						// 验证当前用户是否已赞
-					    int count = this.photoService.isPraisedPictureSet(
-					    currentUserId, ps.getId() + "");
+						int count = this.photoService.isPraisedPictureSet(
+								currentUserId, ps.getId() + "");
 						if (count > 0) {// 已赞
 							ps.setIsUserPraised("1");
 						} else {// 未赞
@@ -701,16 +706,33 @@ public class PhotoAction extends ActionSupport {
 								HashMap<String, String> map = new HashMap<String, String>();
 								map.put("scheme",
 										"vshow://vshow.com/notification");
-								PushPayload pushPayload = PushExample
-										.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-												currentUser.getUsername()
-														+ " 赞了您", map,
-												PictureSetUser.getAlias());
-								PushResult pushResult = jPushClient
-										.sendPush(pushPayload);
-								System.out
-										.println("jpush result：" + pushResult);
-								logger.error("发送通知：" + pushResult);
+								PushResult pushResult;
+								PushPayload pushPayload;
+								if ("iPhone".equals(PictureSetUser.getPf())) {
+									pushPayload = PushExample
+											.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+													currentUser.getUsername()
+															+ " 赞了您", map,
+													PictureSetUser.getAlias());
+									pushResult = jPushClient
+											.sendPush(pushPayload);
+									System.out.println("jpush result："
+											+ pushResult);
+									logger.error("发送通知：" + pushResult);
+								} else if ("Android".equals(PictureSetUser
+										.getPf())) {
+									pushPayload = PushExample
+											.buildPushObject_android_tagAnd_alertWithExtrasAndMessage(
+													"享秀",
+													currentUser.getUsername()
+															+ " 赞了您", map,
+													PictureSetUser.getAlias());
+									pushResult = jPushClient
+											.sendPush(pushPayload);
+									System.out.println("jpush result："
+											+ pushResult);
+									logger.error("发送通知：" + result);
+								}
 							}
 						}
 						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
@@ -1321,18 +1343,37 @@ public class PhotoAction extends ActionSupport {
 								map.put("scheme",
 										"vshow://vshow.com/pictureSetDetail?pictureSetId="
 												+ pictureSetId);
-								PushPayload pushPayload = PushExample
-										.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-												"您收到了 "
-														+ currentUser
-																.getUsername()
-														+ " 的评论", map,
-												PictureSetUser.getAlias());
-								PushResult pushResult = jPushClient
-										.sendPush(pushPayload);
-								System.out
-										.println("jpush result：" + pushResult);
-								logger.error("发送通知：" + pushResult);
+								PushResult pushResult;
+								PushPayload pushPayload;
+								if ("iPhone".equals(PictureSetUser.getPf())) {
+									pushPayload = PushExample
+											.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+													"您收到了 "
+															+ currentUser
+																	.getUsername()
+															+ " 的评论", map,
+													PictureSetUser.getAlias());
+									pushResult = jPushClient
+											.sendPush(pushPayload);
+									System.out.println("jpush result："
+											+ pushResult);
+									logger.error("发送通知：" + pushResult);
+								} else if ("Android".equals(PictureSetUser
+										.getPf())) {
+									pushPayload = PushExample
+											.buildPushObject_android_tagAnd_alertWithExtrasAndMessage(
+													"享秀",
+													"您收到了 "
+															+ currentUser
+																	.getUsername()
+															+ " 的评论", map,
+													PictureSetUser.getAlias());
+									pushResult = jPushClient
+											.sendPush(pushPayload);
+									System.out.println("jpush result："
+											+ pushResult);
+									logger.error("发送通知：" + pushResult);
+								}
 							}
 						}
 
@@ -1507,8 +1548,10 @@ public class PhotoAction extends ActionSupport {
 			filterMap.put("limit", limit);
 			filterMap.put("width", width);
 			// 版本号中间数字
-			int middleNum = Integer.parseInt(appversion.substring(2, 3));// 1.0.2 >> 0
-			if (middleNum>=1 || "Android".equals(pf)) {// 1.1.0···9 版本
+			int middleNum = Integer.parseInt(appversion.substring(2, 3));// 1.0.2
+																			// >>
+																			// 0
+			if (middleNum >= 1 || "Android".equals(pf)) {// 1.1.0···9 版本
 				List disList = photoService.discoverPictureSet(filterMap);
 				List disResult = new ArrayList();
 				// 图集所属用户信息
@@ -1696,7 +1739,8 @@ public class PhotoAction extends ActionSupport {
 				} else {// 未参与
 					isvalidate = "0";
 				}
-				Cycle cycle=(Cycle)photoService.getObjectById(Cycle.class, themeCycleId);
+				Cycle cycle = (Cycle) photoService.getObjectById(Cycle.class,
+						themeCycleId);
 				// 选秀最新图集
 				List<PictureSet> list = photoService
 						.queryDraftPhotosWall(filterMap);
@@ -1779,7 +1823,7 @@ public class PhotoAction extends ActionSupport {
 						+ ",\"userRank\":" + JSON.toJSONString(userlist, true)
 						+ ",\"isUserAttented\":\"" + isvalidate
 						+ "\",\"surplusVotes\":\"" + (3 - surplusVotes)
-						+ "\",\"theme\":"+JSON.toJSONString(cycle)+"}}");
+						+ "\",\"theme\":" + JSON.toJSONString(cycle) + "}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()

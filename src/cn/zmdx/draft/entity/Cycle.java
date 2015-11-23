@@ -19,6 +19,7 @@ public class Cycle {
 	private String webTitleUrl;//web页面标题图片
 	private String role;//主题规则
 	private String awardSetting;//奖项设置
+	private String notice;//活动须知
 	private String isNeedValidate;//是否需要真人验证，0：需要，1：不需要
 	private Date voteStartTime;//投票开始时间
 	private Date voteEndTime;//投票结束时间
@@ -130,5 +131,11 @@ public class Cycle {
 	}
 	public void setInsideBgUrl(String insideBgUrl) {
 		this.insideBgUrl = insideBgUrl;
+	}
+	public String getNotice() {
+		return notice;
+	}
+	public void setNotice(String notice) {
+		this.notice = notice;
 	}
 }

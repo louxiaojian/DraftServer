@@ -256,6 +256,7 @@ public class UserAction extends ActionSupport {
 			String loginname = request.getParameter("loginname");
 			String pwd = request.getParameter("password");
 			String alias = request.getParameter("alias");// 用户登录设备别名
+			String pf = request.getParameter("pf");// 当前登录的平台：iPhone、Android
 			if ("".equals(loginname) || loginname == null || "".equals(pwd)
 					|| pwd == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
@@ -269,6 +270,7 @@ public class UserAction extends ActionSupport {
 					if (alias != null && !"".equals(alias)
 							&& !"null".equals(alias)) {
 						user.setAlias(alias);// 更新用户登录设备别名
+						user.setPf(pf);//更新当前登录的平台：iPhone、Android
 						this.userService.updateUser(user);
 					}
 					Sha1 sha1 = new Sha1();
@@ -663,14 +665,27 @@ public class UserAction extends ActionSupport {
 								&& attentionUser.getAlias() != null) {
 							HashMap<String, String> map = new HashMap<String, String>();
 							map.put("scheme", "vshow://vshow.com/notification");
-							PushPayload pushPayload = PushExample
-									.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-											currentUser.getUsername() + " 关注了您",
-											map, attentionUser.getAlias());
-							PushResult result = jPushClient
-									.sendPush(pushPayload);
-							System.out.println("jpush result：" + result);
-							logger.error("发送通知：" + result);
+							PushResult result ;
+							PushPayload pushPayload ;
+							if("iPhone".equals(attentionUser.getPf())){
+								pushPayload = PushExample
+										.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+												currentUser.getUsername() + " 关注了您",
+												map, attentionUser.getAlias());
+								result = jPushClient
+										.sendPush(pushPayload);
+								System.out.println("jpush result：" + result);
+								logger.error("发送通知：" + result);
+							}else if("Android".equals(attentionUser.getPf())){
+								pushPayload = PushExample
+										.buildPushObject_android_tagAnd_alertWithExtrasAndMessage("享秀",
+												currentUser.getUsername() + " 关注了您",
+												map, attentionUser.getAlias());
+								result = jPushClient
+										.sendPush(pushPayload);
+								System.out.println("jpush result：" + result);
+								logger.error("发送通知：" + result);
+							}
 
 							// IosAlert alert = IosAlert.newBuilder()
 							// .setTitleAndBody("测试标题", "你被关注了")
@@ -1304,4 +1319,42 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
+	
+	/**
+	 * 重新绑定用户别名及登录平台
+	 * @author louxiaojian
+	 * @date： 日期：2015-11-20 时间：下午2:06:52
+	 */
+	public void resetAliasAndPf() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String alias = request.getParameter("alias");// 推送时的用户别名
+			String pf = request.getParameter("pf");// 当前登录平台
+			User user = userService.getById(Integer.parseInt(currentUserId));
+			if (currentUserId == null || "".equals(currentUserId) || user == null
+					|| "null".equals(currentUserId) || "0".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				user.setAlias(alias);
+				user.setPf(pf);
+				this.userService.updateUser(user);
+				out.print("{\"state\":0,\"result\":{\"state\":0}}");
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("重新绑定用户别名及登录平台：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
 }

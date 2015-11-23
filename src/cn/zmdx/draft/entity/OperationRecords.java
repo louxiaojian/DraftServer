@@ -12,6 +12,7 @@ public class OperationRecords {
 	private Date datetime;//举报时间
 	private String isRead;//是否已读：0：未读，1：已读
 	private String ip;//操作请求ip
+	private int commentId;//评论id
 	public int getId() {
 		return id;
 	}
@@ -65,5 +66,11 @@ public class OperationRecords {
 	}
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+	public int getCommentId() {
+		return commentId;
+	}
+	public void setCommentId(int commentId) {
+		this.commentId = commentId;
 	}
 }

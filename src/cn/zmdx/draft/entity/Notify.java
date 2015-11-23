@@ -18,6 +18,7 @@ public class Notify {
 	private int pictureSetId;
 	private String isRead;//是否已读：0：未读，1：已读
 	private String area;//地区
+	private String content;//评论内容
 	public int getId() {
 		return id;
 	}
@@ -95,5 +96,11 @@ public class Notify {
 	}
 	public void setArea(String area) {
 		this.area = area;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
 	}
 }

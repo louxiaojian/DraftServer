@@ -13,6 +13,7 @@
 		<property name="datetime" column="datetime"/>
 		<property name="isRead" column="isRead"/>
 		<property name="ip" column="ip"/>
+		<property name="commentId" column="comment_id"/>
 	</class>
 	
 </hibernate-mapping>
