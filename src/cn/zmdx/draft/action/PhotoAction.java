@@ -8,11 +8,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+
 import cn.jpush.api.JPushClient;
+import cn.jpush.api.common.resp.APIConnectionException;
+import cn.jpush.api.common.resp.APIRequestException;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.PushPayload;
 import cn.zmdx.draft.entity.Comment;
@@ -32,6 +37,7 @@ import cn.zmdx.draft.util.picCloud.PicCloud;
 import cn.zmdx.draft.weixin.api.SnsAPI;
 import cn.zmdx.draft.weixin.bean.SnsToken;
 import cn.zmdx.draft.weixin.entity.WeiXinUser;
+
 import com.alibaba.fastjson.JSON;
 import com.opensymphony.xwork2.ActionSupport;
 import com.qcloud.UploadResult;
@@ -147,6 +153,7 @@ public class PhotoAction extends ActionSupport {
 
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSONString(list, true) + "}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -233,6 +240,7 @@ public class PhotoAction extends ActionSupport {
 							+ JSON.toJSONString(result, true)
 							+ ",\"bulletinList\":" + JSON.toJSONString(blist)
 							+ "}}");
+					logger.error("{\"state\":0}");
 				} else if ("0".equals(category)) {
 					// 查询我关注的人的最新图集
 					List attentedResult = new ArrayList();
@@ -260,6 +268,7 @@ public class PhotoAction extends ActionSupport {
 					}
 					out.print("{\"state\":0,\"result\":{\"photoSet\":"
 							+ JSON.toJSONString(attentedResult, true) + "}}");
+					logger.error("{\"state\":0}");
 				}
 			} else {// 1.0.0···9 版本
 				List list = null;
@@ -295,6 +304,7 @@ public class PhotoAction extends ActionSupport {
 				}
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSONString(result, true) + "}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -383,6 +393,7 @@ public class PhotoAction extends ActionSupport {
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSONString(result, true)
 						+ ",\"surplusVotes\":\"" + (3 - surplusVotes) + "\"}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -504,6 +515,7 @@ public class PhotoAction extends ActionSupport {
 										filterMap.put("cyclePhoto", cyclePhoto);
 										photoService.uploadPhoto(filterMap);
 										out.print("{\"state\":0,\"result\":{\"state\":0}}");
+										logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 									}
 								} else {// 失败删除本次所有上传照片
 									for (int i = 0; i < fileids.length; i++) {
@@ -569,6 +581,7 @@ public class PhotoAction extends ActionSupport {
 							filterMap.put("count", files.length);
 							photoService.uploadPhoto(filterMap);
 							out.print("{\"state\":0,\"result\":{\"state\":0}}");
+							logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 						} else {// 失败删除本次所有上传照片
 							for (int i = 0; i < fileids.length; i++) {
 								if (fileids[i] != null
@@ -646,6 +659,7 @@ public class PhotoAction extends ActionSupport {
 						photo.setFileid(result.fileid);
 						this.photoService.realityVerification(photo, userId);
 						out.print("{\"state\":0,\"result\":{\"state\":0}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择照片\"}");
@@ -708,34 +722,47 @@ public class PhotoAction extends ActionSupport {
 										"vshow://vshow.com/notification");
 								PushResult pushResult;
 								PushPayload pushPayload;
-								if ("iPhone".equals(PictureSetUser.getPf())) {
-									pushPayload = PushExample
-											.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-													currentUser.getUsername()
-															+ " 赞了您", map,
-													PictureSetUser.getAlias());
-									pushResult = jPushClient
-											.sendPush(pushPayload);
-									System.out.println("jpush result："
-											+ pushResult);
-									logger.error("发送通知：" + pushResult);
-								} else if ("Android".equals(PictureSetUser
-										.getPf())) {
-									pushPayload = PushExample
-											.buildPushObject_android_tagAnd_alertWithExtrasAndMessage(
-													"享秀",
-													currentUser.getUsername()
-															+ " 赞了您", map,
-													PictureSetUser.getAlias());
-									pushResult = jPushClient
-											.sendPush(pushPayload);
-									System.out.println("jpush result："
-											+ pushResult);
-									logger.error("发送通知：" + result);
+								try {
+									if ("iPhone".equals(PictureSetUser.getPf())) {
+										pushPayload = PushExample
+												.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+														currentUser
+																.getUsername()
+																+ " 赞了您", map,
+														PictureSetUser
+																.getAlias());
+										pushResult = jPushClient
+												.sendPush(pushPayload);
+										System.out.println("jpush result："
+												+ pushResult);
+										logger.error("发送通知：" + pushResult);
+									} else if ("Android".equals(PictureSetUser
+											.getPf())) {
+										pushPayload = PushExample
+												.buildPushObject_android_tagAnd_alertWithExtrasAndMessage(
+														"享秀",
+														currentUser
+																.getUsername()
+																+ " 赞了您", map,
+														PictureSetUser
+																.getAlias());
+										pushResult = jPushClient
+												.sendPush(pushPayload);
+										System.out.println("jpush result："
+												+ pushResult);
+										logger.error("发送通知：" + pushResult);
+									}
+								} catch (APIConnectionException e) {
+									logger.error("发送通知：" + e);
+									e.printStackTrace();
+								} catch (APIRequestException e) {
+									logger.error("发送通知：" + e);
+									e.printStackTrace();
 								}
 							}
 						}
 						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
@@ -778,8 +805,10 @@ public class PhotoAction extends ActionSupport {
 							pictureSetId, 4, ip);
 					if ("failed".equals(result)) {// 已操作
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
 						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
@@ -822,8 +851,10 @@ public class PhotoAction extends ActionSupport {
 							pictureSetId, 1, ip);
 					if ("failed".equals(result)) {// 已操作过
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
 						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
@@ -866,8 +897,10 @@ public class PhotoAction extends ActionSupport {
 							pictureSetId, 2, ip);
 					if ("failed".equals(result)) {// 已操作过
 						out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 					} else {
 						out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 					}
 				}
 			}
@@ -907,6 +940,7 @@ public class PhotoAction extends ActionSupport {
 				photoService.updateObject(ps);
 
 				out.print("{\"state\":0,\"result\":{\"state\":0}}");
+				logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -975,10 +1009,13 @@ public class PhotoAction extends ActionSupport {
 								.queryUserSurplusVote(surplusVotesFilterMap);
 						if (votes >= 3) {
 							out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
+							logger.error("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
 						} else {
 							String result = photoService.OperationPictureSet(
 									userid, pictureSetId, 3, ip);
 							out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
+									+ (3 - votes - 1) + "\"}}");
+							logger.error("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
 									+ (3 - votes - 1) + "\"}}");
 						}
 					} else if (cycle.getVoteStartTime().getTime() > currentDate
@@ -1095,6 +1132,7 @@ public class PhotoAction extends ActionSupport {
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSONString(result, true)
 						+ ",\"surplusVotes\":\"" + (3 - surplusVotes) + "\"}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1157,6 +1195,7 @@ public class PhotoAction extends ActionSupport {
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(list, true)
 						+ ",\"surplusVotes\":\"" + (3 - surplusVotes) + "\"}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1195,6 +1234,7 @@ public class PhotoAction extends ActionSupport {
 
 			out.print("{\"state\":0,\"result\":{\"themeCycle\":"
 					+ JSON.toJSONString(list, true) + "}}");
+			logger.error("{\"state\":0}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -1268,8 +1308,10 @@ public class PhotoAction extends ActionSupport {
 						List<?> list = photoService.validateIsAttend(filterMap);
 						if (list != null && list.size() > 0) {// 参与过
 							out.print("{\"state\":0,\"result\":{\"state\":\"1\"}}");
+							logger.error("{\"state\":0,\"result\":{\"state\":\"1\"}}");
 						} else {// 未参与
 							out.print("{\"state\":0,\"result\":{\"state\":\"0\"}}");
+							logger.error("{\"state\":0,\"result\":{\"state\":\"0\"}}");
 						}
 					}
 				}
@@ -1345,39 +1387,51 @@ public class PhotoAction extends ActionSupport {
 												+ pictureSetId);
 								PushResult pushResult;
 								PushPayload pushPayload;
-								if ("iPhone".equals(PictureSetUser.getPf())) {
-									pushPayload = PushExample
-											.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-													"您收到了 "
-															+ currentUser
-																	.getUsername()
-															+ " 的评论", map,
-													PictureSetUser.getAlias());
-									pushResult = jPushClient
-											.sendPush(pushPayload);
-									System.out.println("jpush result："
-											+ pushResult);
-									logger.error("发送通知：" + pushResult);
-								} else if ("Android".equals(PictureSetUser
-										.getPf())) {
-									pushPayload = PushExample
-											.buildPushObject_android_tagAnd_alertWithExtrasAndMessage(
-													"享秀",
-													"您收到了 "
-															+ currentUser
-																	.getUsername()
-															+ " 的评论", map,
-													PictureSetUser.getAlias());
-									pushResult = jPushClient
-											.sendPush(pushPayload);
-									System.out.println("jpush result："
-											+ pushResult);
-									logger.error("发送通知：" + pushResult);
+								try {
+									if ("iPhone".equals(PictureSetUser.getPf())) {
+										pushPayload = PushExample
+												.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+														"您收到了 "
+																+ currentUser
+																		.getUsername()
+																+ " 的评论", map,
+														PictureSetUser
+																.getAlias());
+										pushResult = jPushClient
+												.sendPush(pushPayload);
+										System.out.println("jpush result："
+												+ pushResult);
+										logger.error("发送通知：" + pushResult);
+									} else if ("Android".equals(PictureSetUser
+											.getPf())) {
+										pushPayload = PushExample
+												.buildPushObject_android_tagAnd_alertWithExtrasAndMessage(
+														"享秀",
+														"您收到了 "
+																+ currentUser
+																		.getUsername()
+																+ " 的评论", map,
+														PictureSetUser
+																.getAlias());
+										pushResult = jPushClient
+												.sendPush(pushPayload);
+										System.out.println("jpush result："
+												+ pushResult);
+										logger.error("发送通知：" + pushResult);
+									}
+								} catch (APIConnectionException e) {
+									logger.error("发送通知：" + e);
+									e.printStackTrace();
+								} catch (APIRequestException e) {
+									logger.error("发送通知：" + e);
+									e.printStackTrace();
 								}
 							}
 						}
 
 						out.print("{\"state\":0,\"result\":{\"commentId\":"
+								+ comment.getId() + "}}");
+						logger.error("{\"state\":0,\"result\":{\"commentId\":"
 								+ comment.getId() + "}}");
 					}
 				}
@@ -1421,6 +1475,8 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("limit", limit);
 				List list = this.photoService.queryComment(filterMap);
 				out.print("{\"state\":0,\"result\":{\"comments\":"
+						+ JSON.toJSONString(list, true) + "}}");
+				logger.error("{\"state\":0,\"result\":{\"comments\":"
 						+ JSON.toJSONString(list, true) + "}}");
 			}
 		} catch (Exception e) {
@@ -1468,6 +1524,7 @@ public class PhotoAction extends ActionSupport {
 				List list = photoService.queryReviewRecords(filterMap);
 				out.print("{\"state\":0,\"result\":{\"reviewRecords\":"
 						+ JSON.toJSONString(list, true) + "}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1508,6 +1565,7 @@ public class PhotoAction extends ActionSupport {
 					filterMap.put("beingInformerId", beingInformerId);
 					photoService.reportUser(filterMap);
 					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 				}
 			}
 		} catch (Exception e) {
@@ -1586,6 +1644,7 @@ public class PhotoAction extends ActionSupport {
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSONString(result, true) + ",\"disPhotoSet\":"
 						+ JSON.toJSONString(disResult, true) + "}}");
+				logger.error("{\"state\":0}");
 			} else {
 				List list = photoService.discoverPictureSet(filterMap);
 				List result = new ArrayList();
@@ -1604,6 +1663,7 @@ public class PhotoAction extends ActionSupport {
 				}
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
 						+ JSON.toJSONString(result, true) + "}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1680,6 +1740,7 @@ public class PhotoAction extends ActionSupport {
 					out.print("{\"state\":0,\"result\":{\"photoSet\":"
 							+ JSON.toJSONString(ps) + ",\"comments\":"
 							+ JSON.toJSONString(commList, true) + "}}");
+					logger.error("{\"state\":0}");
 				} else {
 					out.print("{\"state\":1,\"errorMsg\":\"图集不存在\"}");
 				}
@@ -1824,6 +1885,7 @@ public class PhotoAction extends ActionSupport {
 						+ ",\"isUserAttented\":\"" + isvalidate
 						+ "\",\"surplusVotes\":\"" + (3 - surplusVotes)
 						+ "\",\"theme\":" + JSON.toJSONString(cycle) + "}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1870,6 +1932,7 @@ public class PhotoAction extends ActionSupport {
 						.queryPraiseUsers(praiseFilterMap);
 				out.print("{\"state\":0,\"result\":{\"praiseUsers\":"
 						+ JSON.toJSONString(praiseList, true) + "}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1909,6 +1972,7 @@ public class PhotoAction extends ActionSupport {
 				filterMap.put("pictureSetIds", pictureSetIds);
 				this.photoService.deletePictureSet(filterMap);
 				out.print("{\"state\":0,\"result\":{\"state\":0}}");
+				logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1960,6 +2024,7 @@ public class PhotoAction extends ActionSupport {
 				List list = this.photoService.queryNotify(filterMap);
 				out.print("{\"state\":0,\"result\":{\"notifyList\":"
 						+ JSON.toJSONString(list, true) + "}}");
+				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1995,8 +2060,10 @@ public class PhotoAction extends ActionSupport {
 				int count = this.photoService.readNotify(filterMap);
 				if (count > 0) {
 					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 				} else {
 					out.print("{\"state\":0,\"result\":{\"state\":1}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
 				}
 			}
 		} catch (Exception e) {
@@ -2035,8 +2102,10 @@ public class PhotoAction extends ActionSupport {
 				int count = this.photoService.deleteComment(filterMap);
 				if (count > 0) {
 					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 				} else {
 					out.print("{\"state\":0,\"result\":{\"state\":1}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
 				}
 			}
 		} catch (Exception e) {
@@ -2248,6 +2317,7 @@ public class PhotoAction extends ActionSupport {
 			}
 			out.print("{\"state\":0,\"result\":{\"attentedPhotoSet\":"
 					+ JSON.toJSONString(attentedResult, true) + "}}");
+			logger.error("{\"state\":0}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -2300,6 +2370,7 @@ public class PhotoAction extends ActionSupport {
 			}
 			out.print("{\"state\":0,\"result\":{\"photoSet\":"
 					+ JSON.toJSONString(result, true) + "}}");
+			logger.error("{\"state\":0}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -2365,6 +2436,7 @@ public class PhotoAction extends ActionSupport {
 			}
 			out.print("{\"state\":0,\"result\":{\"photoSet\":"
 					+ JSON.toJSONString(result, true) + "}}");
+			logger.error("{\"state\":0}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");

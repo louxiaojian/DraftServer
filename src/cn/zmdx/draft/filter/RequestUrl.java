@@ -38,8 +38,10 @@ public class RequestUrl extends HttpServlet implements Filter  {
 		String reqURI = httpRequest.getRequestURI()+"?"+httpRequest.getQueryString();
 		String reqContextPath = httpRequest.getContextPath();
 //		System.out.println("1***"+reqURI);
-		logger.error("请求参数："+reqURI);
+		logger.error("请求开始************************************************************");
+		logger.error("请求开始参数："+reqURI);
 		chain.doFilter(request, response);
+		logger.error("请求结束************************************************************");
 	}
 
 	@Override

@@ -1,5 +1,9 @@
 package cn.zmdx.draft.action;
 
+import io.rong.ApiHttpClient;
+import io.rong.models.FormatType;
+import io.rong.models.SdkHttpResult;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,8 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
+import org.json.JSONObject;
 
 import cn.jpush.api.JPushClient;
+import cn.jpush.api.common.resp.APIConnectionException;
+import cn.jpush.api.common.resp.APIRequestException;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.PushPayload;
 import cn.zmdx.draft.entity.Captcha;
@@ -69,6 +76,8 @@ public class UserAction extends ActionSupport {
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
 	private static final String jpushAppKey = "b1d281203f8f4d8b2d7f2993";
 	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
+	private static final String rongCloudAppKey = "sfci50a7cb0gi";
+	private static final String rongCloudSecret = "ZZK2E56947b";
 	private JPushClient jPushClient = new JPushClient(jpushMasterSecret,
 			jpushAppKey, 3);
 
@@ -151,6 +160,7 @@ public class UserAction extends ActionSupport {
 								newUser.setThirdParty("vshow");// 默认本产品
 								this.userService.register(newUser, captcha);
 								out.print("{\"state\":0,\"result\":{\"state\":0}}");
+								logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 							} else {// 验证码失效
 								captcha.setStatus("1");
 								// this.userService.updateObject(captcha);
@@ -217,6 +227,8 @@ public class UserAction extends ActionSupport {
 								telephone, code);
 						out.print("{\"state\":0,\"result\":{\"captcha\":"
 								+ JSON.toJSONString(captcha) + "}}");
+						logger.error("{\"state\":0,\"result\":{\"captcha\":"
+								+ JSON.toJSONString(captcha) + "}}");
 					} else if ("107".equals(returnCode)) {// 手机号错误
 						out.print("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
 						logger.error("{\"state\":1,\"errorMsg\":\"填写手机号有误，请检查\"}");
@@ -270,9 +282,33 @@ public class UserAction extends ActionSupport {
 					if (alias != null && !"".equals(alias)
 							&& !"null".equals(alias)) {
 						user.setAlias(alias);// 更新用户登录设备别名
-						user.setPf(pf);//更新当前登录的平台：iPhone、Android
-						this.userService.updateUser(user);
+						user.setPf(pf);// 更新当前登录的平台：iPhone、Android
+					} else {
+						alias = "null";
 					}
+					String token = null;
+					if ("".equals(user.getRongCloudToken())
+							|| user.getRongCloudToken() == null) {
+						// 绑定用户融云token
+						SdkHttpResult result = null;
+						result = ApiHttpClient.getToken(rongCloudAppKey,
+								rongCloudSecret, String.valueOf(user.getId()),
+								user.getUsername(), user.getHeadPortrait(),
+								FormatType.json);
+						JSONObject resultJson = new JSONObject(
+								result.toString());
+						String code = resultJson.get("code").toString();
+						if ("200".equals(code)) {
+							JSONObject jsonObject = new JSONObject(resultJson
+									.get("result").toString());
+							token = jsonObject.get("token").toString();
+							user.setRongCloudToken(token);
+						}
+					}
+					// 更新用户信息
+					// if(alias.equals(user.getAlias())||pf.equals(user.getPf())||token.equals(user.getRongCloudToken())){
+					this.userService.updateUser(user);
+					// }
 					Sha1 sha1 = new Sha1();
 					pwd = sha1.Digest(pwd);
 					if (user.getPassword().equals(pwd)) {
@@ -281,6 +317,8 @@ public class UserAction extends ActionSupport {
 						User user2 = UserUtil.getUser(user);
 						user2.setCookie(cookie.getValue());
 						out.print("{\"state\":0,\"result\":{\"user\":"
+								+ JSON.toJSONString(user2) + "}}");
+						logger.error("{\"state\":0,\"result\":{\"user\":"
 								+ JSON.toJSONString(user2) + "}}");
 					} else {
 						out.print("{\"state\":1,\"errorMsg\":\"密码错误\"}");
@@ -314,6 +352,7 @@ public class UserAction extends ActionSupport {
 			// String loginname=request.getParameter("loginname");
 			UserCookieUtil.clearCookie(ServletActionContext.getResponse());
 			out.print("{\"state\":0,\"result\":{\"state\":0}}");
+			logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
@@ -365,7 +404,14 @@ public class UserAction extends ActionSupport {
 						user.setHeadPortrait(result.download_url);
 						user.setFileid(result.fileid);
 						this.userService.updateUser(user);
+						// 刷新融云用户信息
+						ApiHttpClient.refreshUser(rongCloudAppKey,
+								rongCloudSecret, String.valueOf(user.getId()),
+								user.getUsername(), user.getHeadPortrait(),
+								FormatType.json);
 						out.print("{\"state\":0,\"result\":{\"user\":"
+								+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
+						logger.error("{\"state\":0,\"result\":{\"user\":"
 								+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
 					}
 				} else {
@@ -457,7 +503,16 @@ public class UserAction extends ActionSupport {
 					// // }
 					// }else{
 					this.userService.updateUser(user);
+					if (!"".equals(username) && username != null) {
+						// 刷新融云用户信息
+						ApiHttpClient.refreshUser(rongCloudAppKey,
+								rongCloudSecret, String.valueOf(user.getId()),
+								user.getUsername(), user.getHeadPortrait(),
+								FormatType.json);
+					}
 					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
 					// }
 				} else {
@@ -503,6 +558,7 @@ public class UserAction extends ActionSupport {
 						user.setPassword(sha1.Digest(newPassowrd));
 						this.userService.updateUser(user);
 						out.print("{\"state\":0,\"result\":{\"state\":0}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 					} else {// 原密码错误
 						out.print("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
 						logger.error("{\"state\":1,\"errorMsg\":\"原始密码错误\"}");
@@ -556,7 +612,7 @@ public class UserAction extends ActionSupport {
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("userid", userId);
 				filterMap.put("currentUserId", currentUserId);
-//				filterMap.put("limit", "20");
+				// filterMap.put("limit", "20");
 				filterMap.put("width", width);
 				List photoSet = new ArrayList();
 				List<PictureSet> list = photoService
@@ -570,14 +626,14 @@ public class UserAction extends ActionSupport {
 				// }
 				// 获取要查看的用户的关注
 				Map<String, String> filterMap1 = new HashMap();
-//				filterMap1.put("limit", "20");
+				// filterMap1.put("limit", "20");
 				if (userId != null && !"".equals(userId)) {
 					filterMap1.put("fansUserId", userId);
 				}
 				List attentionList = userService.queryAttentions(filterMap1);
 				// 获取要查看的用户的粉丝
 				Map<String, String> filterMap2 = new HashMap();
-//				filterMap2.put("limit", "20");
+				// filterMap2.put("limit", "20");
 				if (userId != null && !"".equals(userId)) {
 					filterMap2.put("attentionUserId", userId);
 				}
@@ -588,7 +644,7 @@ public class UserAction extends ActionSupport {
 					// 通知
 					Map<String, String> notifyFilterMap = new HashMap();
 					notifyFilterMap.put("currentUserId", currentUserId);
-//					notifyFilterMap.put("limit", "20");
+					// notifyFilterMap.put("limit", "20");
 					notifyList = this.photoService.queryNotify(notifyFilterMap);
 					for (int i = 0; i < notifyList.size(); i++) {
 						Notify notify = (Notify) notifyList.get(i);
@@ -602,6 +658,16 @@ public class UserAction extends ActionSupport {
 					User newUser = UserUtil.getUser(user);
 					newUser.setIsAttention(user.getIsAttention());
 					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(newUser) + ",\"photoSet\":"
+							+ JSON.toJSONString(list, true)
+							+ ",\"attentionUserList\":"
+							+ JSON.toJSONString(attentionList, true)
+							+ ",\"fansUserList\":"
+							+ JSON.toJSONString(fansList, true)
+							+ ",\"notifyList\":"
+							+ JSON.toJSONString(notifyList, true)
+							+ ",\"isRead\":" + isRead + "}}");
+					logger.error("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(newUser) + ",\"photoSet\":"
 							+ JSON.toJSONString(list, true)
 							+ ",\"attentionUserList\":"
@@ -665,28 +731,39 @@ public class UserAction extends ActionSupport {
 								&& attentionUser.getAlias() != null) {
 							HashMap<String, String> map = new HashMap<String, String>();
 							map.put("scheme", "vshow://vshow.com/notification");
-							PushResult result ;
-							PushPayload pushPayload ;
-							if("iPhone".equals(attentionUser.getPf())){
-								pushPayload = PushExample
-										.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
-												currentUser.getUsername() + " 关注了您",
-												map, attentionUser.getAlias());
-								result = jPushClient
-										.sendPush(pushPayload);
-								System.out.println("jpush result：" + result);
-								logger.error("发送通知：" + result);
-							}else if("Android".equals(attentionUser.getPf())){
-								pushPayload = PushExample
-										.buildPushObject_android_tagAnd_alertWithExtrasAndMessage("享秀",
-												currentUser.getUsername() + " 关注了您",
-												map, attentionUser.getAlias());
-								result = jPushClient
-										.sendPush(pushPayload);
-								System.out.println("jpush result：" + result);
-								logger.error("发送通知：" + result);
+							PushResult result;
+							PushPayload pushPayload;
+							try {
+								if ("iPhone".equals(attentionUser.getPf())) {
+									pushPayload = PushExample
+											.buildPushObject_ios_tagAnd_alertWithExtrasAndMessage(
+													currentUser.getUsername()
+															+ " 关注了您", map,
+													attentionUser.getAlias());
+									result = jPushClient.sendPush(pushPayload);
+									System.out
+											.println("jpush result：" + result);
+									logger.error("发送通知：" + result);
+								} else if ("Android".equals(attentionUser
+										.getPf())) {
+									pushPayload = PushExample
+											.buildPushObject_android_tagAnd_alertWithExtrasAndMessage(
+													"享秀",
+													currentUser.getUsername()
+															+ " 关注了您", map,
+													attentionUser.getAlias());
+									result = jPushClient.sendPush(pushPayload);
+									System.out
+											.println("jpush result：" + result);
+									logger.error("发送通知：" + result);
+								}
+							} catch (APIConnectionException e) {
+								logger.error("发送通知：" + e);
+								e.printStackTrace();
+							} catch (APIRequestException e) {
+								logger.error("发送通知：" + e);
+								e.printStackTrace();
 							}
-
 							// IosAlert alert = IosAlert.newBuilder()
 							// .setTitleAndBody("测试标题", "你被关注了")
 							// .setActionLocKey("PLAY")
@@ -706,6 +783,7 @@ public class UserAction extends ActionSupport {
 						uaf.setAttentionTime(new Date());
 						this.userService.attentionUser(uaf);
 						out.print("{\"state\":0,\"result\":{\"state\":0}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				}
 			}
@@ -760,8 +838,10 @@ public class UserAction extends ActionSupport {
 							fansUserId, attentionUserId);
 					if (u != null) {// 已关注
 						out.print("{\"state\":0,\"result\":{\"state\":1}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":1}}");
 					} else {// 未关注
 						out.print("{\"state\":0,\"result\":{\"state\":0}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				}
 			}
@@ -804,6 +884,7 @@ public class UserAction extends ActionSupport {
 					this.userService.cancelAttention(fansUserId,
 							attentionUserId);
 					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 				}
 			}
 		} catch (Exception e) {
@@ -850,6 +931,8 @@ public class UserAction extends ActionSupport {
 				filterMap.put("limit", limit);
 				List list = userService.queryAttentions(filterMap);
 				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(list, true) + "}}");
+				logger.error("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(list, true) + "}}");
 			}
 		} catch (Exception e) {
@@ -898,6 +981,8 @@ public class UserAction extends ActionSupport {
 				List list = userService.queryFans(filterMap);
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(list, true) + "}}");
+				logger.error("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(list, true) + "}}");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -945,6 +1030,9 @@ public class UserAction extends ActionSupport {
 								user.setPassword(pwd);
 								this.userService.resetPassword(user, captcha);
 								out.print("{\"state\":0,\"result\":{\"user\":"
+										+ JSON.toJSONString(UserUtil
+												.getUser(user)) + "}}");
+								logger.error("{\"state\":0,\"result\":{\"user\":"
 										+ JSON.toJSONString(UserUtil
 												.getUser(user)) + "}}");
 							} else {// 用户名不存在
@@ -1057,6 +1145,8 @@ public class UserAction extends ActionSupport {
 					logger.error("***********************返回数据***********************");
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(user2) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(user2) + "}}");
 					logger.error("***********************结束***********************");
 				} else if ("weixin".equals(thirdParty)) {// 微信登录
 					WeiXinUser weixinUser = SnsAPI.userinfo(access_token,
@@ -1092,6 +1182,8 @@ public class UserAction extends ActionSupport {
 					User user2 = UserUtil.getUser(newUser);
 					user2.setCookie(cookie.getValue());
 					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(user2) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSONString(user2) + "}}");
 				}
 			}
@@ -1135,6 +1227,8 @@ public class UserAction extends ActionSupport {
 				List list = userService.automaticPrompt(filterMap);
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(list, true) + "}}");
+				logger.error("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(list, true) + "}}");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1170,6 +1264,7 @@ public class UserAction extends ActionSupport {
 					user.setAlias(aliasStr);
 					this.userService.updateUser(user);
 					out.print("{\"state\":0}");
+					logger.error("{\"state\":0}");
 				} else {
 					out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
@@ -1218,8 +1313,10 @@ public class UserAction extends ActionSupport {
 						.queryNotify(notifyFilterMap);
 				if (notifyList.size() > 0) {// 有未读通知
 					out.print("{\"state\":0,\"result\":{\"isRead\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"isRead\":0}}");
 				} else {// 没有未读通知
 					out.print("{\"state\":0,\"result\":{\"isRead\":1}}");
+					logger.error("{\"state\":0,\"result\":{\"isRead\":1}}");
 				}
 			}
 		} catch (Exception e) {
@@ -1273,6 +1370,8 @@ public class UserAction extends ActionSupport {
 					List notifyList = this.photoService.queryNotify(filterMap);
 					out.print("{\"state\":0,\"result\":{\"notifyList\":"
 							+ JSON.toJSONString(notifyList, true) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"notifyList\":"
+							+ JSON.toJSONString(notifyList, true) + "}}");
 				}
 			}
 		} catch (Exception e) {
@@ -1287,6 +1386,7 @@ public class UserAction extends ActionSupport {
 	}
 	/**
 	 * 加载用户信息
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-11-10 时间：下午5:29:10
 	 */
@@ -1298,8 +1398,6 @@ public class UserAction extends ActionSupport {
 		try {
 			out = response.getWriter();
 			String userId = request.getParameter("userId");// 要查看的用户
-			String currentUserId = request.getParameter("currentUserId");// 当前用户
-			String width = request.getParameter("w");// 缩放宽度
 			User user = userService.getById(Integer.parseInt(userId));
 			if (userId == null || "".equals(userId) || user == null
 					|| "null".equals(userId) || "0".equals(userId)) {
@@ -1307,6 +1405,8 @@ public class UserAction extends ActionSupport {
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
+				logger.error("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
 			}
 		} catch (Exception e) {
@@ -1319,9 +1419,10 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 重新绑定用户别名及登录平台
+	 * 
 	 * @author louxiaojian
 	 * @date： 日期：2015-11-20 时间：下午2:06:52
 	 */
@@ -1336,8 +1437,9 @@ public class UserAction extends ActionSupport {
 			String alias = request.getParameter("alias");// 推送时的用户别名
 			String pf = request.getParameter("pf");// 当前登录平台
 			User user = userService.getById(Integer.parseInt(currentUserId));
-			if (currentUserId == null || "".equals(currentUserId) || user == null
-					|| "null".equals(currentUserId) || "0".equals(currentUserId)) {
+			if (currentUserId == null || "".equals(currentUserId)
+					|| user == null || "null".equals(currentUserId)
+					|| "0".equals(currentUserId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
@@ -1345,16 +1447,256 @@ public class UserAction extends ActionSupport {
 				user.setPf(pf);
 				this.userService.updateUser(user);
 				out.print("{\"state\":0,\"result\":{\"state\":0}}");
+				logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error("重新绑定用户别名及登录平台：" + e);
+			logger.error("重新绑定用户别名及登录平台resetAliasAndPf报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-	
+
+	/**
+	 * 用户获取融云token
+	 */
+	public void getRongCloudToken() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			User user = userService.getById(Integer.parseInt(currentUserId));
+			if (currentUserId == null || "".equals(currentUserId)
+					|| user == null || "null".equals(currentUserId)
+					|| "0".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				SdkHttpResult result = null;
+				result = ApiHttpClient.getToken(rongCloudAppKey,
+						rongCloudSecret, String.valueOf(user.getId()),
+						user.getUsername(), user.getHeadPortrait(),
+						FormatType.json);
+				JSONObject resultJson = new JSONObject(result.toString());
+				String code = resultJson.get("code").toString();
+				if ("200".equals(code)) {
+					JSONObject jsonObject = new JSONObject(resultJson.get(
+							"result").toString());
+					String token = jsonObject.get("token").toString();
+					out.print("{\"state\":0,\"result\":{\"state\":0,\"token\":\""
+							+ token + "\"}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0,\"token\":\""
+							+ token + "\"}}");
+				} else {
+					out.print("{\"state\":0,\"result\":{\"state\":1}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("用户获取融云token getRongCloudToken报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 检查用户在线状态
+	 */
+	public void checkOnline() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String userId = request.getParameter("userId");// 要检查的用户Id
+			if (userId == null || "".equals(userId) || "null".equals(userId)
+					|| "0".equals(userId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				SdkHttpResult result = null;
+				result = ApiHttpClient.checkOnline(rongCloudAppKey,
+						rongCloudSecret, userId, FormatType.json);
+				JSONObject resultJson = new JSONObject(result.toString());
+				String code = resultJson.get("code").toString();
+				if ("200".equals(code)) {
+					JSONObject jsonObject = new JSONObject(resultJson.get(
+							"result").toString());
+					String status = jsonObject.get("status").toString();// 在线状态，1为在线，0为不在线
+					out.print("{\"state\":0,\"result\":{\"state\":0,\"status\":"
+							+ status + "}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0,\"status\":"
+							+ status + "}}");
+				} else {
+					out.print("{\"state\":0,\"result\":{\"state\":1}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("用户获取融云token getRongCloudToken报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	/**
+	 * 刷新融云用户信息
+	 */
+	public void refreshUser() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户Id
+			if (currentUserId == null || "".equals(currentUserId)
+					|| "null".equals(currentUserId)
+					|| "0".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				User user = userService
+						.getById(Integer.parseInt(currentUserId));
+				SdkHttpResult result = null;
+				result = ApiHttpClient.refreshUser(rongCloudAppKey,
+						rongCloudSecret, String.valueOf(user.getId()),
+						user.getUsername(), user.getHeadPortrait(),
+						FormatType.json);
+				JSONObject resultJson = new JSONObject(result.toString());
+				String code = resultJson.get("code").toString();
+				if ("200".equals(code)) {
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
+				} else {
+					out.print("{\"state\":0,\"result\":{\"state\":1}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("用户获取融云token getRongCloudToken报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 个人中心-加载点赞、评论、关注通知
+	 * 
+	 * @author louxiaojian
+	 * @date： 日期：2015-10-30 时间：上午10:41:25
+	 */
+	public void loadPraiseOrAttentedOrReplyNotify() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			// lastModified
+			String lastId = request.getParameter("lastId");
+			// 查询数据数量
+			String limit = request.getParameter("limit");
+			String type = request.getParameter("type");// 0：点赞，1：评论，2：关注
+
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "20";
+			}
+			if (currentUserId == null || "".equals(currentUserId)
+					|| "null".equals(currentUserId)
+					|| "0".equals(currentUserId)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				User user = userService
+						.getById(Integer.parseInt(currentUserId));
+				if (user == null) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				} else {
+					// 通知 0：未读 ，1：已读
+					Map<String, String> filterMap = new HashMap();
+					filterMap.put("limit", limit);
+					filterMap.put("lastId", lastId);
+					filterMap.put("currentUserId", currentUserId);
+					filterMap.put("type", type);
+					List notifyList = this.photoService
+							.loadPraiseOrAttentedOrReplyNotify(filterMap);
+					out.print("{\"state\":0,\"result\":{\"notifyList\":"
+							+ JSON.toJSONString(notifyList, true) + "}}");
+					logger.error("{\"state\":0}");
+				}
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("查看用户信息viewUserInfo报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 会话列表----根据id数组获取user对象集合
+	 */
+	public void loadUsers() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String ids = request.getParameter("ids");// 获取的id
+			// lastModified
+			String lastId = request.getParameter("lastId");
+			// 查询数据数量
+			String limit = request.getParameter("limit");
+
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "20";
+			}
+			if (ids == null || "".equals(ids) || "null".equals(ids)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("limit", limit);
+				filterMap.put("lastId", lastId);
+				filterMap.put("ids", ids);
+				List userList = this.userService.loadUsers(filterMap);
+				out.print("{\"state\":0,\"result\":{\"userList\":"
+						+ JSON.toJSONString(userList, true) + "}}");
+				logger.error("{\"state\":0}");
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("查看用户信息viewUserInfo报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
 }

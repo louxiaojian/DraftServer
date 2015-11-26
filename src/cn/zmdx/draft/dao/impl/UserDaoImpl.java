@@ -208,4 +208,19 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		return query.list();
 	}
 
+	@Override
+	public List loadUsers(Map<String, String> filterMap) {
+		StringBuffer sql=new StringBuffer("select id,username,headPortrait from users where 1=1 ");
+		if(filterMap!=null&&!filterMap.isEmpty()){
+			if(!"".equals(filterMap.get("ids"))&&filterMap.get("ids")!=null){
+				sql.append(" and id in (:ids)");
+			}
+		}
+		Query query = getSession().createSQLQuery(sql.toString()).setResultTransformer(Transformers.aliasToBean(User.class));
+		if(!"".equals(filterMap.get("ids"))&&filterMap.get("ids")!=null){
+			query.setParameterList("ids", filterMap.get("ids").split(","));
+		}
+		return query.list();
+	}
+
 }

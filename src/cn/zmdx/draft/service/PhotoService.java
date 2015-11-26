@@ -260,4 +260,10 @@ public interface PhotoService {
 	 * @return
 	 */
 	public List queryBulletinBoard(Map<String, String> filterMap);
+	/**
+	 * 个人中心-加载点赞、评论、关注通知
+	 * @param filterMap
+	 * @return
+	 */
+	public List loadPraiseOrAttentedOrReplyNotify(Map<String, String> filterMap);
 }

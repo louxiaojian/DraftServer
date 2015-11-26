@@ -99,4 +99,10 @@ public interface UserDao extends BaseDao{
 	 * @return
 	 */
 	public List automaticPrompt(Map<String, String> filterMap);
+	/**
+	 * 根据id数组获取user对象集合
+	 * @param filterMap
+	 * @return
+	 */
+	public List loadUsers(Map<String, String> filterMap);
 }

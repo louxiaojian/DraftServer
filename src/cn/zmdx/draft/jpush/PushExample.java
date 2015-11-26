@@ -1,6 +1,8 @@
 package cn.zmdx.draft.jpush;
 
 import java.util.Map;
+
+import cn.jpush.api.push.model.Options;
 import cn.jpush.api.push.model.Platform;
 import cn.jpush.api.push.model.PushPayload;
 import cn.jpush.api.push.model.audience.Audience;
@@ -36,7 +38,10 @@ public class PushExample {
 												.setAlert(alert)// alert
 												.setSound(sound)// sound
 												.addExtras(map).build())
-								.build()).build();
+								.build())
+				.setOptions(
+						Options.newBuilder().setTimeToLive(60)
+								.setApnsProduction(true).build()).build();
 	}
 
 	/**
@@ -63,7 +68,10 @@ public class PushExample {
 												.setAlert(alert)// alert
 												.setSound("default")// sound
 												.addExtras(map).build())
-								.build()).build();
+								.build())
+				.setOptions(
+						Options.newBuilder().setTimeToLive(60)
+								.setApnsProduction(true).build()).build();
 	}
 	/**
 	 * 发送Android通知
@@ -90,8 +98,9 @@ public class PushExample {
 										AndroidNotification.newBuilder()
 												.setAlert(alert)
 												.setTitle(title).addExtras(map)
-												.build()
-								).build()
-				).build();
+												.build()).build())
+				.setOptions(
+						Options.newBuilder().setTimeToLive(60)
+								.setApnsProduction(true).build()).build();
 	}
 }

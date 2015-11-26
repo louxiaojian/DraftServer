@@ -97,7 +97,56 @@
       margin-top: 10px;
       text-align: center;
     }
-    
+    #popweixin {
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    position:fixed;
+    z-index:1000;
+    background:rgba(0,0,0,.5);
+    top:0;
+    left:0;
+    display:none;
+}
+#popweixin .tip {
+    width:100%;
+    background:#fff;
+    z-index:1001;
+}
+.top2bottom {
+    -webkit-animation:top2bottom 1.2s ease;
+    -moz-animation:top2bottom 1.2s ease;
+    -o-animation:top2bottom 1.2s ease;
+    animation:top2bottom 1.2s ease;
+    -webkit-animation-fill-mode:backwards;
+    -moz-animation-fill-mode:backwards;
+    -o-animation-fill-mode:backwards;
+    animation-fill-mode:backwards
+}
+.animate-delay-1 {
+    -webkit-animation-delay:1s;
+    -moz-animation-delay:1s;
+    -o-animation-delay:1s;
+    animation-delay:1s
+}
+@-webkit-keyframes top2bottom {
+    0% {
+    -webkit-transform:translateY(-300px);
+    opacity:.6
+}
+100% {
+    -webkit-transform:translateY(0px);
+    opacity:1
+}
+}@keyframes top2bottom {
+    0% {
+    transform:translateY(-300px);
+    opacity:.6
+}
+100% {
+    transform:translateY(0px);
+    opacity:1
+}
   </style>
 </head>
 <%
@@ -105,6 +154,11 @@
 %>
 <body style="background-color: #f8f8f8;color: block;">
 <div class="am-g am-g-fixed">
+<div id='popweixin' onclick="hiddenDiv()">
+    <div class='tip top2bottom animate-delay-1'>
+        <img style="width: 100%" src='<%=request.getContextPath()%>/data/assets/i/90C2A7BF-9A70-4688-8CA8-4FB0163A5F2D.png'/>
+    </div>
+</div>
   <div class="am-u-md-9 am-u-md-push-3">
     <div class="am-g">
 <header class="am-g my-head">
@@ -157,7 +211,7 @@
           <c:if test='${themeId!=null&&themeId!=0&&themeId!="" }'>
     		<div align="center">
     			<input type="button" value="为ta投票" id="voteButton" class="button1" onclick="vote_pic()">
-          		<p class="zhu">注：每人每天一个主题下限投3票，使用享秀APP还可以再投3票。</p>
+          		<p class="zhu">注：每人每天一个主题下限投3票。</p>
           	</div>
           </c:if> 
           </c:if>
@@ -167,7 +221,7 @@
   </div>
 </div>
 <footer class="my-footer">
-  <p style="margin-bottom: -5px;">享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司.</small></p>
+  <p style="margin-bottom: -5px;color: rgba(51, 51, 51, 0.6);">享秀<br><small>© Copyright x-show.net 北京智美点心科技有限公司</small></p>
 </footer>
 <!--[if lt IE 9]>
 <script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
@@ -183,6 +237,13 @@
 </html>
   <script type="text/javascript">
   	function vote_pic(){
+			downloadApp();
+  		<%--if(!confirm("请下载享秀APP为Ta投票")){
+  			return false;
+  		}else{
+  			downloadApp();
+  		}
+  		
   		//alert(${currentUser.id}+"-----"+${pictureSet.id});
   		var currentUserId='<%=request.getSession().getAttribute("currentUserId")%>';
   		document.getElementById("voteButton").disabled="disabled";
@@ -218,14 +279,26 @@
   		}else{
   	  		var codeUrl= 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx81b0d978030f90aa&redirect_uri='+encodeURIComponent('http://pandora.hdlocker.com/draftServer/photo_loadPictureSet.action?pictureSetId=${pictureSet.id}&themeId=${themeId}')+'&response_type=code&scope=snsapi_userinfo&state='+Math.round(Math.random()*10000000)+'#wechat_redirect';
   	  		window.location.href=codeUrl;
-  		}
+  		}--%>
   	}
 	function closeDiv(){
 		document.getElementById("div1").style.display="none"
 	}
 	function downloadApp(){
+		//a();
 		window.location.href="https://itunes.apple.com/cn/app/xiang-xiu/id1034657726?mt=8";
 	}
-	
-	
+	function a(){alert(11)
+	    var ua = navigator.userAgent.toLowerCase();
+	    alert(ua);
+	    if (/iphone|ipod/.test(ua)) {
+	        if(/micromessenger/.test(ua)){
+	             document.getElementById("popweixin").style.display = "block";
+	        }
+	    }
+	}
+	function hiddenDiv(){
+		document.getElementById("popweixin").style.display = "none";
+	}
+
   </script>

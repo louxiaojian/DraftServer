@@ -24,6 +24,7 @@ public class UserUtil {
 		newUser.setGender(user.getGender());
 		newUser.setIsvalidate(user.getIsvalidate());
 		newUser.setArea(user.getArea());
+		newUser.setRongCloudToken(user.getRongCloudToken());
 		return newUser;
 	}
 }

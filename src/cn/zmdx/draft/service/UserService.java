@@ -171,4 +171,11 @@ public interface UserService {
 	 * @param uaf
 	 */
 	public void attentionUser(UserAttentionFans uaf);
+
+	/**
+	 * 根据id数组获取user对象集合
+	 * @param filterMap
+	 * @return
+	 */
+	public List loadUsers(Map<String, String> filterMap);
 }

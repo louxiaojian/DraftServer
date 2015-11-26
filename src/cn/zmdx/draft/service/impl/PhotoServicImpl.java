@@ -1,5 +1,6 @@
 package cn.zmdx.draft.service.impl;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -116,7 +117,7 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public String OperationPictureSet(String userid, String pictureSetId,
 			int operationType,String ip) {
-		if(!((operationType==2)||(operationType==3))){
+		if(!((operationType==2)||(operationType==3)||(operationType==4))){
 			List list=this.photoDao.queryPhotoByPictureSetId(userid,pictureSetId,operationType);
 			if(list.size()>0){
 				return "failed";
@@ -126,13 +127,14 @@ public class PhotoServicImpl implements PhotoService {
 //		if(!String.valueOf(ps.getUserid()).equals(userid)){
 			//操作类型：7：赞，1：踩，2：举报，3：投票，4取消赞
 			if(operationType==7){
+				DecimalFormat df = new DecimalFormat("#.00000000000000000000");
 				//个人、选秀图片全部显示在照片墙 计算rank衰减值
 //				if("0".equals(ps.getType())){//个人
 					ps.setPraise(ps.getPraise()+1);
 					long time=new Date().getTime()-ps.getUploadDate().getTime();
 				    long hour=time/(24*60*60*1000);
 					double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
-					ps.setRank(rank);
+					ps.setRank(Double.valueOf(df.format(rank)));
 //				}else{
 //					ps.setPraise(ps.getPraise()+1);
 //				}
@@ -145,17 +147,20 @@ public class PhotoServicImpl implements PhotoService {
 			}else if(operationType==4){
 				//个人、选秀图片全部显示在照片墙 计算rank衰减值
 //				if("0".equals(ps.getType())){//个人
-					ps.setPraise(ps.getPraise()-1);
-					long time=new Date().getTime()-ps.getUploadDate().getTime();
-			    	long hour=time/(24*60*60*1000);
-					double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
-					ps.setRank(rank);
+					
 //				}else{
 //					ps.setPraise(ps.getPraise()-1);
 //				}
 				int count=this.photoDao.deleteOperationRecords(Integer.parseInt(userid), Integer.parseInt(pictureSetId));
 				if(count<1){
 					return "failed";
+				}else{
+					DecimalFormat df = new DecimalFormat("#.00000000000000000000");
+					ps.setPraise(ps.getPraise()-1);
+					long time=new Date().getTime()-ps.getUploadDate().getTime();
+			    	long hour=time/(24*60*60*1000);
+					double rank=ps.getPraise()/Math.pow(hour+2, 1.8);
+					ps.setRank(Double.valueOf(df.format(rank)));
 				}
 			}
 			this.photoDao.updateEntity(ps);
@@ -312,6 +317,11 @@ public class PhotoServicImpl implements PhotoService {
 	@Override
 	public List queryBulletinBoard(Map<String, String> filterMap) {
 		return this.photoDao.queryBulletinBoard(filterMap);
+	}
+
+	@Override
+	public List loadPraiseOrAttentedOrReplyNotify(Map<String, String> filterMap) {
+		return this.photoDao.loadPraiseOrAttentedOrReplyNotify(filterMap);
 	}
 	
 }

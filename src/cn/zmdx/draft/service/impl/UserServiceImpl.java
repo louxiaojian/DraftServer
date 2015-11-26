@@ -135,4 +135,9 @@ public class UserServiceImpl implements UserService {
 		this.userDao.saveEntity(or);
 		this.userDao.saveEntity(uaf);
 	}
+	
+	@Override
+	public List loadUsers(Map<String, String> filterMap) {
+		return this.userDao.loadUsers(filterMap);
+	}
 }
