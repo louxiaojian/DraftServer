@@ -31,6 +31,7 @@ import cn.zmdx.draft.jpush.PushExample;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
 import cn.zmdx.draft.util.SensitivewordFilter;
+import cn.zmdx.draft.util.Sha1;
 import cn.zmdx.draft.util.StringUtil;
 import cn.zmdx.draft.util.UserUtil;
 import cn.zmdx.draft.util.picCloud.PicCloud;
@@ -967,68 +968,112 @@ public class PhotoAction extends ActionSupport {
 			out = ServletActionContext.getResponse().getWriter();
 			String userid = request.getParameter("currentUserId");
 			String pictureSetId = request.getParameter("pictureSetId");
-			String ip = getRemoteHost(request);// 返回发出请求的真实IP地址
-			// logger.error("投票请求网址："+ip);
-			// System.err.println(ip);
-			// if(!"".equals(ip)&&ip!=null&&!"null".equals(ip)){
-			// //检查当前ip投票次数
-			// Map<String, String> filterMap = new HashMap<String, String>();
-			// filterMap.put("ip", ip);
-			// filterMap.put("operate_type", "3");
-			// List list=this.photoService.queryOperations(filterMap);
-			// if(list!=null&&list.size()<9){
-			User user = (User) this.photoService.getObjectById(User.class,
-					userid);
-			if (("".equals(userid) || userid == null) || user == null) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
-				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
-			} else {
-				if ("".equals(pictureSetId) || pictureSetId == null) {
-					out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
-					logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
-				} else {
-					PictureSet ps = (PictureSet) this.photoService
-							.getObjectById(PictureSet.class, pictureSetId);
-					int themeId = ps.getThemeCycleId();
-					Cycle cycle = (Cycle) this.photoService.getObjectById(
-							Cycle.class, String.valueOf(themeId));
-					Date currentDate = new Date();
-					if (!"1".equals(cycle.getStatus())) {
-						out.print("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
-						logger.error("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
-					} else if (cycle.getVoteStartTime().getTime() < currentDate
-							.getTime()
-							&& cycle.getVoteEndTime().getTime() > currentDate
-									.getTime()) {
-						Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
-						surplusVotesFilterMap.put("userId", userid);
-						surplusVotesFilterMap.put("ip", ip);
-						surplusVotesFilterMap.put("themeId",
-								String.valueOf(ps.getThemeCycleId()));
-						int votes = this.photoService
-								.queryUserSurplusVote(surplusVotesFilterMap);
-						if (votes >= 3) {
-							out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
-							logger.error("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
-						} else {
-							String result = photoService.OperationPictureSet(
-									userid, pictureSetId, 3, ip);
-							out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
-									+ (3 - votes - 1) + "\"}}");
-							logger.error("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
-									+ (3 - votes - 1) + "\"}}");
-						}
-					} else if (cycle.getVoteStartTime().getTime() > currentDate
-							.getTime()) {
-						out.print("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
-						logger.error("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
-					} else if (cycle.getVoteEndTime().getTime() < currentDate
-							.getTime()) {
-						out.print("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
-						logger.error("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
+			String pf = request.getParameter("pf");
+			String t = request.getParameter("t");
+			String appVersion = request.getParameter("appversion");
+			String did = request.getParameter("did");
+			String s = request.getParameter("s");//加密后的字符串
+			StringBuffer sb=new StringBuffer("AtQym[didR");
+			sb.append(did);
+			sb.append("`currentUserIde");
+			sb.append(userid);
+			sb.append("`pfF");
+			sb.append(pf);
+			sb.append("`tI");
+			sb.append(t);
+			sb.append("`appVersionc");
+			sb.append(appVersion);
+			sb.append("]AtQym}/~&^;'");
+			int tmp=0;
+			String [] appversion=appVersion.split(".");
+			if("iPhone".equals(pf)){
+				if(Integer.parseInt(appversion[1])>1){
+					String sStr=Sha1.SHA1Digest(sb.toString());
+					if(s.equals(sStr)){
+						tmp=1;
 					}
+				}else if(Integer.parseInt(appversion[1])==1&&Integer.parseInt(appversion[2])>=1){
+					String sStr=Sha1.SHA1Digest(sb.toString());
+					if(s.equals(sStr)){
+						tmp=1;
+					}
+				} else {
+					tmp = 1;
+				}
+			}else if("Android".equals(pf)){
+				String sStr=Sha1.SHA1Digest(sb.toString());
+				if(s.equals(sStr)){
+					tmp=1;
 				}
 			}
+			if(tmp==1){
+				String ip = getRemoteHost(request);// 返回发出请求的真实IP地址
+				 logger.error("投票请求网址："+ip);
+				// System.err.println(ip);
+				// if(!"".equals(ip)&&ip!=null&&!"null".equals(ip)){
+				// //检查当前ip投票次数
+				// Map<String, String> filterMap = new HashMap<String, String>();
+				// filterMap.put("ip", ip);
+				// filterMap.put("operate_type", "3");
+				// List list=this.photoService.queryOperations(filterMap);
+				// if(list!=null&&list.size()<9){
+				User user = (User) this.photoService.getObjectById(User.class,
+						userid);
+				if (("".equals(userid) || userid == null) || user == null) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				} else {
+					if ("".equals(pictureSetId) || pictureSetId == null) {
+						out.print("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
+						logger.error("{\"state\":\"1\",\"errorMsg\":\"请先选择图集\"}");
+					} else {
+						PictureSet ps = (PictureSet) this.photoService
+								.getObjectById(PictureSet.class, pictureSetId);
+						int themeId = ps.getThemeCycleId();
+						Cycle cycle = (Cycle) this.photoService.getObjectById(
+								Cycle.class, String.valueOf(themeId));
+						Date currentDate = new Date();
+						if (!"1".equals(cycle.getStatus())) {
+							out.print("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
+							logger.error("{\"state\":\"1\",\"errorMsg\":\"主题活动结束，投票已停止\"}");
+						} else if (cycle.getVoteStartTime().getTime() < currentDate
+								.getTime()
+								&& cycle.getVoteEndTime().getTime() > currentDate
+										.getTime()) {
+							Map<String, String> surplusVotesFilterMap = new HashMap<String, String>();
+							surplusVotesFilterMap.put("userId", userid);
+							surplusVotesFilterMap.put("ip", ip);
+							surplusVotesFilterMap.put("themeId",
+									String.valueOf(ps.getThemeCycleId()));
+							int votes = this.photoService
+									.queryUserSurplusVote(surplusVotesFilterMap);
+							if (votes >= 3) {
+								out.print("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
+								logger.error("{\"state\":0,\"result\":{\"state\":\"1\",\"surplusVotes\":\"0\"}}");
+							} else {
+								String result = photoService.OperationPictureSet(
+										userid, pictureSetId, 3, ip);
+								out.print("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
+										+ (3 - votes - 1) + "\"}}");
+								logger.error("{\"state\":0,\"result\":{\"state\":\"0\",\"surplusVotes\":\""
+										+ (3 - votes - 1) + "\"}}");
+							}
+						} else if (cycle.getVoteStartTime().getTime() > currentDate
+								.getTime()) {
+							out.print("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
+							logger.error("{\"state\":\"1\",\"errorMsg\":\"投票未开始\"}");
+						} else if (cycle.getVoteEndTime().getTime() < currentDate
+								.getTime()) {
+							out.print("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
+							logger.error("{\"state\":\"1\",\"errorMsg\":\"投票已结束\"}");
+						}
+					}
+				}
+			}else{
+				out.print("{\"state\":\"1\",\"errorMsg\":\"投票失败\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"投票失败\"}");
+			}
+			
 			// }else{
 			// out.print("{\"state\":\"1\",\"errorMsg\":\"当前操作存在刷票嫌疑，已被系统屏蔽\"}");
 			// }

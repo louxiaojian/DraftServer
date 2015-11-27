@@ -41,7 +41,7 @@ public class PushExample {
 								.build())
 				.setOptions(
 						Options.newBuilder().setTimeToLive(60)
-								.setApnsProduction(true).build()).build();
+								.setApnsProduction(false).build()).build();
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class PushExample {
 								.build())
 				.setOptions(
 						Options.newBuilder().setTimeToLive(60)
-								.setApnsProduction(true).build()).build();
+								.setApnsProduction(false).build()).build();
 	}
 	/**
 	 * 发送Android通知
@@ -101,6 +101,6 @@ public class PushExample {
 												.build()).build())
 				.setOptions(
 						Options.newBuilder().setTimeToLive(60)
-								.setApnsProduction(true).build()).build();
+								.setApnsProduction(false).build()).build();
 	}
 }

@@ -217,9 +217,21 @@ public interface PhotoDao extends BaseDao {
 	 */
 	public List queryBulletinBoard(Map<String, String> filterMap);
 	/**
-	 * 个人中心-加载点赞、评论、关注通知
+	 * 个人中心-加载点赞通知
 	 * @param filterMap
 	 * @return
 	 */
-	public List loadPraiseOrAttentedOrReplyNotify(Map<String, String> filterMap);
+	public List loadPraiseNotify(Map<String, String> filterMap);
+	/**
+	 * 个人中心-加载评论通知
+	 * @param filterMap
+	 * @return
+	 */
+	public List loadReplyNotify(Map<String, String> filterMap);
+	/**
+	 * 个人中心-加载关注通知
+	 * @param filterMap
+	 * @return
+	 */
+	public List loadAttentedNotify(Map<String, String> filterMap);
 }

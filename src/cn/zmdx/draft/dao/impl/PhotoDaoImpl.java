@@ -193,8 +193,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		if (!"".equals(filterMap.get("limit"))
 				&& filterMap.get("limit") != null
 				&& !"0".equals(filterMap.get("limit"))) {
-			query.setInteger("limit",
-					Integer.parseInt(filterMap.get("limit")));
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
 		}
 		return query.list();
 	}
@@ -202,9 +201,11 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryThemes(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		if (Integer.parseInt(String.valueOf(filterMap.get("middleNum")))>=1 || "Android".equals(filterMap.get("pf"))) {// 1.1.0···9 版本或者Android版本
+		if (Integer.parseInt(String.valueOf(filterMap.get("middleNum"))) >= 1
+				|| "Android".equals(filterMap.get("pf"))) {// 1.1.0···9
+															// 版本或者Android版本
 			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,new_bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting,notice from theme_cycle order by status asc,starttime asc");
-		}else{
+		} else {
 			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting from theme_cycle order by status asc,starttime asc");
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
@@ -271,7 +272,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and picture_set_id = :pictureSetId");
 			}
 			if (!"".equals(filterMap.get("lastId"))
-					&& filterMap.get("lastId") != null&&!"0".equals(filterMap.get("lastId"))) {
+					&& filterMap.get("lastId") != null
+					&& !"0".equals(filterMap.get("lastId"))) {
 				sql.append(" and c.id < :lastid");
 			}
 		}
@@ -292,7 +294,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					Integer.parseInt(filterMap.get("pictureSetId").toString()));
 		}
 		if (!"".equals(filterMap.get("lastId"))
-				&& filterMap.get("lastId") != null&&!"0".equals(filterMap.get("lastId"))) {
+				&& filterMap.get("lastId") != null
+				&& !"0".equals(filterMap.get("lastId"))) {
 			query.setInteger("lastid",
 					Integer.parseInt(filterMap.get("lastId").toString()));
 		}
@@ -488,8 +491,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		if (!"".equals(filterMap.get("limit"))
 				&& filterMap.get("limit") != null
 				&& !"0".equals(filterMap.get("limit"))) {
-			query.setInteger("limit",
-					Integer.parseInt(filterMap.get("limit")));
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
 		}
 		return query.list();
 	}
@@ -537,7 +539,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and picture_set_id=:pictureSetId ");
 			}
 			if (!"".equals(praiseFilterMap.get("lastId"))
-					&& praiseFilterMap.get("lastId") != null&&!"0".equals(praiseFilterMap.get("lastId"))) {
+					&& praiseFilterMap.get("lastId") != null
+					&& !"0".equals(praiseFilterMap.get("lastId"))) {
 				sql.append(" and o.id<:lastId ");
 			}
 			sql.append(" order by o.id desc ");
@@ -555,7 +558,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					Integer.parseInt(praiseFilterMap.get("pictureSetId")));
 		}
 		if (!"".equals(praiseFilterMap.get("lastId"))
-				&& praiseFilterMap.get("lastId") != null&&!"0".equals(praiseFilterMap.get("lastId"))) {
+				&& praiseFilterMap.get("lastId") != null
+				&& !"0".equals(praiseFilterMap.get("lastId"))) {
 			query.setInteger("lastId",
 					Integer.parseInt(praiseFilterMap.get("lastId")));
 		}
@@ -604,7 +608,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and (ps.userid=:psUserId or o.being_informer_id=:currentUserId)");
 			}
 			if (!"".equals(filterMap.get("lastId"))
-					&& filterMap.get("lastId") != null&&!"0".equals(filterMap.get("lastId"))) {
+					&& filterMap.get("lastId") != null
+					&& !"0".equals(filterMap.get("lastId"))) {
 				sql.append(" and o.id<:lastId ");
 			}
 			if (!"".equals(filterMap.get("status"))
@@ -628,7 +633,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					Integer.parseInt(filterMap.get("currentUserId")));
 		}
 		if (!"".equals(filterMap.get("lastId"))
-				&& filterMap.get("lastId") != null&&!"0".equals(filterMap.get("lastId"))) {
+				&& filterMap.get("lastId") != null
+				&& !"0".equals(filterMap.get("lastId"))) {
 			query.setInteger("lastId",
 					Integer.parseInt(filterMap.get("lastId")));
 		}
@@ -797,24 +803,77 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		sql.append("select id,image_url as imageUrl,url,display from bulletin_board where display='0' order by id desc");
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
-				.setResultTransformer(Transformers.aliasToBean(BulletinBoard.class));
+				.setResultTransformer(
+						Transformers.aliasToBean(BulletinBoard.class));
 		return query.list();
 	}
 
 	@Override
-	public List loadPraiseOrAttentedOrReplyNotify(Map<String, String> filterMap) {
+	public List loadPraiseNotify(Map<String, String> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select o.id as id,o.id as orderId,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,u.area as area,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead from picture_set ps  left join operation_records o on ps.id=o.picture_set_id  left join  users u  on informer_id=u.id where u.id>0 ");
+		if (filterMap != null && !filterMap.isEmpty()) {
+			if (!"".equals(filterMap.get("type"))
+					&& filterMap.get("type") != null) {
+				if ("0".equals(filterMap.get("type"))) {// 点赞
+					// operation_type 4：评论，5：回复，6：@，7：赞，8：关注
+					sql.append(" and operation_type=7 ");
+				}
+			}
+			if (!"".equals(filterMap.get("currentUserId"))
+					&& filterMap.get("currentUserId") != null) {
+				sql.append(" and ps.userid=:psUserId");
+			}
+			if (!"".equals(filterMap.get("lastId"))
+					&& filterMap.get("lastId") != null
+					&& !"0".equals(filterMap.get("lastId"))) {
+				sql.append(" and o.id<:lastId ");
+			}
+			if (!"".equals(filterMap.get("status"))
+					&& filterMap.get("status") != null) {
+				sql.append(" and o.isRead=:status ");
+			}
+			sql.append(" order by o.id desc ");
+			if (!"".equals(filterMap.get("limit"))
+					&& filterMap.get("limit") != null) {
+				sql.append(" limit :limit");
+			}
+		}
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Notify.class));
+		if (!"".equals(filterMap.get("currentUserId"))
+				&& filterMap.get("currentUserId") != null) {
+			query.setInteger("psUserId",
+					Integer.parseInt(filterMap.get("currentUserId")));
+		}
+		if (!"".equals(filterMap.get("lastId"))
+				&& filterMap.get("lastId") != null
+				&& !"0".equals(filterMap.get("lastId"))) {
+			query.setInteger("lastId",
+					Integer.parseInt(filterMap.get("lastId")));
+		}
+		if (!"".equals(filterMap.get("status"))
+				&& filterMap.get("status") != null) {
+			query.setInteger("status",
+					Integer.parseInt(filterMap.get("status")));
+		}
+		if (!"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null) {
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
+		return query.list();
+	}
+
+	@Override
+	public List loadReplyNotify(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select o.id as id,o.id as orderId,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,u.area as area,o.operation_type as type,o.datetime as dateTime,ps.coverUrl as coverUrl,ps.id as pictureSetId,o.isRead,com.content as content from picture_set ps  left join operation_records o on ps.id=o.picture_set_id  left join  users u  on informer_id=u.id left join comment com on com.id=o.comment_id where u.id>0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("type"))
 					&& filterMap.get("type") != null) {
-				if("0".equals(filterMap.get("type"))){//点赞
-					//operation_type 4：评论，5：回复，6：@，7：赞，8：关注
-					sql.append(" and operation_type=7 ");
-				}else if("1".equals(filterMap.get("type"))){//评论
+				if ("1".equals(filterMap.get("type"))) {// 评论
 					sql.append(" and operation_type >3 and operation_type<6");
-				}else if("2".equals(filterMap.get("type"))){//关注
-					sql.append(" and operation_type=8 ");
 				}
 			}
 			if (!"".equals(filterMap.get("currentUserId"))
@@ -822,7 +881,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				sql.append(" and (ps.userid=:psUserId or o.being_informer_id=:currentUserId)");
 			}
 			if (!"".equals(filterMap.get("lastId"))
-					&& filterMap.get("lastId") != null&&!"0".equals(filterMap.get("lastId"))) {
+					&& filterMap.get("lastId") != null
+					&& !"0".equals(filterMap.get("lastId"))) {
 				sql.append(" and o.id<:lastId ");
 			}
 			if (!"".equals(filterMap.get("status"))
@@ -846,7 +906,64 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 					Integer.parseInt(filterMap.get("currentUserId")));
 		}
 		if (!"".equals(filterMap.get("lastId"))
-				&& filterMap.get("lastId") != null&&!"0".equals(filterMap.get("lastId"))) {
+				&& filterMap.get("lastId") != null
+				&& !"0".equals(filterMap.get("lastId"))) {
+			query.setInteger("lastId",
+					Integer.parseInt(filterMap.get("lastId")));
+		}
+		if (!"".equals(filterMap.get("status"))
+				&& filterMap.get("status") != null) {
+			query.setInteger("status",
+					Integer.parseInt(filterMap.get("status")));
+		}
+		if (!"".equals(filterMap.get("limit"))
+				&& filterMap.get("limit") != null) {
+			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
+		}
+		return query.list();
+	}
+
+	@Override
+	public List loadAttentedNotify(Map<String, String> filterMap) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select o.id as id,o.id as orderId,u.id as userId,u.username as userName,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,u.area as area,o.operation_type as type,o.datetime as dateTime,o.isRead from operation_records o left join  users u  on informer_id=u.id where u.id>0 ");
+		if (filterMap != null && !filterMap.isEmpty()) {
+			if (!"".equals(filterMap.get("type"))
+					&& filterMap.get("type") != null) {
+				if ("2".equals(filterMap.get("type"))) {// 关注
+					sql.append(" and operation_type=8 ");
+				}
+			}
+			if (!"".equals(filterMap.get("currentUserId"))
+					&& filterMap.get("currentUserId") != null) {
+				sql.append(" and o.being_informer_id=:currentUserId");
+			}
+			if (!"".equals(filterMap.get("lastId"))
+					&& filterMap.get("lastId") != null
+					&& !"0".equals(filterMap.get("lastId"))) {
+				sql.append(" and o.id<:lastId ");
+			}
+			if (!"".equals(filterMap.get("status"))
+					&& filterMap.get("status") != null) {
+				sql.append(" and o.isRead=:status ");
+			}
+			sql.append(" order by o.id desc ");
+			if (!"".equals(filterMap.get("limit"))
+					&& filterMap.get("limit") != null) {
+				sql.append(" limit :limit");
+			}
+		}
+		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+		Query query = getSession().createSQLQuery(sql.toString())
+				.setResultTransformer(Transformers.aliasToBean(Notify.class));
+		if (!"".equals(filterMap.get("currentUserId"))
+				&& filterMap.get("currentUserId") != null) {
+			query.setInteger("currentUserId",
+					Integer.parseInt(filterMap.get("currentUserId")));
+		}
+		if (!"".equals(filterMap.get("lastId"))
+				&& filterMap.get("lastId") != null
+				&& !"0".equals(filterMap.get("lastId"))) {
 			query.setInteger("lastId",
 					Integer.parseInt(filterMap.get("lastId")));
 		}

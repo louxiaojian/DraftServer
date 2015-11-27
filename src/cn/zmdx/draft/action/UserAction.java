@@ -306,9 +306,11 @@ public class UserAction extends ActionSupport {
 						}
 					}
 					// 更新用户信息
-					// if(alias.equals(user.getAlias())||pf.equals(user.getPf())||token.equals(user.getRongCloudToken())){
-					this.userService.updateUser(user);
-					// }
+					if (alias.equals(user.getAlias())
+							|| pf.equals(user.getPf())
+							|| token.equals(user.getRongCloudToken())) {
+						this.userService.updateUser(user);
+					}
 					Sha1 sha1 = new Sha1();
 					pwd = sha1.Digest(pwd);
 					if (user.getPassword().equals(pwd)) {

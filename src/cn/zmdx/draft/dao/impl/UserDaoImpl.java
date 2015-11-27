@@ -94,10 +94,14 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
 	@Override
 	public void cancelAttention(String fansUserId, String attentionUserId) {
-		Query query=getSession().createQuery("delete UserAttentionFans where attentionUserId=? and fansUserId=?");
+		Query query=getSession().createSQLQuery("delete from user_attention_fans where attention_user_id=? and fans_user_id=?");
+		Query query1=getSession().createSQLQuery("delete from operation_records where informer_id=? and being_informer_id=? and operation_type=8");
 		query.setInteger(0, Integer.parseInt(attentionUserId));
 		query.setInteger(1, Integer.parseInt(fansUserId));
+		query1.setInteger(0, Integer.parseInt(fansUserId));
+		query1.setInteger(1, Integer.parseInt(attentionUserId));
 		query.executeUpdate();
+		query1.executeUpdate();
 	}
 
 	@Override

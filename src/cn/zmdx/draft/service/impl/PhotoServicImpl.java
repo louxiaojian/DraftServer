@@ -321,7 +321,15 @@ public class PhotoServicImpl implements PhotoService {
 
 	@Override
 	public List loadPraiseOrAttentedOrReplyNotify(Map<String, String> filterMap) {
-		return this.photoDao.loadPraiseOrAttentedOrReplyNotify(filterMap);
+		List list = null;
+		if ("0".equals(filterMap.get("type"))) {// 点赞
+			list= this.photoDao.loadPraiseNotify(filterMap);
+		} else if ("1".equals(filterMap.get("type"))) {// 评论
+			list=this.photoDao.loadReplyNotify(filterMap);
+		} else if ("2".equals(filterMap.get("type"))) {// 关注
+			list=this.photoDao.loadAttentedNotify(filterMap);
+		}
+		return list;
 	}
 	
 }
