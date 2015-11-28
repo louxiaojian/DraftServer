@@ -48,7 +48,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,photoCount from picture_set where 1=1 ");
+				+ "') as coverUrl,photoCount from picture_set where 1=1 and display=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"".equals(filterMap.get("userid"))
 					&& filterMap.get("userid") != null
@@ -115,7 +115,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,photoCount from picture_set where status =1 and userid>0 and report<10 ");// 个人、选秀图片全部显示在照片墙
+				+ "') as coverUrl,photoCount from picture_set where status =1 and userid>0 and report<10 and display=0 ");// 个人、选秀图片全部显示在照片墙
 																											// and
 																											// type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
@@ -157,7 +157,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,rank,photoCount,votes from draft_rank_picture_set where status =1 and type=1 and userid>0 ");
+				+ "') as coverUrl,rank,photoCount,votes from draft_rank_picture_set where status =1 and type=1 and userid>0  and display=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -315,7 +315,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,photoCount,votes from picture_set where status =1 and type=1 and userid>0 ");
+				+ "') as coverUrl,photoCount,votes from picture_set where status =1 and type=1 and userid>0  and display=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -363,7 +363,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,rank,photoCount from rank_picture_set where status =1 and userid>0 and report<10 ");// 个人、选秀图片全部显示在照片墙
+				+ "') as coverUrl,rank,photoCount from rank_picture_set where status =1 and userid>0 and report<10  and display=0 ");// 个人、选秀图片全部显示在照片墙
 																														// and
 																														// type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
@@ -456,7 +456,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List queryUserCycleRanking(Map<String, String> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("select rps.id as orderId,u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,u.area,rps.praise,rps.votes from users u left join draft_rank_picture_set rps on rps.userid=u.id where rps.status =1 and rps.userid>0 and rps.type=1 ");
+		sql.append("select rps.id as orderId,u.id,u.loginname,u.age,u.gender,u.username,u.headPortrait,u.introduction,u.area,rps.praise,rps.votes from users u left join draft_rank_picture_set rps on rps.userid=u.id where rps.status =1 and rps.userid>0 and rps.type=1 and rps.display=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -509,7 +509,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,photoCount from picture_set where status =1 and userid>0 and report<10 and type=0 ");
+				+ "') as coverUrl,photoCount from picture_set where status =1 and userid>0 and report<10 and type=0  and display=0 ");
 		if (filterMap != null && !filterMap.isEmpty()) {
 			sql.append(" order by rand() ");
 			if (!"0".equals(filterMap.get("limit"))
@@ -752,7 +752,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ filterMap.get("width")
 				+ "/h/"
 				+ filterMap.get("width")
-				+ "') as coverUrl,rank,photoCount from picture_set where status =1 and userid>0 and report<10 ");// 个人、选秀图片全部显示在照片墙
+				+ "') as coverUrl,rank,photoCount from picture_set where status =1 and userid>0 and report<10  and display=0 ");// 个人、选秀图片全部显示在照片墙
 																													// and
 																													// type=0
 		if (filterMap != null && !filterMap.isEmpty()) {

@@ -196,7 +196,7 @@ public interface PhotoService {
 	 * @param filterMap
 	 * @return
 	 */
-	public void deletePictureSet(Map<String, String> filterMap);
+	public boolean deletePictureSet(Map<String, String> filterMap);
 	/**
 	 * 发表评论
 	 * @author louxiaojian

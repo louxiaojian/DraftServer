@@ -2015,9 +2015,14 @@ public class PhotoAction extends ActionSupport {
 				// 加载图集点赞人
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("pictureSetIds", pictureSetIds);
-				this.photoService.deletePictureSet(filterMap);
-				out.print("{\"state\":0,\"result\":{\"state\":0}}");
-				logger.error("{\"state\":0,\"result\":{\"state\":0}}");
+				boolean flag=this.photoService.deletePictureSet(filterMap);
+				if(flag){
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
+				}else{
+					out.print("{\"state\":1,\"errorMsg\":\"选秀主题结束后不能删除\"}");
+					logger.error("{\"state\":1,\"errorMsg\":\"选秀主题结束后不能删除\"}");
+				}
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()

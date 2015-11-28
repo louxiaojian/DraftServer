@@ -8,6 +8,7 @@ import java.util.Map;
 
 import cn.zmdx.draft.dao.PhotoDao;
 import cn.zmdx.draft.entity.Comment;
+import cn.zmdx.draft.entity.Cycle;
 import cn.zmdx.draft.entity.CyclePhotoSet;
 import cn.zmdx.draft.entity.OperationRecords;
 import cn.zmdx.draft.entity.Photo;
@@ -241,30 +242,47 @@ public class PhotoServicImpl implements PhotoService {
 	}
 
 	@Override
-	public void deletePictureSet(Map<String, String> filterMap) {
+	public boolean deletePictureSet(Map<String, String> filterMap) {
 		String ids=filterMap.get("pictureSetIds");
-		//删除图片源文件
-		List fileidList=this.photoDao.queryPhotoByPictureSetIds(ids);
-		PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2,
-				ALBUMBUCKET);
-		for (int i = 0; i < fileidList.size(); i++) {
-			Photo photo=(Photo)fileidList.get(i);
-			pc.Delete(photo.getFileid());
+		PictureSet pictureSet= (PictureSet)this.photoDao.getEntity(PictureSet.class, Integer.parseInt(ids));
+		boolean flag=false;
+		if(pictureSet.getThemeCycleId()==0){
+			flag=true;
+		}else{
+			Cycle cycle=(Cycle)this.photoDao.getEntity(Cycle.class,pictureSet.getThemeCycleId());
+			if(!"1".equals(cycle.getStatus())){
+				flag=false;
+			}else{
+				flag=true;
+			}
 		}
-		//删除图集所有评论
-		this.photoDao.executeSql("DELETE from comment where picture_set_id in ("+ids+")");
-		//删除图集点赞记录
-		this.photoDao.executeSql("DELETE from operation_records where picture_set_id in ("+ids+")");
-		//删除图集所有照片
-		this.photoDao.executeSql("DELETE from photo where picture_set_id in ("+ids+")");
-		//删除选秀记录
-		this.photoDao.executeSql("DELETE from cycle_photo_set where photo_set_id in ("+ids+")");
-		//删除图集
-		this.photoDao.executeSql("DELETE from picture_set where id in ("+ids+")");
-		//删除排名
-		this.photoDao.executeSql("DELETE from rank_picture_set where picture_set_id in ("+ids+")");
-		//删除排名
-		this.photoDao.executeSql("DELETE from draft_rank_picture_set where picture_set_id in ("+ids+")");
+		if(flag){
+			//删除图片源文件
+			List fileidList=this.photoDao.queryPhotoByPictureSetIds(ids);
+			PicCloud pc = new PicCloud(APP_ID_V2, SECRET_ID_V2, SECRET_KEY_V2,
+					ALBUMBUCKET);
+			for (int i = 0; i < fileidList.size(); i++) {
+				Photo photo=(Photo)fileidList.get(i);
+				pc.Delete(photo.getFileid());
+			}
+			//删除图集所有评论
+//			this.photoDao.executeSql("DELETE from comment where picture_set_id in ("+ids+")");
+			//删除图集点赞记录
+//			this.photoDao.executeSql("DELETE from operation_records where picture_set_id in ("+ids+")");
+			//删除图集所有照片
+//			this.photoDao.executeSql("DELETE from photo where picture_set_id in ("+ids+")");
+			//删除选秀记录
+//			this.photoDao.executeSql("DELETE from cycle_photo_set where photo_set_id in ("+ids+")");
+			//删除图集
+			this.photoDao.executeSql("update picture_set set display=1 where id in ("+ids+")");
+			//删除排名
+			this.photoDao.executeSql("update rank_picture_set set display=1 where picture_set_id in ("+ids+")");
+			//删除排名
+			this.photoDao.executeSql("update draft_rank_picture_set set display=1 where picture_set_id in ("+ids+")");
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	@Override
