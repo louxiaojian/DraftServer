@@ -985,7 +985,7 @@ public class PhotoAction extends ActionSupport {
 			sb.append(appVersion);
 			sb.append("]AtQym}/~&^;'");
 			int tmp=0;
-			String [] appversion=appVersion.split(".");
+			String [] appversion=appVersion.split("\\.");
 			if("iPhone".equals(pf)){
 				if(Integer.parseInt(appversion[1])>1){
 					String sStr=Sha1.SHA1Digest(sb.toString());

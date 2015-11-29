@@ -303,17 +303,20 @@ public class Sha1 {
 		 */
 		public static void main(String[] args) {
 			Sha1 sha1 = new Sha1();
-			System.out.println("2d0c162f1d55cb855098c4b8002be75575186f37");
+//			System.out.println("2d0c162f1d55cb855098c4b8002be75575186f37");
+			System.out.println("6cefcabbf26cc4df6cdced683735e280efe4007f");
 //			String sb="AtQym[didR407036F3-39BF-40CD-A18E-73D23C0C68CC`currentUserIde58`pfFiPhone`tI1448623095916`appVersionc1.1.0]AtQym}/~&^;'";
-			String sb="AtQym[didR407036F3-39BF-40CD-A18E-73D23C0C68CC`currentUserIde58`pfFiPhone`tI1448624378537`appVersioncnull]AtQym}/~&^;'";
+//			String sb="AtQym[didR407036F3-39BF-40CD-A18E-73D23C0C68CC`currentUserIde58`pfFiPhone`tI1448624378537`appVersioncnull]AtQym}/~&^;'";
+			String sb="AtQym[didR358240055103550`currentUserIde1`pfFAndroid`tI1448696452357`appVersionc1]AtQym}/~&^;'";
 			// 0805949359741CE14FE90402B25E2E023F449748
 //			System.out.println(sha1.Digest("1","UTF-8"));
 			// 24E384109C1FE06E363DB1FF6C8F8DDBF18C45EA
 //			System.out.println(sha1.Digest("123456"));
-			String ssb=sha1.Digest(sb);
-			System.out.println("2d0c162f1d55cb855098c4b8002be75575186f37".equalsIgnoreCase(ssb));
-			System.out.println(sha1.Digest(sb,"UTF-8"));
-			System.out.println(Sha1.SHA1Digest("AtQym[didR407036F3-39BF-40CD-A18E-73D23C0C68CC`currentUserIde58`pfFiPhone`tI1448624378537`appVersioncnull]AtQym}/~&^;'"));
+			String ssb=Sha1.SHA1Digest(sb);
+			System.out.println(ssb);
+//			System.out.println("2d0c162f1d55cb855098c4b8002be75575186f37".equalsIgnoreCase(ssb));
+//			System.out.println(sha1.Digest(sb,"UTF-8"));
+//			System.out.println(Sha1.SHA1Digest("AtQym[didR407036F3-39BF-40CD-A18E-73D23C0C68CC`currentUserIde58`pfFiPhone`tI1448624378537`appVersioncnull]AtQym}/~&^;'"));
 			
 			// 24e384109c1fe06e363db1ff6c8f8ddbf18c45ea
 //			System.out.println(Sha1.SHA1Digest("我们"));

@@ -303,6 +303,8 @@ public class UserAction extends ActionSupport {
 									.get("result").toString());
 							token = jsonObject.get("token").toString();
 							user.setRongCloudToken(token);
+						}else if("403".equals(code)){
+							logger.error("测试人数已满");
 						}
 					}
 					// 更新用户信息
