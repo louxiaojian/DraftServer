@@ -7,8 +7,15 @@ import io.rong.models.SdkHttpResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,8 +83,18 @@ public class UserAction extends ActionSupport {
 	public static final String HEADPICBUCKET = "headpic"; // 空间名
 	private static final String jpushAppKey = "b1d281203f8f4d8b2d7f2993";
 	private static final String jpushMasterSecret = "acc4ade2f7b4b5757f9bd5d8";
-	private static final String rongCloudAppKey = "sfci50a7cb0gi";
-	private static final String rongCloudSecret = "ZZK2E56947b";
+	private static String rongCloudAppKey = "sfci50a7cb0gi";
+	private static String rongCloudSecret = "ZZK2E56947b";
+	private static final boolean rongCloudFlag = true;
+	static {
+		if (rongCloudFlag) {// 正式 即 生产环境
+			rongCloudAppKey = "y745wfm84bfgv";
+			rongCloudSecret = "JC1cZU0cwst";
+		} else {// 测试 即 开发环境
+			rongCloudAppKey = "sfci50a7cb0gi";
+			rongCloudSecret = "ZZK2E56947b";
+		}
+	}
 	private JPushClient jPushClient = new JPushClient(jpushMasterSecret,
 			jpushAppKey, 3);
 
@@ -269,6 +286,9 @@ public class UserAction extends ActionSupport {
 			String pwd = request.getParameter("password");
 			String alias = request.getParameter("alias");// 用户登录设备别名
 			String pf = request.getParameter("pf");// 当前登录的平台：iPhone、Android
+			// app版本号 1.0.1
+			String appVersion = request.getParameter("appversion");
+			String[] appversion = appVersion.split("\\.");
 			if ("".equals(loginname) || loginname == null || "".equals(pwd)
 					|| pwd == null) {
 				out.print("{\"state\":1,\"errorMsg\":\"用户名或密码不能为空\"}");
@@ -286,25 +306,36 @@ public class UserAction extends ActionSupport {
 					} else {
 						alias = "null";
 					}
-					String token = null;
-					if ("".equals(user.getRongCloudToken())
-							|| user.getRongCloudToken() == null) {
-						// 绑定用户融云token
-						SdkHttpResult result = null;
-						result = ApiHttpClient.getToken(rongCloudAppKey,
-								rongCloudSecret, String.valueOf(user.getId()),
-								user.getUsername(), user.getHeadPortrait(),
-								FormatType.json);
-						JSONObject resultJson = new JSONObject(
-								result.toString());
-						String code = resultJson.get("code").toString();
-						if ("200".equals(code)) {
-							JSONObject jsonObject = new JSONObject(resultJson
-									.get("result").toString());
-							token = jsonObject.get("token").toString();
-							user.setRongCloudToken(token);
-						}else if("403".equals(code)){
-							logger.error("测试人数已满");
+					String token = "";
+					if (Integer.parseInt(appversion[1]) > 1
+							&& Integer.parseInt(appversion[2]) >= 1) {
+						if ("".equals(user.getRongCloudToken())
+								|| user.getRongCloudToken() == null) {
+							// 绑定用户融云token
+							SdkHttpResult result = null;
+							try {
+								result = ApiHttpClient
+										.getToken(rongCloudAppKey,
+												rongCloudSecret,
+												String.valueOf(user.getId()),
+												user.getUsername(),
+												user.getHeadPortrait(),
+												FormatType.json);
+								JSONObject resultJson = new JSONObject(
+										result.toString());
+								String code = resultJson.get("code").toString();
+								if ("200".equals(code)) {
+									JSONObject jsonObject = new JSONObject(
+											resultJson.get("result").toString());
+									token = jsonObject.get("token").toString();
+									user.setRongCloudToken(token);
+								} else if ("403".equals(code)) {
+									logger.error("测试人数已满");
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+								logger.error("第三方登录获取融云token报错：" + e);
+							}
 						}
 					}
 					// 更新用户信息
@@ -381,6 +412,9 @@ public class UserAction extends ActionSupport {
 		try {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			String id = request.getParameter("currentUserId");
+			// app版本号 1.0.1
+			String appVersion = request.getParameter("appversion");
+			String[] appversion = appVersion.split("\\.");
 			if (id == null || "".equals(id) || "null".equals(id)
 					|| "0".equals(id)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
@@ -408,11 +442,22 @@ public class UserAction extends ActionSupport {
 						user.setHeadPortrait(result.download_url);
 						user.setFileid(result.fileid);
 						this.userService.updateUser(user);
-						// 刷新融云用户信息
-						ApiHttpClient.refreshUser(rongCloudAppKey,
-								rongCloudSecret, String.valueOf(user.getId()),
-								user.getUsername(), user.getHeadPortrait(),
-								FormatType.json);
+						if (Integer.parseInt(appversion[1]) > 1
+								&& Integer.parseInt(appversion[2]) >= 1) {
+							try {
+								// 刷新融云用户信息
+								ApiHttpClient
+										.refreshUser(rongCloudAppKey,
+												rongCloudSecret,
+												String.valueOf(user.getId()),
+												user.getUsername(),
+												user.getHeadPortrait(),
+												FormatType.json);
+							} catch (Exception e) {
+								e.printStackTrace();
+								logger.error("上传用户头像更新融云token报错：" + e);
+							}
+						}
 						out.print("{\"state\":0,\"result\":{\"user\":"
 								+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
 						logger.error("{\"state\":0,\"result\":{\"user\":"
@@ -460,6 +505,9 @@ public class UserAction extends ActionSupport {
 			String area = request.getParameter("area");// 地区
 			String introduction = StringUtil.encodingUrl(request
 					.getParameter("introduction"));// 个人介绍
+			// app版本号 1.0.1
+			String appVersion = request.getParameter("appversion");
+			String[] appversion = appVersion.split("\\.");
 			int age = 0;
 			if (!"".equals(ageStr) && ageStr != null) {
 				age = Integer.parseInt(ageStr);
@@ -508,11 +556,22 @@ public class UserAction extends ActionSupport {
 					// }else{
 					this.userService.updateUser(user);
 					if (!"".equals(username) && username != null) {
-						// 刷新融云用户信息
-						ApiHttpClient.refreshUser(rongCloudAppKey,
-								rongCloudSecret, String.valueOf(user.getId()),
-								user.getUsername(), user.getHeadPortrait(),
-								FormatType.json);
+						if (Integer.parseInt(appversion[1]) > 1
+								&& Integer.parseInt(appversion[2]) >= 1) {
+							try {
+								// 刷新融云用户信息
+								ApiHttpClient
+										.refreshUser(rongCloudAppKey,
+												rongCloudSecret,
+												String.valueOf(user.getId()),
+												user.getUsername(),
+												user.getHeadPortrait(),
+												FormatType.json);
+							} catch (Exception e) {
+								e.printStackTrace();
+								logger.error("第三方登录获取融云token报错：" + e);
+							}
+						}
 					}
 					out.print("{\"state\":0,\"result\":{\"user\":"
 							+ JSON.toJSON(UserUtil.getUser(user)) + "}}");
@@ -1085,30 +1144,71 @@ public class UserAction extends ActionSupport {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			request.setCharacterEncoding("utf-8");
 			String access_token = request.getParameter("token");// token
-			String thirdParty = request.getParameter("thirdParty");// 登录平台
+			String thirdParty = request.getParameter("thirdParty");// 登录平台vshow、weibo、weixin
 			String userId = request.getParameter("userId");// 第三方uid
 			String expiresIn = request.getParameter("expiresIn");// 过期时间
 			String alias = request.getParameter("alias");// 用户登录设备别名
+			String pf = request.getParameter("pf");// 平台Android、iOS
+			// app版本号 1.0.1
+			String appVersion = request.getParameter("appversion");
+			String[] appversion = appVersion.split("\\.");
 			// 验证是否已注册
 			User user = this.userService.validateThirdPartyUser(userId,
 					thirdParty);
 			if (user != null) {// 已存在用户信息
 				if (alias != null && !"".equals(alias) && !"null".equals(alias)) {
-					user.setAlias(alias);// 保存用户登录设备别名
-					this.userService.updateObject(user);
+					user.setAlias(alias);// 更新用户登录设备别名
+					user.setPf(pf);// 更新当前登录的平台：iPhone、Android
+				} else {
+					alias = "null";
+				}
+				String token = "";
+				if (Integer.parseInt(appversion[1]) > 1
+						&& Integer.parseInt(appversion[2]) >= 1) {
+					if ("".equals(user.getRongCloudToken())
+							|| user.getRongCloudToken() == null) {
+						// 绑定用户融云token
+						SdkHttpResult result = null;
+						try {
+							result = ApiHttpClient.getToken(rongCloudAppKey,
+									rongCloudSecret,
+									String.valueOf(user.getId()),
+									user.getUsername(), user.getHeadPortrait(),
+									FormatType.json);
+							JSONObject resultJson = new JSONObject(
+									result.toString());
+							String code = resultJson.get("code").toString();
+							if ("200".equals(code)) {
+								JSONObject jsonObject = new JSONObject(
+										resultJson.get("result").toString());
+								token = jsonObject.get("token").toString();
+								user.setRongCloudToken(token);
+							} else if ("403".equals(code)) {
+								logger.error("测试人数已满");
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							logger.error("第三方登录获取融云token报错：" + e);
+						}
+					}
+				}
+				// 更新用户信息
+				if (alias.equals(user.getAlias()) || pf.equals(user.getPf())
+						|| token.equals(user.getRongCloudToken())) {
+					this.userService.updateUser(user);
 				}
 				UserCookieUtil.saveCookie(user,
 						ServletActionContext.getResponse());
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
 			} else {// 先注册该用户
+				User newUser = new User();
 				if ("weibo".equals(thirdParty)) {// 新浪微博登录
 					logger.error("***********************开始***********************");
 					Users users = new Users(access_token);
 					logger.error("***********************获取Users帮助类***********************");
 					WeiboUser wbUser = users.showUserById(userId);
 					logger.error("***********************获取微博用户对象WeiBoUser***********************");
-					User newUser = new User();
 					if ("m".equals(wbUser.getGender())) {// 男
 						newUser.setGender(1);
 					} else if ("f".equals(wbUser.getGender())) {// 女
@@ -1128,6 +1228,7 @@ public class UserAction extends ActionSupport {
 					if (alias != null && !"".equals(alias)
 							&& !"null".equals(alias)) {
 						newUser.setAlias(alias);// 保存用户登录设备别名
+						newUser.setPf(pf);// 更新当前登录的平台：iPhone、Android
 					}
 					if (!"".equals(wbUser.getAvatarLarge())
 							&& wbUser.getAvatarLarge() != null) {
@@ -1140,22 +1241,9 @@ public class UserAction extends ActionSupport {
 					newUser.setUid(userId);
 					logger.error("***********************保存对象到项目中***********************");
 					this.userService.saveUser(newUser);
-					logger.error("***********************获取cookie信息***********************");
-					Cookie cookie = UserCookieUtil.saveCookie(newUser,
-							ServletActionContext.getResponse(),
-							Long.parseLong(expiresIn));
-					User user2 = UserUtil.getUser(newUser);
-					user2.setCookie(cookie.getValue());
-					logger.error("***********************返回数据***********************");
-					out.print("{\"state\":0,\"result\":{\"user\":"
-							+ JSON.toJSONString(user2) + "}}");
-					logger.error("{\"state\":0,\"result\":{\"user\":"
-							+ JSON.toJSONString(user2) + "}}");
-					logger.error("***********************结束***********************");
 				} else if ("weixin".equals(thirdParty)) {// 微信登录
 					WeiXinUser weixinUser = SnsAPI.userinfo(access_token,
 							userId, "zh_CN");
-					User newUser = new User();
 					newUser.setUsername(weixinUser.getNickname());
 					if (!"".equals(weixinUser.getHeadimgurl())
 							&& weixinUser.getHeadimgurl() != null) {
@@ -1177,19 +1265,50 @@ public class UserAction extends ActionSupport {
 					if (alias != null && !"".equals(alias)
 							&& !"null".equals(alias)) {
 						newUser.setAlias(alias);// 保存用户登录设备别名
+						newUser.setPf(pf);// 更新当前登录的平台：iPhone、Android
 					}
 					this.userService.saveUser(newUser);
-
-					Cookie cookie = UserCookieUtil.saveCookie(newUser,
-							ServletActionContext.getResponse(),
-							Long.parseLong(expiresIn));
-					User user2 = UserUtil.getUser(newUser);
-					user2.setCookie(cookie.getValue());
-					out.print("{\"state\":0,\"result\":{\"user\":"
-							+ JSON.toJSONString(user2) + "}}");
-					logger.error("{\"state\":0,\"result\":{\"user\":"
-							+ JSON.toJSONString(user2) + "}}");
 				}
+				String token = "";
+				if (Integer.parseInt(appversion[1]) > 1
+						&& Integer.parseInt(appversion[2]) >= 1) {
+					// 绑定用户融云token
+					SdkHttpResult result = null;
+					try {
+						result = ApiHttpClient.getToken(rongCloudAppKey,
+								rongCloudSecret,
+								String.valueOf(newUser.getId()),
+								newUser.getUsername(),
+								newUser.getHeadPortrait(), FormatType.json);
+						JSONObject resultJson = new JSONObject(
+								result.toString());
+						String code = resultJson.get("code").toString();
+						if ("200".equals(code)) {
+							JSONObject jsonObject = new JSONObject(resultJson
+									.get("result").toString());
+							token = jsonObject.get("token").toString();
+							newUser.setRongCloudToken(token);
+							this.photoService.updateObject(newUser);
+						} else if ("403".equals(code)) {
+							logger.error("测试人数已满");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error("第三方登录获取融云token报错：" + e);
+					}
+				}
+				logger.error("***********************获取cookie信息***********************");
+				Cookie cookie = UserCookieUtil.saveCookie(newUser,
+						ServletActionContext.getResponse(),
+						Long.parseLong(expiresIn));
+				User user2 = UserUtil.getUser(newUser);
+				user2.setCookie(cookie.getValue());
+				logger.error("***********************返回数据***********************");
+				out.print("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(user2) + "}}");
+				logger.error("{\"state\":0,\"result\":{\"user\":"
+						+ JSON.toJSONString(user2) + "}}");
+				logger.error("***********************结束***********************");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1483,23 +1602,30 @@ public class UserAction extends ActionSupport {
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				SdkHttpResult result = null;
-				result = ApiHttpClient.getToken(rongCloudAppKey,
-						rongCloudSecret, String.valueOf(user.getId()),
-						user.getUsername(), user.getHeadPortrait(),
-						FormatType.json);
-				JSONObject resultJson = new JSONObject(result.toString());
-				String code = resultJson.get("code").toString();
-				if ("200".equals(code)) {
-					JSONObject jsonObject = new JSONObject(resultJson.get(
-							"result").toString());
-					String token = jsonObject.get("token").toString();
-					out.print("{\"state\":0,\"result\":{\"state\":0,\"token\":\""
-							+ token + "\"}}");
-					logger.error("{\"state\":0,\"result\":{\"state\":0,\"token\":\""
-							+ token + "\"}}");
-				} else {
-					out.print("{\"state\":0,\"result\":{\"state\":1}}");
-					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+				try {
+					result = ApiHttpClient.getToken(rongCloudAppKey,
+							rongCloudSecret, String.valueOf(user.getId()),
+							user.getUsername(), user.getHeadPortrait(),
+							FormatType.json);
+					JSONObject resultJson = new JSONObject(result.toString());
+					String code = resultJson.get("code").toString();
+					if ("200".equals(code)) {
+						JSONObject jsonObject = new JSONObject(resultJson.get(
+								"result").toString());
+						String token = jsonObject.get("token").toString();
+						user.setRongCloudToken(token);
+						this.photoService.updateObject(user);
+						out.print("{\"state\":0,\"result\":{\"state\":0,\"token\":\""
+								+ token + "\"}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0,\"token\":\""
+								+ token + "\"}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":1}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+					}
+				} catch (Exception e) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"用户获取融云token异常\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户获取融云token异常\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -1530,21 +1656,26 @@ public class UserAction extends ActionSupport {
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
 				SdkHttpResult result = null;
-				result = ApiHttpClient.checkOnline(rongCloudAppKey,
-						rongCloudSecret, userId, FormatType.json);
-				JSONObject resultJson = new JSONObject(result.toString());
-				String code = resultJson.get("code").toString();
-				if ("200".equals(code)) {
-					JSONObject jsonObject = new JSONObject(resultJson.get(
-							"result").toString());
-					String status = jsonObject.get("status").toString();// 在线状态，1为在线，0为不在线
-					out.print("{\"state\":0,\"result\":{\"state\":0,\"status\":"
-							+ status + "}}");
-					logger.error("{\"state\":0,\"result\":{\"state\":0,\"status\":"
-							+ status + "}}");
-				} else {
-					out.print("{\"state\":0,\"result\":{\"state\":1}}");
-					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+				try {
+					result = ApiHttpClient.checkOnline(rongCloudAppKey,
+							rongCloudSecret, userId, FormatType.json);
+					JSONObject resultJson = new JSONObject(result.toString());
+					String code = resultJson.get("code").toString();
+					if ("200".equals(code)) {
+						JSONObject jsonObject = new JSONObject(resultJson.get(
+								"result").toString());
+						String status = jsonObject.get("status").toString();// 在线状态，1为在线，0为不在线
+						out.print("{\"state\":0,\"result\":{\"state\":0,\"status\":"
+								+ status + "}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0,\"status\":"
+								+ status + "}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":1}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+					}
+				} catch (Exception e) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"检查用户在线状态异常\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"检查用户在线状态异常\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -1577,18 +1708,23 @@ public class UserAction extends ActionSupport {
 				User user = userService
 						.getById(Integer.parseInt(currentUserId));
 				SdkHttpResult result = null;
-				result = ApiHttpClient.refreshUser(rongCloudAppKey,
-						rongCloudSecret, String.valueOf(user.getId()),
-						user.getUsername(), user.getHeadPortrait(),
-						FormatType.json);
-				JSONObject resultJson = new JSONObject(result.toString());
-				String code = resultJson.get("code").toString();
-				if ("200".equals(code)) {
-					out.print("{\"state\":0,\"result\":{\"state\":0}}");
-					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
-				} else {
-					out.print("{\"state\":0,\"result\":{\"state\":1}}");
-					logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+				try {
+					result = ApiHttpClient.refreshUser(rongCloudAppKey,
+							rongCloudSecret, String.valueOf(user.getId()),
+							user.getUsername(), user.getHeadPortrait(),
+							FormatType.json);
+					JSONObject resultJson = new JSONObject(result.toString());
+					String code = resultJson.get("code").toString();
+					if ("200".equals(code)) {
+						out.print("{\"state\":0,\"result\":{\"state\":0}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
+					} else {
+						out.print("{\"state\":0,\"result\":{\"state\":1}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":1}}");
+					}
+				} catch (Exception e) {
+					out.print("{\"state\":\"1\",\"errorMsg\":\"刷新融云用户异常\"}");
+					logger.error("{\"state\":\"1\",\"errorMsg\":\"刷新融云用户异常\"}");
 				}
 			}
 		} catch (Exception e) {
@@ -1703,4 +1839,5 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
+
 }

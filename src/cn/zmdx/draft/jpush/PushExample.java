@@ -12,6 +12,7 @@ import cn.jpush.api.push.model.notification.Notification;
 
 public class PushExample {
 
+	private static final boolean flag=true;
 	/**
 	 * 发送iPhone通知，可设置声音
 	 * 
@@ -41,7 +42,7 @@ public class PushExample {
 								.build())
 				.setOptions(
 						Options.newBuilder().setTimeToLive(60)
-								.setApnsProduction(false).build()).build();
+								.setApnsProduction(flag).build()).build();
 	}
 
 	/**
@@ -71,7 +72,7 @@ public class PushExample {
 								.build())
 				.setOptions(
 						Options.newBuilder().setTimeToLive(60)
-								.setApnsProduction(false).build()).build();
+								.setApnsProduction(flag).build()).build();
 	}
 	/**
 	 * 发送Android通知
@@ -101,6 +102,6 @@ public class PushExample {
 												.build()).build())
 				.setOptions(
 						Options.newBuilder().setTimeToLive(60)
-								.setApnsProduction(false).build()).build();
+								.setApnsProduction(flag).build()).build();
 	}
 }

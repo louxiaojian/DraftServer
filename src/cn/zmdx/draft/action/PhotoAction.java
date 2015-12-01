@@ -337,7 +337,7 @@ public class PhotoAction extends ActionSupport {
 			// 查询数据数量
 			String limit = request.getParameter("limit");
 			// 选秀主题周期id
-			String themeCycleId = request.getParameter("themeId");
+			String themeCycleId = request.getParameter("themeCycleId");
 			String currentUserId = request.getParameter("currentUserId");// 当前用户
 			String width = request.getParameter("w");// 缩放宽度
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
@@ -1771,7 +1771,7 @@ public class PhotoAction extends ActionSupport {
 					// 加载评论
 					Map<String, Object> filterMap = new HashMap();
 					filterMap.put("pictureSetId", id);
-					filterMap.put("limit", 20);
+					filterMap.put("limit", 10);
 					List list = this.photoService.queryComment(filterMap);
 					List commList = new ArrayList();
 					for (int i = 0; i < list.size(); i++) {

@@ -204,9 +204,9 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 		if (Integer.parseInt(String.valueOf(filterMap.get("middleNum"))) >= 1
 				|| "Android".equals(filterMap.get("pf"))) {// 1.1.0···9
 															// 版本或者Android版本
-			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,new_bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting,notice from theme_cycle order by status asc,starttime asc");
+			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,new_bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting,notice,inside_bg_url as insideBgUrl from theme_cycle order by status asc,starttime asc");
 		} else {
-			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting from theme_cycle order by status asc,starttime asc");
+			sql.append("select id,theme_title as themeTitle,tag_url as tag,starttime,endtime,status,bg_url as bgUrl,descs,detail_image_url as detailImageUrl,isNeedValidate,inside_detail_image_url as insideDetailImageUrl,descs,role,award_setting as awardSetting,inside_bg_url as insideBgUrl from theme_cycle order by status asc,starttime asc");
 		}
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())

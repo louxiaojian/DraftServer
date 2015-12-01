@@ -114,20 +114,20 @@
     z-index:1001;
 }
 .top2bottom {
-    -webkit-animation:top2bottom 1.2s ease;
-    -moz-animation:top2bottom 1.2s ease;
-    -o-animation:top2bottom 1.2s ease;
-    animation:top2bottom 1.2s ease;
+    -webkit-animation:top2bottom 0.6s ease;
+    -moz-animation:top2bottom 0.6s ease;
+    -o-animation:top2bottom 0.6s ease;
+    animation:top2bottom 0.6s ease;
     -webkit-animation-fill-mode:backwards;
     -moz-animation-fill-mode:backwards;
     -o-animation-fill-mode:backwards;
     animation-fill-mode:backwards
 }
 .animate-delay-1 {
-    -webkit-animation-delay:1s;
-    -moz-animation-delay:1s;
-    -o-animation-delay:1s;
-    animation-delay:1s
+    -webkit-animation-delay:0s;
+    -moz-animation-delay:0s;
+    -o-animation-delay:0s;
+    animation-delay:0s
 }
 @-webkit-keyframes top2bottom {
     0% {
@@ -136,7 +136,7 @@
 }
 100% {
     -webkit-transform:translateY(0px);
-    opacity:1
+    opacity:1 
 }
 }@keyframes top2bottom {
     0% {
@@ -156,7 +156,7 @@
 <div class="am-g am-g-fixed">
 <div id='popweixin' onclick="hiddenDiv()">
     <div class='tip top2bottom animate-delay-1'>
-        <img style="width: 100%" src='<%=request.getContextPath()%>/data/assets/i/90C2A7BF-9A70-4688-8CA8-4FB0163A5F2D.png'/>
+        <img style="width: 100%;" src='http://themepic-10002468.image.myqcloud.com/17f8c4a8-bb37-427b-8a1b-abb636fc0c28'/>
     </div>
 </div>
   <div class="am-u-md-9 am-u-md-push-3">
@@ -237,14 +237,14 @@
 </html>
   <script type="text/javascript">
   	function vote_pic(){
-			downloadApp();
-  		<%--if(!confirm("请下载享秀APP为Ta投票")){
+			//downloadApp();
+  		if(!confirm("请下载享秀APP为Ta投票")){
   			return false;
   		}else{
   			downloadApp();
   		}
   		
-  		//alert(${currentUser.id}+"-----"+${pictureSet.id});
+  		<%--//alert(${currentUser.id}+"-----"+${pictureSet.id});
   		var currentUserId='<%=request.getSession().getAttribute("currentUserId")%>';
   		document.getElementById("voteButton").disabled="disabled";
   		//if(('${code}'!=null&&'${code}'!=""&&'${code}'!="null")||(currentUserId!=null&&currentUserId!="null"&&currentUserId!="")){
@@ -285,12 +285,12 @@
 		document.getElementById("div1").style.display="none"
 	}
 	function downloadApp(){
-		//a();
+		a();
 		window.location.href="https://itunes.apple.com/cn/app/xiang-xiu/id1034657726?mt=8";
 	}
-	function a(){alert(11)
+	function a(){//alert(11)
 	    var ua = navigator.userAgent.toLowerCase();
-	    alert(ua);
+	    //alert(ua);
 	    if (/iphone|ipod/.test(ua)) {
 	        if(/micromessenger/.test(ua)){
 	             document.getElementById("popweixin").style.display = "block";
