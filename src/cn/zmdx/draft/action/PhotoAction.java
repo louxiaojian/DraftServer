@@ -265,6 +265,9 @@ public class PhotoAction extends ActionSupport {
 						u.setHeadPortrait(user.getHeadPortrait());
 						u.setUsername(user.getUsername());
 						ps.setUser(u);
+						//加载图集评论数
+						int comments = photoService.queryCommentByPictureSetId(ps.getId());
+						ps.setComments(comments);
 						attentedResult.add(ps);
 					}
 					out.print("{\"state\":0,\"result\":{\"photoSet\":"
@@ -2363,6 +2366,9 @@ public class PhotoAction extends ActionSupport {
 				u.setHeadPortrait(user.getHeadPortrait());
 				u.setUsername(user.getUsername());
 				ps.setUser(u);
+				//加载图集评论数
+				int comments = photoService.queryCommentByPictureSetId(ps.getId());
+				ps.setComments(comments);
 				attentedResult.add(ps);
 			}
 			out.print("{\"state\":0,\"result\":{\"attentedPhotoSet\":"

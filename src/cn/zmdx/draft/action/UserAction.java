@@ -176,6 +176,14 @@ public class UserAction extends ActionSupport {
 								newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
 								newUser.setThirdParty("vshow");// 默认本产品
 								this.userService.register(newUser, captcha);
+								
+								//默认关注官方账号
+								UserAttentionFans uaf = new UserAttentionFans();
+								uaf.setAttentionUserId(78434);
+								uaf.setFansUserId(newUser.getId());
+								uaf.setAttentionTime(new Date());
+								this.userService.attentionUser(uaf);
+								
 								out.print("{\"state\":0,\"result\":{\"state\":0}}");
 								logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 							} else {// 验证码失效

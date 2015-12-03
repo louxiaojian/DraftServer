@@ -163,9 +163,11 @@
     <div class="am-g">
 <header class="am-g my-head">
   <div class="am-u-sm-12 am-article" style="padding-left:0px;padding-right: 0px;">
+        <c:if test="${cycle.webTitleUrl!=null }">
     		<div class="am-article-title">
     			<img src="${cycle.webTitleUrl }" alt="" class="" width="100%">
     		</div>
+   		</c:if>
         <c:if test="${pictureSet!=null }">
     		<div class="vote" style="" align="center">
     			<input type="button" value="我也要参加" class="button" onclick="downloadApp()">

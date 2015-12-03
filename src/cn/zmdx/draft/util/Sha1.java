@@ -311,9 +311,9 @@ public class Sha1 {
 			// 0805949359741CE14FE90402B25E2E023F449748
 //			System.out.println(sha1.Digest("1","UTF-8"));
 			// 24E384109C1FE06E363DB1FF6C8F8DDBF18C45EA
-//			System.out.println(sha1.Digest("123456"));
-			String ssb=Sha1.SHA1Digest(sb);
-			System.out.println(ssb);
+			System.out.println(sha1.Digest("zmdx1234"));
+//			String ssb=Sha1.SHA1Digest(sb);
+//			System.out.println(ssb);
 //			System.out.println("2d0c162f1d55cb855098c4b8002be75575186f37".equalsIgnoreCase(ssb));
 //			System.out.println(sha1.Digest(sb,"UTF-8"));
 //			System.out.println(Sha1.SHA1Digest("AtQym[didR407036F3-39BF-40CD-A18E-73D23C0C68CC`currentUserIde58`pfFiPhone`tI1448624378537`appVersioncnull]AtQym}/~&^;'"));
