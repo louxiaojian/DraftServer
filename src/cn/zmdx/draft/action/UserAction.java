@@ -952,10 +952,15 @@ public class UserAction extends ActionSupport {
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				} else {
 					// 取消关注
-					this.userService.cancelAttention(fansUserId,
-							attentionUserId);
-					out.print("{\"state\":0,\"result\":{\"state\":0}}");
-					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
+					if(!"78434".equals(attentionUserId)){
+						this.userService.cancelAttention(fansUserId,
+								attentionUserId);
+						out.print("{\"state\":0,\"result\":{\"state\":0}}");
+						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
+					}else{
+						out.print("{\"state\":1,\"errorMsg\":\"不能取消关注官方账号\"}");
+						logger.error("{\"state\":1,\"errorMsg\":\"不能取消关注官方账\"}");
+					}
 				}
 			}
 		} catch (Exception e) {
