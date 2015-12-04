@@ -140,4 +140,9 @@ public class UserServiceImpl implements UserService {
 	public List loadUsers(Map<String, String> filterMap) {
 		return this.userDao.loadUsers(filterMap);
 	}
+	
+	@Override
+	public List searchUser(Map<String, String> filterMap) {
+		return this.userDao.searchUser(filterMap);
+	}
 }

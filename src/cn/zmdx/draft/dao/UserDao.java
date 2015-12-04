@@ -105,4 +105,10 @@ public interface UserDao extends BaseDao{
 	 * @return
 	 */
 	public List loadUsers(Map<String, String> filterMap);
+	/**
+	 * 搜索用户
+	 * @param filterMap
+	 * @return
+	 */
+	public List searchUser(Map<String, String> filterMap);
 }

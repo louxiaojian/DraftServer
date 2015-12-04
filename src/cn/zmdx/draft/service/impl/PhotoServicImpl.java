@@ -349,5 +349,10 @@ public class PhotoServicImpl implements PhotoService {
 		}
 		return list;
 	}
+
+	@Override
+	public List queryVotingResults(Map<String, String> filterMap) {
+		return this.photoDao.queryVotingResults(filterMap);
+	}
 	
 }

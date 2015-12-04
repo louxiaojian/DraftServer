@@ -952,15 +952,15 @@ public class UserAction extends ActionSupport {
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				} else {
 					// 取消关注
-					if(!"78434".equals(attentionUserId)){
+//					if(!"78434".equals(attentionUserId)){
 						this.userService.cancelAttention(fansUserId,
 								attentionUserId);
 						out.print("{\"state\":0,\"result\":{\"state\":0}}");
 						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
-					}else{
-						out.print("{\"state\":1,\"errorMsg\":\"不能取消关注官方账号\"}");
-						logger.error("{\"state\":1,\"errorMsg\":\"不能取消关注官方账\"}");
-					}
+//					}else{
+//						out.print("{\"state\":1,\"errorMsg\":\"不能取消关注官方账号\"}");
+//						logger.error("{\"state\":1,\"errorMsg\":\"不能取消关注官方账\"}");
+//					}
 				}
 			}
 		} catch (Exception e) {
@@ -1534,16 +1534,25 @@ public class UserAction extends ActionSupport {
 		try {
 			out = response.getWriter();
 			String userId = request.getParameter("userId");// 要查看的用户
+			String currentUserId = request.getParameter("currentUserId");// 要查看的用户
 			User user = userService.getById(Integer.parseInt(userId));
 			if (userId == null || "".equals(userId) || user == null
 					|| "null".equals(userId) || "0".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
+				// 验证是否已经关注
+				UserAttentionFans u = this.userService.isAttention(
+						currentUserId, userId);
+				if (u != null) {// 已关注
+					user.setIsAttention("1");
+				} else {// 未关注
+					user.setIsAttention("0");
+				}
 				out.print("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
+						+ JSON.toJSONString(UserUtil.getUser2(user)) + "}}");
 				logger.error("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(UserUtil.getUser(user)) + "}}");
+						+ JSON.toJSONString(UserUtil.getUser2(user)) + "}}");
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1838,6 +1847,40 @@ public class UserAction extends ActionSupport {
 				filterMap.put("lastId", lastId);
 				filterMap.put("ids", ids);
 				List userList = this.userService.loadUsers(filterMap);
+				out.print("{\"state\":0,\"result\":{\"userList\":"
+						+ JSON.toJSONString(userList, true) + "}}");
+				logger.error("{\"state\":0}");
+			}
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			logger.error("查看用户信息viewUserInfo报错：" + e);
+			e.printStackTrace();
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 搜索用户
+	 */
+	public void searchUser() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setContentType("text/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String userName = request.getParameter("userName");// 获取的id
+
+			if (userName == null || "".equals(userName) || "null".equals(userName)) {
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请输入用户昵称\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请输入用户昵称\"}");
+			} else {
+				Map<String, String> filterMap = new HashMap();
+				filterMap.put("userName", userName);
+				List userList = this.userService.searchUser(filterMap);
 				out.print("{\"state\":0,\"result\":{\"userList\":"
 						+ JSON.toJSONString(userList, true) + "}}");
 				logger.error("{\"state\":0}");

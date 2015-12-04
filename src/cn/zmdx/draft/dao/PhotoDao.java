@@ -234,4 +234,10 @@ public interface PhotoDao extends BaseDao {
 	 * @return
 	 */
 	public List loadAttentedNotify(Map<String, String> filterMap);
+	/**
+	 * 加载图集投票人员列表
+	 * @param filterMap
+	 * @return
+	 */
+	public List queryVotingResults(Map<String, String> filterMap);
 }

@@ -116,8 +116,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ "/h/"
 				+ filterMap.get("width")
 				+ "') as coverUrl,photoCount from picture_set where status =1 and userid>0 and report<10 and display=0 ");// 个人、选秀图片全部显示在照片墙
-																											// and
-																											// type=0
+		// and
+		// type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -364,8 +364,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ "/h/"
 				+ filterMap.get("width")
 				+ "') as coverUrl,rank,photoCount from rank_picture_set where status =1 and userid>0 and report<10  and display=0 ");// 个人、选秀图片全部显示在照片墙
-																														// and
-																														// type=0
+		// and
+		// type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -753,8 +753,8 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 				+ "/h/"
 				+ filterMap.get("width")
 				+ "') as coverUrl,rank,photoCount from picture_set where status =1 and userid>0 and report<10  and display=0 ");// 个人、选秀图片全部显示在照片墙
-																													// and
-																													// type=0
+		// and
+		// type=0
 		if (filterMap != null && !filterMap.isEmpty()) {
 			if (!"0".equals(filterMap.get("lastid"))
 					&& !"".equals(filterMap.get("lastid"))
@@ -977,6 +977,50 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 			query.setInteger("limit", Integer.parseInt(filterMap.get("limit")));
 		}
 		return query.list();
+	}
+
+	@Override
+	public List queryVotingResults(Map<String, String> filterMap) {
+		if (filterMap != null && !filterMap.isEmpty()) {
+			StringBuffer sql = new StringBuffer();
+			if (!"".equals(filterMap.get("pictureSetId"))
+					&& filterMap.get("pictureSetId") != null) {
+				sql.append("select u.id as id,u.id as orderId,u.username as username,u.gender as gender,u.headPortrait as headPortrait,u.introduction as introduction,u.area as area,CONVERT(count(1),SIGNED)" +
+						" as voteNum from users u left join operation_records o on informer_id=u.id where o.operation_type=3 and o.picture_set_id=:pictureSetId ");
+				if (!"".equals(filterMap.get("lastId"))
+						&& filterMap.get("lastId") != null
+						&& !"0".equals(filterMap.get("lastId"))) {
+					sql.append(" and u.id<:lastId ");
+				}
+				sql.append(" group by o.informer_id order by u.id desc");
+				if (!"".equals(filterMap.get("limit"))
+						&& filterMap.get("limit") != null) {
+					sql.append(" limit :limit");
+				}
+			}
+			// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
+			Query query = getSession().createSQLQuery(sql.toString())
+					.setResultTransformer(Transformers.aliasToBean(User.class));
+			if (!"".equals(filterMap.get("pictureSetId"))
+					&& filterMap.get("pictureSetId") != null) {
+				query.setInteger("pictureSetId",
+						Integer.parseInt(filterMap.get("pictureSetId")));
+			}
+			if (!"".equals(filterMap.get("lastId"))
+					&& filterMap.get("lastId") != null
+					&& !"0".equals(filterMap.get("lastId"))) {
+				query.setInteger("lastId",
+						Integer.parseInt(filterMap.get("lastId")));
+			}
+			if (!"".equals(filterMap.get("limit"))
+					&& filterMap.get("limit") != null) {
+				query.setInteger("limit",
+						Integer.parseInt(filterMap.get("limit")));
+			}
+			return query.list();
+		} else {
+			return null;
+		}
 	}
 
 }

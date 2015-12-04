@@ -31,7 +31,7 @@ public class User {
 	private String pf;//当前登录的平台：iPhone、Android
 	private String rongCloudToken;//融云用户token
 	private int orderId;//排序id
-	
+	private Object voteNum;
 	//选秀排名所用
 	private int praise;//赞
 	private int votes;//投票
@@ -215,6 +215,12 @@ public class User {
 	}
 	public void setRongCloudToken(String rongCloudToken) {
 		this.rongCloudToken = rongCloudToken;
+	}
+	public Object getVoteNum() {
+		return voteNum;
+	}
+	public void setVoteNum(Object voteNum) {
+		this.voteNum = voteNum;
 	}
 	
 }

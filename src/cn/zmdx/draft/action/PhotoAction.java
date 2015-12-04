@@ -27,6 +27,7 @@ import cn.zmdx.draft.entity.Photo;
 import cn.zmdx.draft.entity.PictureSet;
 import cn.zmdx.draft.entity.RankPictureSet;
 import cn.zmdx.draft.entity.User;
+import cn.zmdx.draft.entity.UserAttentionFans;
 import cn.zmdx.draft.jpush.PushExample;
 import cn.zmdx.draft.service.PhotoService;
 import cn.zmdx.draft.service.impl.UserServiceImpl;
@@ -123,6 +124,14 @@ public class PhotoAction extends ActionSupport {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"查看的用户不存在\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"查看的用户不存在\"}");
 			} else {
+				UserAttentionFans u = this.userService.isAttention(
+						currentUserId, userid);
+				String isAttention="0";
+				if (u != null) {// 已关注
+					isAttention="1";
+				} else {// 未关注
+					isAttention="0";
+				}
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("limit", limit);
 				filterMap.put("lastid", lastid);
@@ -153,7 +162,7 @@ public class PhotoAction extends ActionSupport {
 				// }
 
 				out.print("{\"state\":0,\"result\":{\"photoSet\":"
-						+ JSON.toJSONString(list, true) + "}}");
+						+ JSON.toJSONString(list, true) + ",\"isAttention\":"+isAttention+"}}");
 				logger.error("{\"state\":0}");
 			}
 		} catch (Exception e) {
@@ -2498,6 +2507,58 @@ public class PhotoAction extends ActionSupport {
 					+ "\",\"errorMsg\":\"系统异常\"}");
 			e.printStackTrace();
 			logger.error("加载最新、最热图集照片墙queryPhotosWall报错：" + e);
+		} finally {
+			out.flush();
+			out.close();
+		}
+	}
+	
+	/**
+	 * 加载图集投票人员列表
+	 */
+	public void loadVotingResults() {
+		ServletActionContext.getResponse().setContentType(
+				"text/json; charset=utf-8");
+		// ServletActionContext.getResponse().setHeader("Cache-Control",
+		// "max-age=300");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		PrintWriter out = null;
+		try {
+			out = ServletActionContext.getResponse().getWriter();
+			// app版本号 1.0.1
+			String appversion = request.getParameter("appversion");
+			// 平台 iPhone Android
+			String pf = request.getParameter("pf");
+			// lastid
+			String lastId = request.getParameter("lastId");
+			// 查询数据数量
+			String limit = request.getParameter("limit");
+			// 标示，0查询lastModified之后的数据，1查询lastModified之前的数据
+			String currentUserId = request.getParameter("currentUserId");// 当前用户
+			String pictureSetId = request.getParameter("pictureSetId");// 图集id
+			String width = request.getParameter("w");// 缩放宽度
+			if ("".equals(limit) || limit == null || "0".equals(limit)) {
+				limit = "15";
+			}
+			if ("".equals(lastId) || lastId == null) {
+				lastId = "0";
+			}
+
+			Map<String, String> filterMap = new HashMap();
+			filterMap.put("limit", limit);
+			filterMap.put("lastId", lastId);
+			filterMap.put("width", width);
+			filterMap.put("pictureSetId", pictureSetId);
+			List list = photoService.queryVotingResults(filterMap);
+			
+			out.print("{\"state\":0,\"result\":{\"userList\":"
+					+ JSON.toJSONString(list, true) + "}}");
+			logger.error("{\"state\":0}");
+		} catch (Exception e) {
+			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
+					+ "\",\"errorMsg\":\"系统异常\"}");
+			e.printStackTrace();
+			logger.error("加载图集投票人员列表loadVotingResults报错：" + e);
 		} finally {
 			out.flush();
 			out.close();
