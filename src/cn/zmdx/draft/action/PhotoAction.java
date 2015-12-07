@@ -124,13 +124,15 @@ public class PhotoAction extends ActionSupport {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"查看的用户不存在\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"查看的用户不存在\"}");
 			} else {
-				UserAttentionFans u = this.userService.isAttention(
-						currentUserId, userid);
 				String isAttention="0";
-				if (u != null) {// 已关注
-					isAttention="1";
-				} else {// 未关注
-					isAttention="0";
+				if(!currentUserId.equals(userid)){
+					UserAttentionFans u = this.userService.isAttention(
+							currentUserId, userid);
+					if (u != null) {// 已关注
+						isAttention="1";
+					} else {// 未关注
+						isAttention="0";
+					}
 				}
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("limit", limit);

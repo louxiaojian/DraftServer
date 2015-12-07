@@ -176,14 +176,14 @@ public class UserAction extends ActionSupport {
 								newUser.setHeadPortrait("http://headpic-10002468.image.myqcloud.com/d4fa3046-b2dc-49d1-9cf6-62d3c7fc9bc0");
 								newUser.setThirdParty("vshow");// 默认本产品
 								this.userService.register(newUser, captcha);
-								
-								//默认关注官方账号
+
+								// 默认关注官方账号
 								UserAttentionFans uaf = new UserAttentionFans();
 								uaf.setAttentionUserId(78434);
 								uaf.setFansUserId(newUser.getId());
 								uaf.setAttentionTime(new Date());
 								this.userService.attentionUser(uaf);
-								
+
 								out.print("{\"state\":0,\"result\":{\"state\":0}}");
 								logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 							} else {// 验证码失效
@@ -507,10 +507,10 @@ public class UserAction extends ActionSupport {
 			String address = StringUtil.encodingUrl(request
 					.getParameter("address"));// 地址
 			String telephone = request.getParameter("telephone");// 联系电话
-			String name = request.getParameter("name");// 真实姓名
+			String name = StringUtil.encodingUrl(request.getParameter("name"));// 真实姓名
 			String ageStr = request.getParameter("age");// 年龄
 			String gender = request.getParameter("gender");// 性别
-			String area = request.getParameter("area");// 地区
+			String area = StringUtil.encodingUrl(request.getParameter("area"));// 地区
 			String introduction = StringUtil.encodingUrl(request
 					.getParameter("introduction"));// 个人介绍
 			// app版本号 1.0.1
@@ -704,7 +704,9 @@ public class UserAction extends ActionSupport {
 				List attentionList = userService.queryAttentions(filterMap1);
 				// 获取要查看的用户的粉丝
 				Map<String, String> filterMap2 = new HashMap();
-				// filterMap2.put("limit", "20");
+				if("78434".equals(userId)){
+					filterMap2.put("limit", "30");
+				}
 				if (userId != null && !"".equals(userId)) {
 					filterMap2.put("attentionUserId", userId);
 				}
@@ -952,15 +954,15 @@ public class UserAction extends ActionSupport {
 					logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				} else {
 					// 取消关注
-//					if(!"78434".equals(attentionUserId)){
-						this.userService.cancelAttention(fansUserId,
-								attentionUserId);
-						out.print("{\"state\":0,\"result\":{\"state\":0}}");
-						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
-//					}else{
-//						out.print("{\"state\":1,\"errorMsg\":\"不能取消关注官方账号\"}");
-//						logger.error("{\"state\":1,\"errorMsg\":\"不能取消关注官方账\"}");
-//					}
+					// if(!"78434".equals(attentionUserId)){
+					this.userService.cancelAttention(fansUserId,
+							attentionUserId);
+					out.print("{\"state\":0,\"result\":{\"state\":0}}");
+					logger.error("{\"state\":0,\"result\":{\"state\":0}}");
+					// }else{
+					// out.print("{\"state\":1,\"errorMsg\":\"不能取消关注官方账号\"}");
+					// logger.error("{\"state\":1,\"errorMsg\":\"不能取消关注官方账\"}");
+					// }
 				}
 			}
 		} catch (Exception e) {
@@ -1541,13 +1543,15 @@ public class UserAction extends ActionSupport {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"用户不存在\"}");
 			} else {
-				// 验证是否已经关注
-				UserAttentionFans u = this.userService.isAttention(
-						currentUserId, userId);
-				if (u != null) {// 已关注
-					user.setIsAttention("1");
-				} else {// 未关注
-					user.setIsAttention("0");
+				if (!currentUserId.equals(userId)) {
+					// 验证是否已经关注
+					UserAttentionFans u = this.userService.isAttention(
+							currentUserId, userId);
+					if (u != null) {// 已关注
+						user.setIsAttention("1");
+					} else {// 未关注
+						user.setIsAttention("0");
+					}
 				}
 				out.print("{\"state\":0,\"result\":{\"user\":"
 						+ JSON.toJSONString(UserUtil.getUser2(user)) + "}}");
@@ -1861,7 +1865,7 @@ public class UserAction extends ActionSupport {
 			out.close();
 		}
 	}
-	
+
 	/**
 	 * 搜索用户
 	 */
@@ -1872,9 +1876,10 @@ public class UserAction extends ActionSupport {
 		PrintWriter out = null;
 		try {
 			out = response.getWriter();
-			String userName = request.getParameter("userName");// 获取的id
+			String userName = StringUtil.encodingUrl(request.getParameter("userName"));// 用户昵称
 
-			if (userName == null || "".equals(userName) || "null".equals(userName)) {
+			if (userName == null || "".equals(userName)
+					|| "null".equals(userName)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请输入用户昵称\"}");
 				logger.error("{\"state\":\"1\",\"errorMsg\":\"请输入用户昵称\"}");
 			} else {
@@ -1888,7 +1893,7 @@ public class UserAction extends ActionSupport {
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
 					+ "\",\"errorMsg\":\"系统异常\"}");
-			logger.error("查看用户信息viewUserInfo报错：" + e);
+			logger.error("搜索用户searchUser报错：" + e);
 			e.printStackTrace();
 		} finally {
 			out.flush();

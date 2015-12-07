@@ -264,7 +264,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				&& filterMap.get("userName") != null) {
 			StringBuffer sql = new StringBuffer(
 					"select id,username,headPortrait from users where 1=1 ");
-			sql.append(" and username like :userName");
+			sql.append(" and username like :userName limit 20");
 			Query query = getSession().createSQLQuery(sql.toString())
 					.setResultTransformer(
 							Transformers.aliasToBean(User.class));
