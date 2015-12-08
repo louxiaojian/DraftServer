@@ -6,6 +6,7 @@ import java.util.Map;
 
 import cn.zmdx.draft.entity.Comment;
 import cn.zmdx.draft.entity.Photo;
+import cn.zmdx.draft.entity.User;
 
 public interface PhotoService {
 	/**
@@ -133,7 +134,7 @@ public interface PhotoService {
 	 * @param photo
 	 * @param userId
 	 */
-	public void realityVerification(Photo photo, String userId);
+	public void realityVerification(Photo photo, User user);
 	/**
 	 * 加载审批记录
 	 * @author louxiaojian

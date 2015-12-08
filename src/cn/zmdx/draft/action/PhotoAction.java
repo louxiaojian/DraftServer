@@ -647,6 +647,12 @@ public class PhotoAction extends ActionSupport {
 		try {
 			out = ServletActionContext.getResponse().getWriter();
 			String userId = request.getParameter("currentUserId");
+			String username = request.getParameter("username");
+			String address = request.getParameter("address");
+			String telephone = request.getParameter("telephone");
+			username=StringUtil.encodingUrl(username);
+			address=StringUtil.encodingUrl(address);
+			telephone=StringUtil.encodingUrl(telephone);
 			if (userId == null || "".equals(userId) || "null".equals(userId)
 					|| "0".equals(userId)) {
 				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
@@ -664,6 +670,12 @@ public class PhotoAction extends ActionSupport {
 						out.print("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 						logger.error("{\"state\":\"1\",\"errorMsg\":\"上传失败，请重试\"}");
 					} else {
+						User user=(User)this.photoService.getObjectById(User.class, userId);
+						user.setName(username);
+						user.setAddress(address);
+						user.setTelephone(telephone);
+						user.setIsvalidate("3");//待审核
+						user.setValidateUrl(result.download_url);//真人验证图片地址
 						// 图片链接
 						Photo photo = new Photo();
 						photo.setPhotoUrl(result.download_url);
@@ -672,8 +684,8 @@ public class PhotoAction extends ActionSupport {
 						photo.setPictureSetId(0);
 						photo.setType(1);// 图集
 						photo.setFileid(result.fileid);
-						this.photoService.realityVerification(photo, userId);
-						out.print("{\"state\":0,\"result\":{\"state\":0}}");
+						this.photoService.realityVerification(photo, user);
+						out.print("{\"state\":0,\"result\":{\"state\":0,\"user\":"+JSON.toJSON(UserUtil.getUser(user))+"}}");
 						logger.error("{\"state\":0,\"result\":{\"state\":0}}");
 					}
 				} else {

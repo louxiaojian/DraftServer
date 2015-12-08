@@ -187,10 +187,7 @@ public class PhotoServicImpl implements PhotoService {
 	}
 
 	@Override
-	public void realityVerification(Photo photo, String userId) {
-		User user=(User)this.photoDao.getEntity(User.class, Integer.parseInt(userId));
-		user.setIsvalidate("3");//待审核
-		user.setValidateUrl(photo.getPhotoUrl());//真人验证图片地址
+	public void realityVerification(Photo photo, User user) {
 		this.photoDao.updateEntity(user);
 		this.photoDao.saveEntity(photo);
 	}
