@@ -242,7 +242,7 @@ public class PhotoDaoImpl extends HibernateDaoSupport implements PhotoDao {
 	@Override
 	public List validateIsAttend(Map<String, Object> filterMap) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("SELECT ps.id from cycle_photo_set cp LEFT join picture_set ps on cp.photo_set_id =ps.id where cp.theme_cycle_id=? and ps.userid=? ");
+		sql.append("SELECT ps.id from cycle_photo_set cp LEFT join picture_set ps on cp.photo_set_id =ps.id where cp.theme_cycle_id=? and ps.userid=? and ps.display=0");
 
 		// 将返回结果映射到具体的类。可以是实体类，也可以是普通的pojo类
 		Query query = getSession().createSQLQuery(sql.toString())
