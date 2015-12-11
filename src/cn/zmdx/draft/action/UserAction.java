@@ -989,17 +989,18 @@ public class UserAction extends ActionSupport {
 		response.setContentType("text/json; charset=utf-8");
 		PrintWriter out = response.getWriter();
 		try {
-			String fansUserId = request.getParameter("currentUserId");
+			String fansUserId = request.getParameter("userId");
 			// lastModified
 			String lastid = request.getParameter("lastId");
 			String limit = request.getParameter("limit");
+			String pf = request.getParameter("pf");
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "20";
 			}
 			if (fansUserId == null || "".equals(fansUserId)
 					|| "null".equals(fansUserId) || "0".equals(fansUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
-				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请选择查看用户\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请选择查看用户\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				if (fansUserId != null && !"".equals(fansUserId)) {
@@ -1008,10 +1009,17 @@ public class UserAction extends ActionSupport {
 				filterMap.put("lastid", lastid);
 				filterMap.put("limit", limit);
 				List list = userService.queryAttentions(filterMap);
-				out.print("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(list, true) + "}}");
-				logger.error("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(list, true) + "}}");
+				if("iPhone".equals(pf)){
+					out.print("{\"state\":0,\"result\":{\"attentionUserList\":"
+							+ JSON.toJSONString(list, true) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"attentionUserList\":"
+							+ JSON.toJSONString(list, true) + "}}");
+				}else{
+					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(list, true) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(list, true) + "}}");
+				}
 			}
 		} catch (Exception e) {
 			out.print("{\"state\":\"2\",\"errorCode\":\"" + e.getMessage()
@@ -1037,18 +1045,19 @@ public class UserAction extends ActionSupport {
 		response.setContentType("text/json; charset=utf-8");
 		PrintWriter out = response.getWriter();
 		try {
-			String attentionUserId = request.getParameter("currentUserId");
+			String attentionUserId = request.getParameter("userId");
 			// lastModified
 			String lastid = request.getParameter("lastId");
 			String limit = request.getParameter("limit");
+			String pf = request.getParameter("pf");
 			if ("".equals(limit) || limit == null || "0".equals(limit)) {
 				limit = "20";
 			}
 			if (attentionUserId == null || "".equals(attentionUserId)
 					|| "null".equals(attentionUserId)
 					|| "0".equals(attentionUserId)) {
-				out.print("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
-				logger.error("{\"state\":\"1\",\"errorMsg\":\"请重新登录\"}");
+				out.print("{\"state\":\"1\",\"errorMsg\":\"请选择查看用户\"}");
+				logger.error("{\"state\":\"1\",\"errorMsg\":\"请选择查看用户\"}");
 			} else {
 				Map<String, String> filterMap = new HashMap();
 				filterMap.put("lastid", lastid);
@@ -1057,10 +1066,17 @@ public class UserAction extends ActionSupport {
 				}
 				filterMap.put("limit", limit);
 				List list = userService.queryFans(filterMap);
-				out.print("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(list, true) + "}}");
-				logger.error("{\"state\":0,\"result\":{\"user\":"
-						+ JSON.toJSONString(list, true) + "}}");
+				if("iPhone".equals(pf)){
+					out.print("{\"state\":0,\"result\":{\"fansUserList\":"
+							+ JSON.toJSONString(list, true) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"fansUserList\":"
+							+ JSON.toJSONString(list, true) + "}}");
+				}else{
+					out.print("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(list, true) + "}}");
+					logger.error("{\"state\":0,\"result\":{\"user\":"
+							+ JSON.toJSONString(list, true) + "}}");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

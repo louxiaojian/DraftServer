@@ -131,7 +131,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				sql.append(" and uaf.id < :lastid");
 			}
 		}
-		sql.append(" group by u.id order by uaf.attention_time desc ");
+		sql.append(" group by u.id order by uaf.id desc ");
 		if (!"0".equals(filterMap.get("limit"))
 				&& !"".equals(filterMap.get("limit"))
 				&& filterMap.get("limit") != null) {
@@ -173,7 +173,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				sql.append(" and uaf.id < :lastid");
 			}
 		}
-		sql.append(" group by u.id order by uaf.attention_time desc");
+		sql.append(" group by u.id order by uaf.id desc");
 		if (!"0".equals(filterMap.get("limit"))
 				&& !"".equals(filterMap.get("limit"))
 				&& filterMap.get("limit") != null) {
@@ -263,7 +263,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		if (!"".equals(filterMap.get("userName"))
 				&& filterMap.get("userName") != null) {
 			StringBuffer sql = new StringBuffer(
-					"select id,username,headPortrait from users where 1=1 ");
+					"select u.id,u.age,u.gender,u.username,u.headPortrait,u.introduction,u.area from users u where 1=1 ");
 			sql.append(" and username like :userName limit 20");
 			Query query = getSession().createSQLQuery(sql.toString())
 					.setResultTransformer(
